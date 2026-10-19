@@ -1,4 +1,4 @@
-/* 1.1.0 preserves the 1.0.8 single-focus contract. CSS only; no state emulation.
+/* Single-focus contract. CSS only; no state emulation.
  * !important is limited to focus ownership/known host halos, not palette or elevation.
  * Native chrome and independent documents are explicitly outside this adapter. */
 __SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: #c6613f; }

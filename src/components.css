@@ -1,4 +1,4 @@
-/* Visual candidate based on released 1.1.0.
+/* Claude Theme components.
  * Preserve native chrome, pane widths, scroll pinning, content-visibility,
  * and inline drag/position measurements. */
 __SCOPE__ {
@@ -121,7 +121,7 @@ __SCOPE__ .composer-model-thinking-chip { border-radius: 999px; min-height: 28px
 __SCOPE__ :is(.composer-chip, .chat-file-chip, .chat-image-chip, .message-attachment) { border-radius: 10px; }
 __SCOPE__ :is(.chat-file-chip, .message-attachment) { border-color: var(--ds-border-default); background: var(--ds-tile); }
 
-/* Primary actions stay neutral; Composer send alone follows the screenshot sample. */
+/* Primary actions stay neutral; Composer send uses the accent color. */
 __SCOPE__ .btn {
   min-height: 32px; padding: 5px 14px; border-radius: 8px;
   font-size: var(--at-cds-ui-size); font-weight: 400; line-height: var(--at-cds-ui-leading);

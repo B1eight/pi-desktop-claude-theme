@@ -1,4 +1,4 @@
-/* BEGIN repair-settings (visual candidate): shared host settings language in BOTH modes.
+/* BEGIN block-settings: shared host settings language in both modes.
  * Surface-only exceptions for complex lists are below. Keep host grids, editors,
  * positioning, scrolling, menu portals, data and interaction state intact. */
 __SCOPE__ .settings-shell { --ds-raised: var(--at-cds-surface); --ds-raised-shadow: none; --ds-tile: var(--ds-bg-elevated-opaque); --ds-tile-hover: var(--at-cds-row-even); }
@@ -49,5 +49,5 @@ __SCOPE__ .settings-shell :is(.projects-search-wrap, .agent-capability-search-wr
 __SCOPE__ .settings-shell :is(.model-provider-row-name, .settings-remote-host-name) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: 600; }
 __SCOPE__ .settings-shell :is(.model-provider-row-meta, .model-provider-row-account, .settings-remote-host-meta) { color: var(--ds-text-secondary); font-size: calc(13px * var(--font-scale, 1)); line-height: var(--at-cds-ui-leading); }
 __SCOPE__ .settings-shell :is(.agent-capability-toolbar, .projects-toolbar, .settings-card-heading-row) { flex-wrap: wrap; gap: 12px 16px; }
-/* Input and composite focus are owned by shared global-controls.css (1.0.7). */
-/* END repair-settings */
+/* Input and composite focus are owned by shared global-controls.css. */
+/* END block-settings */

@@ -22,7 +22,7 @@
 
 `npm test` 检查变换边界与阶段等价；`npm run verify` 检查身份、权限、字体和生成产物；`npm run check:roles` 检查颜色角色。
 
-浏览器检查使用本项目合成场景，比较全部规则的 CSSOM 及代表场景计算样式，不依赖历史包或宿主源码。输出必须是项目外的新目录：
+浏览器检查使用本项目合成场景，比较全部规则的 CSSOM 及代表场景计算样式。输出必须是项目外的新目录：
 
 ```sh
 node scripts/check-css-equivalence.mjs --output-dir <external-new-directory>

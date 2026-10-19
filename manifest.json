@@ -3,7 +3,7 @@
   "id": "io.github.b1eight.pi-desktop-claude-theme",
   "name": "Claude Theme",
   "version": "1.0.0",
-  "description": "非官方 Claude 风格纯声明式主题。保留原生过程结构与 thinking 排版，无聚合过程外壳；提供浅色与深色主题。",
+  "description": "非官方 Claude 风格纯声明式主题，提供浅色与深色两套配色。",
   "author": "B1eight",
   "license": "MIT",
   "main": "main.js",
@@ -32,11 +32,11 @@
       }
     ]
   },
-  "safetyNotes": "纯声明式主题，仅 ui.theme。空生命周期；不注入脚本、不访问网络、不注册工具、不更改宿主行为或旧版插件。宿主读取包内 CSS 和 OFL 字体。切换主题即可恢复；不含 Anthropic 专有资产。",
+  "safetyNotes": "纯声明式主题，仅 ui.theme。空生命周期；不注入脚本、不访问网络、不注册工具、不更改宿主或其他插件行为。宿主读取包内 CSS 和 OFL 字体。切换主题即可恢复；不含 Anthropic 专有资产。",
   "i18n": {
     "en": {
       "name": "Claude Theme",
-      "description": "Unofficial Claude-inspired declarative light and dark themes. Native process structure and original thinking typography are preserved without an aggregate process shell.",
+      "description": "Unofficial Claude-inspired declarative light and dark themes for PI-Desktop.",
       "safetyNotes": "Declarative themes only; ui.theme is the only permission. No runtime behavior, network, tools or changes to other plugins. The host loads packaged CSS and OFL fonts. Switch themes to revert. No proprietary Anthropic assets."
     }
   }
