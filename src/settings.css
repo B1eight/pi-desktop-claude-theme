@@ -1,0 +1,53 @@
+/* BEGIN repair-settings (visual candidate): shared host settings language in BOTH modes.
+ * Surface-only exceptions for complex lists are below. Keep host grids, editors,
+ * positioning, scrolling, menu portals, data and interaction state intact. */
+__SCOPE__ .settings-shell { --ds-raised: var(--at-cds-surface); --ds-raised-shadow: none; --ds-tile: var(--ds-bg-elevated-opaque); --ds-tile-hover: var(--at-cds-row-even); }
+__SCOPE__ .settings-shell .settings-nav { background: var(--ds-settings-rail-bg); }
+__SCOPE__ .settings-shell .settings-content-inner { width: 100%; max-width: 880px; margin-inline: auto; }
+__SCOPE__ .settings-shell .settings-section-title { font-size: calc(22px * var(--font-scale, 1)); line-height: calc(28px * var(--font-scale, 1)); font-weight: 600; margin-bottom: 20px; }
+__SCOPE__ .settings-shell .settings-card-heading { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: 600; }
+__SCOPE__ .settings-shell .settings-row-title { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: 400; }
+__SCOPE__ .settings-shell .settings-row-detail { font-size: calc(13px * var(--font-scale, 1)); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .settings-shell .settings-search { border-radius: 8px; }
+__SCOPE__ .settings-shell .settings-panel:has(> .settings-row) { background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); border-radius: 12px; overflow: visible; }
+__SCOPE__ .settings-shell .settings-panel:has(> .settings-row):not(:has(> :not(.settings-row))) { gap: 0; background: transparent; border: 0; border-radius: 0; }
+__SCOPE__ .settings-shell .settings-panel > .settings-row { background: transparent; border-radius: 8px; padding: 14px 16px; gap: 12px 24px; flex-wrap: wrap; }
+__SCOPE__ .settings-shell .settings-panel:not(:has(> :not(.settings-row))) > .settings-row { padding-inline: 12px; }
+__SCOPE__ .settings-shell .settings-panel > .settings-row + .settings-row { border-top: 1px solid var(--at-cds-divider); }
+__SCOPE__ .settings-shell .settings-panel > .settings-row > .settings-row-copy { flex: 1 1 160px; overflow-wrap: anywhere; }
+__SCOPE__ .settings-shell .settings-panel > .settings-row > .settings-row-control { flex: 0 1 auto; max-width: 100%; flex-wrap: wrap; gap: 8px; }
+__SCOPE__ .settings-shell :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select, .field-input, .field-select, .field-textarea) { border-radius: 8px; border: 1px solid var(--at-cds-border); background: var(--at-cds-surface); box-shadow: none; font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .settings-shell :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select, .field-input, .field-select) { min-height: calc(32px * var(--font-scale, 1)); }
+__SCOPE__ .settings-shell :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select):hover:not(:disabled) { background: var(--ds-bg-hover); }
+/* Ordinary preference triggers are text+chevron; full-width configuration remains a field. */
+__SCOPE__ .settings-shell .settings-row-control :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select) { background: transparent; border-color: transparent; }
+__SCOPE__ .settings-shell .settings-row-control :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select):is(:hover, [aria-expanded="true"]):not(:disabled) { background: var(--ds-bg-hover); }
+__SCOPE__ .settings-shell :is(.field-input, .field-select, .field-textarea):focus { background: var(--ds-bg-elevated-opaque); }
+__SCOPE__ .settings-shell [aria-invalid="true"] { border-color: var(--ds-error); }
+__SCOPE__ .settings-shell :is(.settings-menu-select-trigger, .field-input, .field-select, .field-textarea):disabled { opacity: .55; }
+__SCOPE__ .settings-shell .settings-segment { border-radius: 8px; max-width: 100%; flex-wrap: wrap; }
+__SCOPE__ .settings-shell .settings-segment-item { border-radius: 6px; white-space: normal; overflow-wrap: anywhere; min-width: 0; padding: 4px 10px; font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .settings-shell .settings-font-size { min-width: 0; max-width: 100%; }
+__SCOPE__ :is(.settings-theme-menu, .settings-language-menu, .settings-font-menu, .settings-menu-select-menu) { border-radius: 12px; background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-model-menu); }
+__SCOPE__ :is(.settings-theme-option, .settings-language-option) { border-radius: 8px; }
+@media (max-width: 900px) { __SCOPE__ .settings-shell .settings-content { padding-inline: 16px; } }
+__SCOPE__ .settings-shell .settings-content-inner:has(:is(.model-provider-panel, .agent-capability-panel, .agent-subagents-page, .shortcut-map, .projects-workbench, .settings-config-sync, .settings-remote-host-list, .settings-instruction-editor)) { max-width: 1120px; }
+__SCOPE__ .settings-shell :is(.settings-remote-host-empty, .projects-empty, .about-update-panel, .settings-panel:has(.settings-instruction-editor), .settings-panel:has(.settings-config-sync-form)) { border: 1px solid var(--at-cds-border); border-radius: 12px; }
+/* Real capability rows: icon/copy/meta/actions remain host-owned, not settings-row substitutes. */
+__SCOPE__ .settings-shell :is(.agent-capability-list, .model-provider-list, .settings-remote-host-list, .shortcut-group) { gap: 0; }
+__SCOPE__ .settings-shell .agent-capability-group { margin-block: 16px 6px; }
+__SCOPE__ .settings-shell .agent-capability-group:first-child { margin-top: 0; }
+/* Rows own rounded interaction backgrounds and content gutters; never clip menus/focus. */
+__SCOPE__ .settings-shell :is(.agent-capability-row, .model-provider-row, .shortcut-row, .settings-remote-host-card) { background: transparent; border: 0; border-bottom: 1px solid var(--at-cds-divider); border-radius: 8px; padding: 14px 12px; }
+__SCOPE__ .settings-shell :is(.agent-capability-row, .model-provider-row, .shortcut-row, .settings-remote-host-card):is(:hover, .menu-open) { background: var(--ds-bg-hover); }
+__SCOPE__ .settings-shell .agent-capability-name { color: var(--ds-text-primary); font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: 600; }
+__SCOPE__ .settings-shell .agent-capability-description { color: var(--ds-text-secondary); font-size: calc(13px * var(--font-scale, 1)); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .settings-shell :is(.agent-capability-command, .agent-capability-meta code) { color: var(--ds-text-muted); }
+__SCOPE__ .settings-shell .agent-capability-badge:not(.is-status):not(.is-ready):not(.is-failed):not(.is-connecting) { color: var(--ds-text-secondary); background: var(--ds-bg-chip); }
+__SCOPE__ .settings-shell :is(.projects-row, .shortcut-recorder, .projects-search-wrap, .agent-capability-search-wrap) { border-radius: 8px; }
+__SCOPE__ .settings-shell :is(.projects-search-wrap, .agent-capability-search-wrap) { border: 1px solid var(--at-cds-border); box-shadow: none; }
+__SCOPE__ .settings-shell :is(.model-provider-row-name, .settings-remote-host-name) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: 600; }
+__SCOPE__ .settings-shell :is(.model-provider-row-meta, .model-provider-row-account, .settings-remote-host-meta) { color: var(--ds-text-secondary); font-size: calc(13px * var(--font-scale, 1)); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .settings-shell :is(.agent-capability-toolbar, .projects-toolbar, .settings-card-heading-row) { flex-wrap: wrap; gap: 12px 16px; }
+/* Input and composite focus are owned by shared global-controls.css (1.0.7). */
+/* END repair-settings */

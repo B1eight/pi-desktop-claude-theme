@@ -1,0 +1,76 @@
+/* 1.1.0 preserves the 1.0.8 single-focus contract. CSS only; no state emulation.
+ * !important is limited to focus ownership/known host halos, not palette or elevation.
+ * Native chrome and independent documents are explicitly outside this adapter. */
+__SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: #c6613f; }
+__SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn)):not(:disabled) {
+  outline: 2px solid var(--at-cds-focus-ink) !important; outline-offset: 2px !important;
+  scroll-margin: 6px;
+}
+/* Text fields: one inset perimeter; native non-text controls keep their own focus. */
+__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error):not(.is-invalid)) {
+  border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer);
+}
+__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):focus:not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error):not(.is-invalid)) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px;
+}
+/* Remove only actual focus-shadow consumers; NOT all focused buttons/cards.
+ * Segment/preset selected shadows, idle elevation and recorder recording state survive. */
+__SCOPE__ :is(.settings-toggle, .settings-icon-button, .agent-capability-segment-btn, .projects-sort-btn, .projects-workbench, .projects-row, .projects-detail-task, .project-create-dialog-source-option, .project-create-dialog-location, .import-group-toggle, .provider-service-chip-change, .service-chooser-empty-action, .provider-models-reload, .service-chooser-tile, .plugins-header-menu, .run-activity-retry-reason):focus-visible,
+__SCOPE__ .plugins-shortcut-recorder:focus-visible:not(.recording) { box-shadow: none !important; }
+__SCOPE__ :is(.import-row, .import-group-checkbox):has(input:focus-visible),
+__SCOPE__ .chat-width-handle:focus-visible::before { box-shadow: none !important; }
+
+/* Real icon+input composite boundaries. :focus-within is intentionally NOT ownership:
+ * clear/tool buttons have their own frame, not a second outer one. */
+__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):not([aria-invalid="true"]):not(.error):not(.is-invalid) { border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer); box-shadow: var(--at-cds-field-idle, none) !important; }
+__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):has(> :is(input, .message-edit-input):focus:not([readonly]):not([aria-invalid="true"])):not([aria-invalid="true"]):not(.error):not(.is-invalid) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px; }
+__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit) > :is(input, .message-edit-input):not(:disabled):not([readonly]):not([aria-invalid="true"]) { border: 0; background: transparent; outline: none !important; box-shadow: none !important; }
+__SCOPE__ .settings-search-wrap { border-radius: 8px; --at-cds-field-idle: inset 0 0 0 1px var(--at-cds-input-border); }
+__SCOPE__ .composer-shell:has(.composer-input:focus) {
+  outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important;
+  border-color: transparent; box-shadow: var(--at-cds-ring-shadow) !important; scroll-margin: 6px;
+}
+__SCOPE__ .composer-shell .composer-input { border: 0; }
+__SCOPE__ .composer-shell .composer-input:focus:not(:disabled) { outline: none !important; box-shadow: none !important; }
+/* Role separation: host accent is ordinary neutral, never the brand token.
+ * Content links, semantic feedback, syntax and diff colors are NOT desaturated. */
+__SCOPE__ .provider-setup-header-copy.is-copied { color: var(--ds-success); background: color-mix(in srgb, var(--ds-success) 12%, transparent); }
+__SCOPE__ .footer-build-dot { background: var(--at-cds-brand); }
+__SCOPE__ .composer-chip[data-plugin-mark] { background: color-mix(in srgb, var(--at-cds-brand) 14%, var(--ds-tile-deep)); }
+__SCOPE__ :is(.oauth-link, .chat-text-link) { color: var(--at-cds-link); }
+__SCOPE__ :is(.oauth-link, .chat-text-link):is(:hover, :focus-visible),
+__SCOPE__ .chat-code-link:is(:hover, :focus-visible) code { color: var(--at-cds-link-hover); text-decoration-color: currentColor; }
+
+/* All native ranges except the transparent interaction layer of thinking slider. */
+__SCOPE__ input[type="range"]:not(.composer-thinking-range) {
+  appearance: none; background: transparent; height: 18px; padding-block: 0;
+  accent-color: var(--at-cds-control-neutral);
+}
+__SCOPE__ input[type="range"]:not(.composer-thinking-range)::-webkit-slider-runnable-track {
+  height: 4px; border: 0; border-radius: 999px; background: var(--at-cds-slider-track); box-shadow: none;
+}
+__SCOPE__ input[type="range"]:not(.composer-thinking-range)::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5px;
+  border: 0; border-radius: 50%; background: var(--at-cds-control-neutral); box-shadow: none;
+}
+__SCOPE__ input[type="range"]:not(.composer-thinking-range)::-moz-range-track {
+  height: 4px; border: 0; border-radius: 999px; background: var(--at-cds-slider-track); box-shadow: none;
+}
+__SCOPE__ input[type="range"]:not(.composer-thinking-range)::-moz-range-thumb {
+  width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--at-cds-control-neutral); box-shadow: none;
+}
+__SCOPE__ input[type="range"]:not(.composer-thinking-range)::-moz-range-progress { background: transparent; }
+__SCOPE__ .composer-thinking-rail::before { height: 4px; background: var(--at-cds-slider-track); }
+__SCOPE__ .composer-thinking-rail::after { display: none; }
+__SCOPE__ .composer-thinking-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--at-cds-compose-accent); }
+/* The original transparent native thumb remains transparent. Host --composer-thinking-progress
+ * still positions its visible span, and stop markers/dragging/native step are untouched. */
+@media (forced-colors: active) {
+  __SCOPE__ { --at-cds-focus-ink: Highlight; --at-cds-composer-focus-ink: Highlight; --at-cds-composer-ring: 2px; --at-cds-ring-shadow: none; --at-cds-slider-track: GrayText; --at-cds-control-neutral: CanvasText; }
+  __SCOPE__ :is(input, textarea, [contenteditable="true"]):focus { outline-color: Highlight !important; box-shadow: none !important; }
+  __SCOPE__ .composer-shell .composer-input:focus { outline: none !important; }
+  __SCOPE__ :is(input[type="range"], .composer-thinking-thumb), __SCOPE__ .composer-thinking-rail::before { forced-color-adjust: none; }
+  __SCOPE__ .composer-thinking-thumb { background: Highlight !important; }
+  __SCOPE__ :is(.composer-model-thinking-level, .composer-thinking-tick.active) { color: Highlight !important; }
+  __SCOPE__ .composer-thinking-dot.active { background: Highlight !important; }
+  __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: Highlight; }
+}

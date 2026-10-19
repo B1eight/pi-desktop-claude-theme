@@ -1,0 +1,131 @@
+/* Shared candidate refinements: table-wrap owns the ONLY outer border.
+ * Table actions remain siblings outside the scroller; preview retains host overflow. */
+__SCOPE__ .prose-chat .table-wrap { background: transparent; border: 1px solid var(--at-cds-divider); border-radius: 8px; }
+__SCOPE__ .prose-chat table { background: transparent; border: 0; border-radius: 0; }
+__SCOPE__ .prose-chat .table-wrap table { min-width: max(100%, 28em); font-size: 1em; line-height: 1.5; }
+__SCOPE__ .prose-chat tbody tr td { background: transparent; border-bottom: 1px solid var(--at-cds-divider); }
+__SCOPE__ .prose-chat tbody tr:is(:nth-child(2n), :hover) td { background: transparent; }
+__SCOPE__ .prose-chat tbody tr:last-child td { border-bottom: 0; }
+
+/* BEGIN repair-loading (1.1.0): known phases only; preserve host state. */
+__SCOPE__ .working-indicator:not(.run-activity-indicator),
+__SCOPE__ .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"]) { color: var(--ds-text-secondary); }
+__SCOPE__ .working-indicator:not(.run-activity-indicator) .working-indicator-label { color: inherit; }
+__SCOPE__ .run-activity-indicator:is([data-phase="retrying"], [data-phase="recovering"]) { color: var(--ds-warning); }
+__SCOPE__ .working-indicator:not(.run-activity-indicator) .working-indicator-mark > span,
+__SCOPE__ .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"]) .working-indicator-mark > span { background: currentColor; }
+__SCOPE__ .run-activity-indicator:is([data-phase="retrying"], [data-phase="recovering"]) .working-indicator-mark > span { background: currentColor; }
+__SCOPE__ .working-indicator .working-elapsed { color: var(--ds-text-muted); }
+@media (forced-colors: active) {
+  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator[data-phase]) .working-indicator-mark > span { background: CanvasText; }
+}
+/* END repair-loading */
+
+/* BEGIN repair-workpanel (1.0.4): host document only, never plugin .md-* content. */
+__SCOPE__ .work-panel { --ds-bg-dock: var(--ds-bg-primary); --ds-bg-dock-raised: var(--ds-bg-sidebar); box-sizing: border-box; padding-left: 1px; box-shadow: inset 1px 0 0 var(--at-cds-region-line); }
+__SCOPE__ .work-panel-header { background: var(--ds-bg-sidebar); box-shadow: inset 0 -1px 0 var(--at-cds-region-line); }
+__SCOPE__ .work-panel-tab { border-radius: 8px; color: var(--ds-text-muted); }
+__SCOPE__ .work-panel-tab:hover { background: var(--at-cds-row-hover); color: var(--ds-text-primary); }
+__SCOPE__ .work-panel-tab.active { background: var(--ds-bg-elevated-opaque); color: var(--ds-text-primary); box-shadow: inset 0 0 0 1px var(--at-cds-border); }
+__SCOPE__ .work-panel-tab-close { border-radius: 6px; }
+__SCOPE__ .work-panel-tab-close:hover { background: var(--ds-code-hover-bg); color: var(--ds-text-primary); }
+__SCOPE__ .work-panel :is(.work-panel-new-tab, .work-panel-maximize) { border-radius: 8px; }
+__SCOPE__ .work-panel :is(.work-panel-new-tab, .work-panel-maximize):hover:not(:disabled) { background: var(--at-cds-row-hover); color: var(--ds-text-primary); }
+/* Work-panel host controls share the global 2px / 2px focus contract. */
+__SCOPE__ .work-panel-header :is(.work-panel-tab-close, .work-panel-new-tab, .work-panel-maximize) > svg[fill="none"][stroke="currentColor"] { stroke-width: 1.75; }
+/* END repair-workpanel */
+
+/* Sidebar 1.1.2: host-owned width, state priority, collapse and dragging stay intact. */
+/* 1.1.4: per-mode reference surfaces, independent home/settings hierarchy. */
+__SCOPE__ :is(.sidebar.sidebar-surface, .sidebar-rail) { background-color: var(--ds-bg-sidebar); }
+__SCOPE__[data-theme="light"] .settings-shell { --ds-bg-primary: #ffffff; }
+__SCOPE__[data-theme="dark"] .settings-shell { --ds-bg-primary: #1a1a19; }
+__SCOPE__ :is(.sidebar.sidebar-surface, .sidebar-rail, .settings-shell .settings-nav) { box-shadow: inset -1px 0 0 var(--at-cds-region-line); }
+__SCOPE__ .sidebar :is(.thread-item, .sidebar-session-group-header) { min-height: 32px; }
+__SCOPE__ .sidebar :is(.thread-item-title, .sidebar-session-group-title) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .sidebar .sidebar-session-group-title { font-weight: 600; }
+__SCOPE__ .sidebar .sidebar-session-group-list { gap: 2px; padding-block: 4px 10px; }
+__SCOPE__ .sidebar .sidebar-project-active-dot { display: none; }
+/* Sidebar navigation revision: project-only dates, title-only activity, five-row standalone viewport. */
+__SCOPE__ .sidebar .project-group > .sidebar-session-group-body.project .sidebar-time-group-header { display: none; }
+__SCOPE__ .sidebar .project-group:not(.is-drop-target) > .sidebar-session-group-header:has(.sidebar-project-active-dot):not(:hover) { background: var(--ds-bg-active); }
+__SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone { max-height: calc(5 * max(32px, calc(var(--at-cds-ui-leading) + 10px)) + 6px); }
+__SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone > .thread-item { flex-shrink: 0; }
+__SCOPE__ .sidebar .thread-item-main { padding-left: 28px; }
+__SCOPE__ .sidebar .thread-item-status { width: 16px; height: 16px; left: 5px; }
+__SCOPE__ .sidebar .thread-item-status.running::before { width: 10px; height: 10px; background: var(--ds-info); box-shadow: none; }
+__SCOPE__ .sidebar .thread-item-status.permission::before { width: 8px; height: 8px; }
+__SCOPE__ .sidebar .thread-item-status.selected::before { width: 10px; height: 10px; }
+__SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) { box-sizing: border-box; border: 1.5px solid currentColor; border-radius: 50%; background: var(--at-cds-result-success-bg); }
+__SCOPE__ .sidebar .thread-item-status.failed { border-radius: 4px; background: var(--at-cds-result-error-bg); }
+__SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) svg { width: 12px; height: 12px; stroke-width: 2.4px; stroke-linecap: round; stroke-linejoin: round; }
+__SCOPE__ .sidebar :is(.sidebar-toolbar-button, .sidebar-session-group-add) { width: 26px; height: 26px; }
+/* 1.1.7 status revision: blue single dot 2s; purple permission 1.6s; both continuous. */
+@media (prefers-reduced-motion: no-preference) {
+  __SCOPE__ .sidebar .thread-item-status.running::before { animation-duration: 2s; animation-iteration-count: infinite; }
+  __SCOPE__ .sidebar .thread-item-status.permission::before { animation-duration: 1.6s; animation-iteration-count: infinite; }
+}
+@media (forced-colors: active) {
+  __SCOPE__ .sidebar .thread-item-status.running::before { background: Highlight; box-shadow: none; forced-color-adjust: none; }
+}
+
+/* 1.1.3: approved planning color only; retain host timing and phase logic. */
+__SCOPE__ .planning-state-indicator .working-indicator-mark > span { background: var(--ds-info); }
+@media (forced-colors: active) {
+  __SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) { color: CanvasText; border-color: CanvasText; background: Canvas; }
+  __SCOPE__ .planning-state-indicator .working-indicator-mark > span { background: CanvasText; }
+}
+
+/* 1.1.8 approved error feedback. Host placement, triggers, height budgets and actions stay intact. */
+__SCOPE__ :is(.chat-error-notice,.toast) { border-radius: 12px; box-shadow: 0 3px 14px rgba(0,0,0,.09); gap: 10px; }
+__SCOPE__ .chat-error-notice { background: var(--ds-bg-elevated-opaque); color: var(--ds-text-primary); border: 1px solid color-mix(in srgb, var(--ds-error) 26%, var(--ds-border-default)); border-inline-start: 3px solid var(--ds-error); padding: 11px 13px; }
+__SCOPE__ :is(.chat-error-notice,.toast-message) { font-size: var(--at-cds-ui-size); line-height: 1.5; }
+__SCOPE__ .chat-error-action { border-radius: 7px; background: var(--ds-bg-hover); min-height: 28px; padding: 4px 9px; }
+__SCOPE__ .message-error { border: 1px solid color-mix(in srgb, var(--ds-error) 22%, var(--ds-border-default)); border-radius: 12px; background: color-mix(in srgb, var(--ds-error) 3%, var(--ds-bg-elevated-opaque)); padding: 14px; color: var(--ds-text-primary); }
+__SCOPE__ .message-error-copy { gap: 5px 9px; }
+__SCOPE__ .message-error-copy strong { font-size: var(--at-cds-ui-size); line-height: 1.45; font-weight: 600; }
+__SCOPE__ .message-error-copy code { border-radius: 5px; font-size: 11px; line-height: 1.5; padding: 2px 6px; overflow-wrap: anywhere; }
+__SCOPE__ .message-error-details dl { grid-template-columns: max-content minmax(0,1fr); gap: 5px 12px; font-size: 12px; line-height: 1.55; }
+__SCOPE__ .message-error-details pre { background: var(--ds-bg-primary); border: 1px solid var(--ds-border-subtle); border-radius: 8px; padding: 10px 40px 10px 11px; font-size: 12px; line-height: 1.6; }
+__SCOPE__ .message-error-toggle { color: var(--ds-text-secondary); }
+__SCOPE__ .run-activity-error-popover.message-error { background: var(--ds-bg-elevated-opaque); box-shadow: var(--ds-shadow-dialog); padding: 12px; }
+__SCOPE__ .run-activity-error-message { font-size: 12px; line-height: 1.6; margin: 10px 0 0 24px; color: var(--ds-text-secondary); }
+__SCOPE__ .toast { border-color: var(--ds-border-default); padding: 12px; }
+@media (forced-colors: active) { __SCOPE__ :is(.message-error,.chat-error-notice,.toast) { border-color: CanvasText; background: Canvas; color: CanvasText; box-shadow: none; } }
+
+/* Six approved feedback families. Only style host-owned states; no business or placement changes.
+ * Tool details and node internals remain representative structures pending renderer evidence. */
+__SCOPE__ :is(.permission-card,.turn-outcome-card,.asktool-card){border:1px solid var(--ds-border-default);border-radius:12px;padding:14px;color:var(--ds-text-primary);font-size:var(--at-cds-ui-size);line-height:1.5}
+__SCOPE__ .permission-card{padding:14px 16px;--at-cds-risk:var(--ds-warning);border-color:color-mix(in srgb,var(--at-cds-risk) 22%,var(--ds-border-default));background:color-mix(in srgb,var(--at-cds-risk) 3%,var(--ds-bg-elevated-opaque))}
+__SCOPE__ .permission-card.risk-high{--at-cds-risk:var(--ds-error)}
+__SCOPE__ .permission-card.risk-low{--at-cds-risk:var(--ds-border-strong)}
+__SCOPE__ :is(.permission-card-title,.permission-card-prompt,.turn-outcome-copy strong,.asktool-card-title){font-size:var(--at-cds-ui-size);line-height:1.45}
+__SCOPE__ :is(.permission-card-reason,.permission-card-agent,.permission-card-meta,.turn-outcome-copy>span,.turn-outcome-stats,.asktool-card-progress){font-size:var(--at-cds-small-size);line-height:1.55}
+__SCOPE__ .permission-card-header{flex-wrap:wrap;gap:6px 10px}
+__SCOPE__ .permission-card-prompt{color:var(--ds-text-primary)}
+__SCOPE__ .permission-card-args{border:1px solid var(--ds-border-subtle);border-radius:8px;background:var(--ds-bg-primary);padding:10px}
+__SCOPE__ .turn-outcome-card.failed{border-color:color-mix(in srgb,var(--ds-error) 22%,var(--ds-border-default));background:color-mix(in srgb,var(--ds-error) 3%,var(--ds-bg-elevated-opaque))}
+__SCOPE__ .turn-outcome-copy{gap:5px}
+__SCOPE__ .composer-stack>.asktool-card{background:var(--ds-bg-elevated-opaque);box-shadow:0 3px 14px rgba(0,0,0,.06)}
+__SCOPE__ .asktool-card-title{color:var(--ds-text-primary);font-weight:600;letter-spacing:normal;text-transform:none}
+__SCOPE__ .asktool-question{font-size:var(--at-cds-ui-size);line-height:1.5;font-weight:600;margin-top:12px}
+__SCOPE__ .asktool-option{border-radius:8px;font-size:var(--at-cds-ui-size);line-height:1.5}
+__SCOPE__ .asktool-option-description{font-size:var(--at-cds-small-size);line-height:1.55}
+/* M04 retains its neutral shell; M05 aggregation uses host structure without a theme shell. */
+__SCOPE__ .plan-approval-bar{border:1px solid var(--ds-border-default);border-radius:12px;background:var(--ds-bg-elevated-opaque);padding:10px 12px}
+__SCOPE__ .plan-approval-bar{box-shadow:0 3px 14px rgba(0,0,0,.06)}
+/* Independent artifact emphasis on the renderer-owned SubmitPlan/SubmitGoal history card, not approval UI or prose. */
+__SCOPE__ .plan-history-card{border:2px solid var(--at-cds-focus-ink);border-radius:12px}
+__SCOPE__ .plan-history-title{color:var(--ds-text-primary);font-weight:600}
+/* Title/path buttons retain actual focus-visible ownership; the card has no permanent focus outline. */
+__SCOPE__ .plan-approval-title{font-size:var(--at-cds-ui-size);line-height:1.45}
+__SCOPE__ .plan-approval-artifact{font-size:var(--at-cds-small-size);line-height:1.5}
+__SCOPE__ .turn-process > .tool-activity-header{font-size:var(--at-cds-ui-size);line-height:1.5}
+/* M05 error styling stays local to error details and failed-search metadata. */
+__SCOPE__ :is(.tool-row-content.is-error,.tool-note.is-error){border:1px solid color-mix(in srgb,var(--ds-error) 22%,var(--ds-border-default));border-radius:8px;background:color-mix(in srgb,var(--ds-error) 3%,var(--ds-bg-primary));color:var(--ds-text-primary);line-height:1.6}
+__SCOPE__ .tool-row.hosted-search:has(> .tool-row-header .turn-process-error) :is(.hosted-search-query,.hosted-search-sources){font-size:var(--at-cds-small-size);line-height:1.55}
+__SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted){border:1px solid var(--ds-border-default);border-radius:12px;background:var(--ds-bg-elevated-opaque);box-shadow:0 3px 14px rgba(0,0,0,.06)}
+__SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted) .subagent-topology-node-title{font-size:var(--at-cds-ui-size);line-height:1.45}
+__SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted) :is(.subagent-topology-node-summary,.subagent-topology-node-steps){font-size:var(--at-cds-small-size);line-height:1.55}
+/* Keep state colors, topology geometry and responsive breakpoints. */
+@media(forced-colors:active){__SCOPE__ :is(.permission-card,.turn-outcome-card,.asktool-card,.plan-approval-bar,.plan-history-card,.tool-row-content.is-error,.subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted)){border-color:CanvasText;background:Canvas;color:CanvasText;box-shadow:none}}

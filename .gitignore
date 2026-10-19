@@ -1,0 +1,15 @@
+/dist/
+/release/
+/artifacts/
+/test-results/
+/coverage/
+/node_modules/
+*.piplug
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

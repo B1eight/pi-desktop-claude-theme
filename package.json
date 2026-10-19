@@ -1,0 +1,15 @@
+{
+  "name": "pi-desktop-claude-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unofficial Claude-inspired declarative themes for PI-Desktop",
+  "license": "MIT",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/capacity.test.mjs",
+    "verify": "node scripts/verify.mjs",
+    "check:roles": "node scripts/check-color-roles.mjs",
+    "test:browser": "node scripts/check-css-equivalence.mjs"
+  }
+}

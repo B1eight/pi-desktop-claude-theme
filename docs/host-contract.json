@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "validatedHostVersion": "0.20.1",
+  "declaredEngineRange": ">=0.20.1",
+  "minimumChromeMajorForNesting": 120,
+  "validatedRuntime": {
+    "electron": "43.6.0",
+    "chrome": "150.0.7871.250"
+  },
+  "policy": "Unknown versions or changed source hashes require review, not broader selectors or automatic rebaselining. This is a static compatibility contract, not a business-behavior test.",
+  "sources": [
+    {
+      "file": "index.css",
+      "entry": "out/renderer/assets/index-B2AQXWUW.css",
+      "sha256": "b468534c3b1331b5a09ef2c5a36c3e2fa97f9b98a53186b0825933a2a0b0515a"
+    },
+    {
+      "file": "chat.css",
+      "entry": "out/renderer/assets/ChatSurface-LzS4DeZN.css",
+      "sha256": "67ea6351c85e4e2c479c421748d09c1d4ada3f45f194e85c5fe760abdbe05ae6"
+    },
+    {
+      "file": "markdown.css",
+      "entry": "out/renderer/assets/Markdown-Bu6RnutN.css",
+      "sha256": "a1d8fd9cd0f3f6226371108c0c40f636eadfa8d71d505f7f47185f258f260d4d"
+    },
+    {
+      "file": "workpanel.css",
+      "entry": "out/renderer/assets/WorkPanel-DDdQ6bLV.css",
+      "sha256": "8d69a823bb5dfe46299ed6aa439470d49cc18c1c5335866f2cec35ef7e3f66a6"
+    },
+    {
+      "file": "main.js",
+      "entry": "out/main/chunks/index-DS4oZDow.js",
+      "sha256": "a181f2ccc2dc25676f455d103bc9441eaf02f127fbc9f18cb819474fe372a2b8"
+    },
+    {
+      "file": "renderer/ChatSurface-DcIV7nCv.js",
+      "entry": "out/renderer/assets/ChatSurface-DcIV7nCv.js",
+      "sha256": "59ba8695b45a5c486bd92b50b08a79b16aa3b072d30d95b7d1c225f3181538a3"
+    },
+    {
+      "file": "renderer/ComposerPermissionPicker-Duah57tC.js",
+      "entry": "out/renderer/assets/ComposerPermissionPicker-Duah57tC.js",
+      "sha256": "71cac4a3900ccfea5f678bfd83ed7cf25ce16a1710cfbc99650f1ffc063a8ce7"
+    },
+    {
+      "file": "renderer/SettingsPage-DKFLGMoJ.js",
+      "entry": "out/renderer/assets/SettingsPage-DKFLGMoJ.js",
+      "sha256": "2c0a35682965f6a4fe9992bb51c9b121e18b0a91af08589f0e2327ab9ed689f7"
+    },
+    {
+      "file": "renderer/SettingsMenuSelect-3EjvDPLr.js",
+      "entry": "out/renderer/assets/SettingsMenuSelect-3EjvDPLr.js",
+      "sha256": "f80138abbad521fd5a56a2779b96112bedbe5eb1e79c52edb3a4c9803fb4c576"
+    },
+    {
+      "file": "renderer/WorkPanel-5aW1mjvW.js",
+      "entry": "out/renderer/assets/WorkPanel-5aW1mjvW.js",
+      "sha256": "918081f5fd12353cc4b102f8662ca1624fe8c383b29b8f825c2a537b4f4cabfd"
+    }
+  ],
+  "groups": [
+    {
+      "id": "settings-shell",
+      "css": [
+        "settings-shell",
+        "settings-content-inner",
+        "settings-section-title",
+        "settings-row-copy",
+        "settings-row-control"
+      ],
+      "renderer": [
+        "settings-shell",
+        "settings-content-inner",
+        "settings-panel",
+        "settings-row"
+      ],
+      "states": [
+        "direct ordinary rows",
+        "mixed panels retain gaps",
+        "880px ordinary pages"
+      ]
+    },
+    {
+      "id": "settings-wide",
+      "css": [
+        "model-provider-panel",
+        "agent-capability-panel",
+        "shortcut-map",
+        "projects-workbench",
+        "settings-config-sync",
+        "settings-remote-host-list",
+        "settings-instruction-editor",
+        "agent-capability-search-wrap"
+      ],
+      "renderer": [
+        "model-provider-panel",
+        "agent-capability-panel",
+        "agent-subagents-page",
+        "shortcut-map",
+        "projects-workbench",
+        "settings-config-sync",
+        "settings-remote-host-list",
+        "settings-instruction-editor"
+      ],
+      "states": [
+        "1120px structural markers",
+        "complex grids/editors remain host-owned"
+      ]
+    },
+    {
+      "id": "light-input-focus",
+      "css": [
+        "service-chooser-search",
+        "composer-model-search",
+        "provider-setup-custom-identity-row",
+        "provider-setup-base-url",
+        "field-input"
+      ],
+      "renderer": [
+        "service-chooser-search",
+        "composer-model-search",
+        "provider-setup-custom-identity-row",
+        "provider-setup-base-url",
+        "field-input"
+      ],
+      "patterns": [
+        "composer-model-search[\\s\\S]{0,500}jsx\\(\"input\"",
+        "provider-setup-custom-identity-row[\\s\\S]{0,400}provider-setup-base-url"
+      ],
+      "states": [
+        "Light only",
+        "focus-within",
+        "focus-visible",
+        "forced-colors",
+        "exclude base URL/API key from new styling"
+      ]
+    },
+    {
+      "id": "composer-context-thinking",
+      "css": [
+        "composer-shell",
+        "composer-thinking-rail",
+        "composer-thinking-dot",
+        "composer-thinking-thumb",
+        "context-inspector"
+      ],
+      "renderer": [
+        "composer-shell",
+        "composer-thinking-rail",
+        "composer-thinking-dot",
+        "context-inspector"
+      ],
+      "states": [
+        "active",
+        "data-level warning/critical",
+        "data-hovered",
+        "data-filled"
+      ]
+    },
+    {
+      "id": "loading-phases",
+      "css": [
+        "run-activity-indicator",
+        "working-indicator",
+        "working-elapsed",
+        "waiting-model",
+        "compacting",
+        "waiting-subagents"
+      ],
+      "renderer": [
+        "run-activity-indicator",
+        "waiting-model",
+        "starting",
+        "preparing",
+        "compacting",
+        "retrying",
+        "recovering",
+        "waiting-subagents"
+      ],
+      "states": [
+        "data-phase",
+        "unknown phase keeps host fallback",
+        "forced-colors"
+      ]
+    },
+    {
+      "id": "menus-and-portals",
+      "css": [
+        "composer-model-menu",
+        "composer-autocomplete",
+        "settings-theme-menu",
+        "settings-menu-select-menu"
+      ],
+      "renderer": [
+        "composer-model-menu",
+        "composer-autocomplete",
+        "settings-theme-menu",
+        "settings-menu-select-menu"
+      ],
+      "states": [
+        "same-document portals",
+        "active",
+        "kb-active",
+        "host positioning"
+      ]
+    },
+    {
+      "id": "workpanel-boundary",
+      "css": [
+        "work-panel-header",
+        "work-panel-tab",
+        "work-panel-tab-close",
+        "work-panel-new-tab",
+        "work-panel-maximize"
+      ],
+      "renderer": [
+        "work-panel-header",
+        "work-panel-tab",
+        "work-panel-tab-close",
+        "work-panel-new-tab",
+        "work-panel-maximize"
+      ],
+      "states": [
+        "active",
+        "focus-visible",
+        "only host-document chrome; no independent plugin .md-* content"
+      ]
+    }
+  ]
+}
