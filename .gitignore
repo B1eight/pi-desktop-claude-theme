@@ -13,3 +13,8 @@
 Thumbs.db
 .vscode/
 .idea/
+# 本机探查脚本与过程报告，不属于插件产物
+/audit*.mjs
+/patch-roles.mjs
+/docs/review-*.html
+/docs/claude-desktop-reference-audit.md
