@@ -1,8 +1,8 @@
 /* Shared refinements: table-wrap owns the ONLY outer border.
  * Table actions remain siblings outside the scroller; preview retains host overflow. */
-__SCOPE__ .prose-chat .table-wrap { background: transparent; border: 1px solid var(--at-cds-divider); border-radius: 8px; }
+__SCOPE__ .prose-chat .table-wrap { background: transparent; border: 1px solid var(--at-cds-divider); border-radius: var(--at-cds-r-md); }
 __SCOPE__ .prose-chat table { background: transparent; border: 0; border-radius: 0; }
-__SCOPE__ .prose-chat .table-wrap table { min-width: max(100%, 28em); font-size: 1em; line-height: 1.5; }
+__SCOPE__ .prose-chat .table-wrap table { min-width: max(100%, 28em); font-size: 1em; line-height: var(--at-cds-body-leading); }
 __SCOPE__ .prose-chat tbody tr td { background: transparent; border-bottom: 1px solid var(--at-cds-divider); }
 __SCOPE__ .prose-chat tbody tr:is(:nth-child(2n), :hover) td { background: transparent; }
 __SCOPE__ .prose-chat tbody tr:last-child td { border-bottom: 0; }
@@ -24,13 +24,13 @@ __SCOPE__ .working-indicator .working-elapsed { color: var(--ds-text-muted); }
 /* BEGIN block-workpanel: host document only, never plugin .md-* content. */
 __SCOPE__ .work-panel { --ds-bg-dock: var(--ds-bg-primary); --ds-bg-dock-raised: var(--ds-bg-sidebar); box-sizing: border-box; padding-left: 1px; box-shadow: inset 1px 0 0 var(--at-cds-region-line); }
 __SCOPE__ .work-panel-header { background: var(--ds-bg-sidebar); box-shadow: inset 0 -1px 0 var(--at-cds-region-line); }
-__SCOPE__ .work-panel-tab { border-radius: 8px; color: var(--ds-text-muted); }
+__SCOPE__ .work-panel-tab { border-radius: var(--at-cds-r-md); color: var(--ds-text-muted); }
 __SCOPE__ .work-panel-tab:hover { background: var(--at-cds-row-hover); color: var(--ds-text-primary); }
 __SCOPE__ .work-panel-tab.active { background: var(--ds-bg-elevated-opaque); color: var(--ds-text-primary); box-shadow: inset 0 0 0 1px var(--at-cds-border); }
-__SCOPE__ .work-panel-tab-close { border-radius: 6px; }
+__SCOPE__ .work-panel-tab-close { border-radius: var(--at-cds-r-sm); }
 __SCOPE__ .work-panel-tab-close:hover { background: var(--ds-code-hover-bg); color: var(--ds-text-primary); }
-__SCOPE__ .work-panel :is(.work-panel-new-tab, .work-panel-maximize) { border-radius: 8px; }
-__SCOPE__ .work-panel :is(.work-panel-new-tab, .work-panel-maximize):hover:not(:disabled) { background: var(--at-cds-row-hover); color: var(--ds-text-primary); }
+__SCOPE__ .work-panel :is(.work-panel-new-tab, .work-panel-maximize) { border-radius: var(--at-cds-r-md); }
+__SCOPE__ .work-panel :is(.work-panel-new-tab, .work-panel-maximize):hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-row-hover); color: var(--ds-text-primary); }
 /* Work-panel host controls share the global 2px / 2px focus contract. */
 __SCOPE__ .work-panel-header :is(.work-panel-tab-close, .work-panel-new-tab, .work-panel-maximize) > svg[fill="none"][stroke="currentColor"] { stroke-width: 1.75; }
 /* END block-workpanel */
@@ -41,23 +41,27 @@ __SCOPE__ :is(.sidebar.sidebar-surface, .sidebar-rail) { background-color: var(-
 __SCOPE__[data-theme="light"] .settings-shell { --ds-bg-primary: #ffffff; }
 __SCOPE__[data-theme="dark"] .settings-shell { --ds-bg-primary: #1a1a19; }
 __SCOPE__ :is(.sidebar.sidebar-surface, .sidebar-rail, .settings-shell .settings-nav) { box-shadow: inset -1px 0 0 var(--at-cds-region-line); }
-__SCOPE__ .sidebar :is(.thread-item, .sidebar-session-group-header) { min-height: 32px; }
+/* Row height is derived from the type scale, not picked by eye:
+ * one UI line box plus the medium spacing step = 20 + 12 = 32px. */
+__SCOPE__ .sidebar :is(.thread-item, .sidebar-session-group-header) { min-height: calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)); border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-base) var(--at-cds-ease); }
 __SCOPE__ .sidebar :is(.thread-item-title, .sidebar-session-group-title) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
-__SCOPE__ .sidebar .sidebar-session-group-title { font-weight: 600; }
-__SCOPE__ .sidebar .sidebar-session-group-list { gap: 2px; padding-block: 4px 10px; }
+__SCOPE__ .sidebar .sidebar-session-group-title { font-weight: var(--at-cds-w-semibold); }
+/* Active row: the title joins the semibold step so the selected row reads one level up,
+ * matching how selected options behave elsewhere in the theme. */
+__SCOPE__ .sidebar .thread-item.active .thread-item-title { font-weight: var(--at-cds-w-semibold); }
+__SCOPE__ .sidebar .sidebar-session-group-list { gap: 2px; padding-block: var(--at-cds-s-xs) var(--at-cds-s-md); }
 __SCOPE__ .sidebar .sidebar-project-active-dot { display: none; }
 /* Sidebar navigation: project-only dates, title-only activity, five-row standalone viewport. */
-__SCOPE__ .sidebar .project-group > .sidebar-session-group-body.project .sidebar-time-group-header { display: none; }
-__SCOPE__ .sidebar .project-group:not(.is-drop-target) > .sidebar-session-group-header:has(.sidebar-project-active-dot):not(:hover) { background: var(--ds-bg-active); }
-__SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone { max-height: calc(5 * max(32px, calc(var(--at-cds-ui-leading) + 10px)) + 6px); }
+__SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone { max-height: calc(5 * calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)) + 6px); }
 __SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone > .thread-item { flex-shrink: 0; }
-__SCOPE__ .sidebar .thread-item-main { padding-left: 28px; }
-__SCOPE__ .sidebar .thread-item-status { width: 16px; height: 16px; left: 5px; }
+/* Status gutter: a 16px marker inside the row, content starts after it plus the small step. */
+__SCOPE__ .sidebar .thread-item-main { padding-left: calc(16px + var(--at-cds-s-md)); }
+__SCOPE__ .sidebar .thread-item-status { width: 16px; height: 16px; left: var(--at-cds-s-xs); }
 __SCOPE__ .sidebar .thread-item-status.running::before { width: 10px; height: 10px; background: var(--ds-info); box-shadow: none; }
 __SCOPE__ .sidebar .thread-item-status.permission::before { width: 8px; height: 8px; }
 __SCOPE__ .sidebar .thread-item-status.selected::before { width: 10px; height: 10px; }
 __SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) { box-sizing: border-box; border: 1.5px solid currentColor; border-radius: 50%; background: var(--at-cds-result-success-bg); }
-__SCOPE__ .sidebar .thread-item-status.failed { border-radius: 4px; background: var(--at-cds-result-error-bg); }
+__SCOPE__ .sidebar .thread-item-status.failed { border-radius: var(--at-cds-r-sm); background: var(--at-cds-result-error-bg); }
 __SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) svg { width: 12px; height: 12px; stroke-width: 2.4px; stroke-linecap: round; stroke-linejoin: round; }
 __SCOPE__ .sidebar :is(.sidebar-toolbar-button, .sidebar-session-group-add) { width: 26px; height: 26px; }
 /* Status: blue single dot 2s; purple permission 1.6s; both continuous. */
@@ -77,25 +81,25 @@ __SCOPE__ .planning-state-indicator .working-indicator-mark > span { background:
 }
 
 /* Error feedback. Host placement, triggers, height budgets and actions stay intact. */
-__SCOPE__ :is(.chat-error-notice,.toast) { border-radius: 12px; box-shadow: 0 3px 14px rgba(0,0,0,.09); gap: 10px; }
+__SCOPE__ :is(.chat-error-notice,.toast) { border-radius: var(--at-cds-r-xl); box-shadow: 0 3px 14px rgba(0,0,0,.09); gap: 10px; }
 __SCOPE__ .chat-error-notice { background: var(--ds-bg-elevated-opaque); color: var(--ds-text-primary); border: 1px solid color-mix(in srgb, var(--ds-error) 26%, var(--ds-border-default)); border-inline-start: 3px solid var(--ds-error); padding: 11px 13px; }
-__SCOPE__ :is(.chat-error-notice,.toast-message) { font-size: var(--at-cds-ui-size); line-height: 1.5; }
-__SCOPE__ .chat-error-action { border-radius: 7px; background: var(--ds-bg-hover); min-height: 28px; padding: 4px 9px; }
-__SCOPE__ .message-error { border: 1px solid color-mix(in srgb, var(--ds-error) 22%, var(--ds-border-default)); border-radius: 12px; background: color-mix(in srgb, var(--ds-error) 3%, var(--ds-bg-elevated-opaque)); padding: 14px; color: var(--ds-text-primary); }
-__SCOPE__ .message-error-copy { gap: 5px 9px; }
-__SCOPE__ .message-error-copy strong { font-size: var(--at-cds-ui-size); line-height: 1.45; font-weight: 600; }
-__SCOPE__ .message-error-copy code { border-radius: 5px; font-size: 11px; line-height: 1.5; padding: 2px 6px; overflow-wrap: anywhere; }
-__SCOPE__ .message-error-details dl { grid-template-columns: max-content minmax(0,1fr); gap: 5px 12px; font-size: 12px; line-height: 1.55; }
-__SCOPE__ .message-error-details pre { background: var(--ds-bg-primary); border: 1px solid var(--ds-border-subtle); border-radius: 8px; padding: 10px 40px 10px 11px; font-size: 12px; line-height: 1.6; }
+__SCOPE__ :is(.chat-error-notice,.toast-message) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-body-leading); }
+__SCOPE__ .chat-error-action { border-radius: var(--at-cds-r-md); background: var(--ds-bg-hover); min-height: 28px; padding: 4px 9px; }
+__SCOPE__ .message-error { border: 1px solid color-mix(in srgb, var(--ds-error) 22%, var(--ds-border-default)); border-radius: var(--at-cds-r-xl); background: color-mix(in srgb, var(--ds-error) 3%, var(--ds-bg-elevated-opaque)); padding: 14px; color: var(--ds-text-primary); }
+__SCOPE__ .message-error-copy { gap: var(--at-cds-s-xs) 9px; }
+__SCOPE__ .message-error-copy strong { font-size: var(--at-cds-ui-size); line-height: 1.45; font-weight: var(--at-cds-w-semibold); }
+__SCOPE__ .message-error-copy code { border-radius: var(--at-cds-r-sm); font-size: var(--at-cds-tiny-size); line-height: var(--at-cds-tiny-leading); padding: 2px 6px; overflow-wrap: anywhere; }
+__SCOPE__ .message-error-details dl { grid-template-columns: max-content minmax(0,1fr); gap: 5px 12px; font-size: var(--at-cds-small-size); line-height: var(--at-cds-small-leading); }
+__SCOPE__ .message-error-details pre { background: var(--ds-bg-primary); border: 1px solid var(--ds-border-subtle); border-radius: var(--at-cds-r-md); padding: 10px 40px 10px 11px; font-size: 12px; line-height: 1.6; }
 __SCOPE__ .message-error-toggle { color: var(--ds-text-secondary); }
 __SCOPE__ .run-activity-error-popover.message-error { background: var(--ds-bg-elevated-opaque); box-shadow: var(--ds-shadow-dialog); padding: 12px; }
-__SCOPE__ .run-activity-error-message { font-size: 12px; line-height: 1.6; margin: 10px 0 0 24px; color: var(--ds-text-secondary); }
-__SCOPE__ .toast { border-color: var(--ds-border-default); padding: 12px; }
+__SCOPE__ .run-activity-error-message { font-size: var(--at-cds-small-size); line-height: var(--at-cds-small-leading); margin: 10px 0 0 24px; color: var(--ds-text-secondary); }
+__SCOPE__ .toast { border-color: var(--ds-border-default); padding: var(--at-cds-s-md); }
 @media (forced-colors: active) { __SCOPE__ :is(.message-error,.chat-error-notice,.toast) { border-color: CanvasText; background: Canvas; color: CanvasText; box-shadow: none; } }
 
 /* Six feedback families. Only style host-owned states; no business or placement changes.
  * Tool details and node internals keep their host structure. */
-__SCOPE__ :is(.permission-card,.turn-outcome-card,.asktool-card){border:1px solid var(--ds-border-default);border-radius:12px;padding:14px;color:var(--ds-text-primary);font-size:var(--at-cds-ui-size);line-height:1.5}
+__SCOPE__ :is(.permission-card,.turn-outcome-card,.asktool-card){border:1px solid var(--ds-border-default);border-radius: var(--at-cds-r-xl);padding:14px;color:var(--ds-text-primary);font-size:var(--at-cds-ui-size);line-height:1.5}
 __SCOPE__ .permission-card{padding:14px 16px;--at-cds-risk:var(--ds-warning);border-color:color-mix(in srgb,var(--at-cds-risk) 22%,var(--ds-border-default));background:color-mix(in srgb,var(--at-cds-risk) 3%,var(--ds-bg-elevated-opaque))}
 __SCOPE__ .permission-card.risk-high{--at-cds-risk:var(--ds-error)}
 __SCOPE__ .permission-card.risk-low{--at-cds-risk:var(--ds-border-strong)}
@@ -103,29 +107,82 @@ __SCOPE__ :is(.permission-card-title,.permission-card-prompt,.turn-outcome-copy 
 __SCOPE__ :is(.permission-card-reason,.permission-card-agent,.permission-card-meta,.turn-outcome-copy>span,.turn-outcome-stats,.asktool-card-progress){font-size:var(--at-cds-small-size);line-height:1.55}
 __SCOPE__ .permission-card-header{flex-wrap:wrap;gap:6px 10px}
 __SCOPE__ .permission-card-prompt{color:var(--ds-text-primary)}
-__SCOPE__ .permission-card-args{border:1px solid var(--ds-border-subtle);border-radius:8px;background:var(--ds-bg-primary);padding:10px}
+__SCOPE__ .permission-card-args{border:1px solid var(--ds-border-subtle);border-radius: var(--at-cds-r-md);background:var(--ds-bg-primary);padding:10px}
 __SCOPE__ .turn-outcome-card.failed{border-color:color-mix(in srgb,var(--ds-error) 22%,var(--ds-border-default));background:color-mix(in srgb,var(--ds-error) 3%,var(--ds-bg-elevated-opaque))}
-__SCOPE__ .turn-outcome-copy{gap:5px}
+__SCOPE__ .turn-outcome-copy{gap:var(--at-cds-s-xs)}
 __SCOPE__ .composer-stack>.asktool-card{background:var(--ds-bg-elevated-opaque);box-shadow:0 3px 14px rgba(0,0,0,.06)}
-__SCOPE__ .asktool-card-title{color:var(--ds-text-primary);font-weight:600;letter-spacing:normal;text-transform:none}
-__SCOPE__ .asktool-question{font-size:var(--at-cds-ui-size);line-height:1.5;font-weight:600;margin-top:12px}
-__SCOPE__ .asktool-option{border-radius:8px;font-size:var(--at-cds-ui-size);line-height:1.5}
+__SCOPE__ .asktool-card-title{color:var(--ds-text-primary);font-weight:var(--at-cds-w-semibold);letter-spacing:normal;text-transform:none}
+__SCOPE__ .asktool-question{font-size:var(--at-cds-ui-size);line-height:var(--at-cds-body-leading);font-weight:var(--at-cds-w-semibold);margin-top:12px}
+__SCOPE__ .asktool-option{border-radius: var(--at-cds-r-md);font-size:var(--at-cds-ui-size);line-height:1.5}
 __SCOPE__ .asktool-option-description{font-size:var(--at-cds-small-size);line-height:1.55}
 /* Approval shell stays neutral; process aggregation uses host structure without a theme shell. */
-__SCOPE__ .plan-approval-bar{border:1px solid var(--ds-border-default);border-radius:12px;background:var(--ds-bg-elevated-opaque);padding:10px 12px}
+__SCOPE__ .plan-approval-bar{border:1px solid var(--ds-border-default);border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);padding:10px 12px}
 __SCOPE__ .plan-approval-bar{box-shadow:0 3px 14px rgba(0,0,0,.06)}
 /* Artifact emphasis on the renderer-owned SubmitPlan/SubmitGoal history card, not approval UI or prose. */
-__SCOPE__ .plan-history-card{border:2px solid var(--at-cds-focus-ink);border-radius:12px}
-__SCOPE__ .plan-history-title{color:var(--ds-text-primary);font-weight:600}
+__SCOPE__ .plan-history-card{border:2px solid var(--at-cds-focus-ink);border-radius: var(--at-cds-r-xl)}
+__SCOPE__ .plan-history-title{color:var(--ds-text-primary);font-weight:var(--at-cds-w-semibold)}
 /* Title/path buttons retain actual focus-visible ownership; the card has no permanent focus outline. */
 __SCOPE__ .plan-approval-title{font-size:var(--at-cds-ui-size);line-height:1.45}
 __SCOPE__ .plan-approval-artifact{font-size:var(--at-cds-small-size);line-height:1.5}
 __SCOPE__ .turn-process > .tool-activity-header{font-size:var(--at-cds-ui-size);line-height:1.5}
 /* Error styling stays local to error details and failed-search metadata. */
-__SCOPE__ :is(.tool-row-content.is-error,.tool-note.is-error){border:1px solid color-mix(in srgb,var(--ds-error) 22%,var(--ds-border-default));border-radius:8px;background:color-mix(in srgb,var(--ds-error) 3%,var(--ds-bg-primary));color:var(--ds-text-primary);line-height:1.6}
+__SCOPE__ :is(.tool-row-content.is-error,.tool-note.is-error){border:1px solid color-mix(in srgb,var(--ds-error) 22%,var(--ds-border-default));border-radius: var(--at-cds-r-md);background:color-mix(in srgb,var(--ds-error) 3%,var(--ds-bg-primary));color:var(--ds-text-primary);line-height:1.6}
 __SCOPE__ .tool-row.hosted-search:has(> .tool-row-header .turn-process-error) :is(.hosted-search-query,.hosted-search-sources){font-size:var(--at-cds-small-size);line-height:1.55}
-__SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted){border:1px solid var(--ds-border-default);border-radius:12px;background:var(--ds-bg-elevated-opaque);box-shadow:0 3px 14px rgba(0,0,0,.06)}
+__SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted){border:1px solid var(--ds-border-default);border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);box-shadow:0 3px 14px rgba(0,0,0,.06)}
 __SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted) .subagent-topology-node-title{font-size:var(--at-cds-ui-size);line-height:1.45}
 __SCOPE__ .subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted) :is(.subagent-topology-node-summary,.subagent-topology-node-steps){font-size:var(--at-cds-small-size);line-height:1.55}
 /* Keep state colors, topology geometry and responsive breakpoints. */
 @media(forced-colors:active){__SCOPE__ :is(.permission-card,.turn-outcome-card,.asktool-card,.plan-approval-bar,.plan-history-card,.tool-row-content.is-error,.subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted)){border-color:CanvasText;background:Canvas;color:CanvasText;box-shadow:none}}
+/* v0.21 additions: task dock, sidebar metadata, worktree surfaces. */
+__SCOPE__ :is(.gen-ui-card,.gen-ui-dialog,.plugins-reviews,.plugins-reviews-summary,.worktree-file-list,.worktree-setup-log){border:1px solid var(--ds-border-default);border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);color:var(--ds-text-primary)}
+/* Task dock follows the model-menu surface: raised card, hairline border, flat rows inside. */
+__SCOPE__ .dock{border:1px solid var(--ds-border-default);border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);color:var(--ds-text-primary);overflow:hidden}
+/* The dock clips its own corners, so any focusable child must draw its ring
+ * inside its own box. The global 2px outer ring would be cut off here, so dock
+ * children get the same ring pulled inward. Specificity matches the global rule
+ * plus one class, so it wins without adding another !important layer. */
+__SCOPE__ .dock :is(button, [tabindex], input, textarea, a[href], summary, [contenteditable="true"]):focus-visible:not(:disabled):not([aria-disabled="true"]) { outline-offset: -2px !important; }
+__SCOPE__ .dock-header{min-height:32px;padding:2px 10px 2px 12px;background:none;color:var(--ds-text-primary)}
+__SCOPE__ .dock-header-symbol{color:var(--ds-text-muted);font-size:.75rem}
+__SCOPE__ .dock-header-copy{min-width:0;gap:var(--at-cds-s-xs)}
+__SCOPE__ .dock-header-text{font-size:var(--at-cds-small-size);font-weight:var(--at-cds-w-regular);color:var(--ds-text-secondary)}
+__SCOPE__ .dock-header-current{font-size:var(--at-cds-small-size);color:var(--ds-text-primary)}
+__SCOPE__ .dock-tab{font-size:var(--at-cds-small-size)}
+__SCOPE__ :is(.dock-tab,.dock-toggle,.task-action){border-radius: var(--at-cds-r-md);color:var(--ds-text-muted)}
+__SCOPE__ :is(.dock-tab:hover,.dock-toggle:hover,.task-action:hover){background:var(--ds-bg-hover);color:var(--ds-text-primary)}
+__SCOPE__ :is(.dock-tab[aria-selected="true"],.dock-tab.active){border-radius: var(--at-cds-r-sm);background:var(--ds-bg-active);color:var(--ds-text-primary);box-shadow:none}
+__SCOPE__ .background-task-error{border:1px solid color-mix(in srgb,var(--ds-error) 24%,var(--ds-border-default));border-radius: var(--at-cds-r-md);background:color-mix(in srgb,var(--ds-error) 4%,var(--ds-bg-elevated-opaque));color:var(--ds-error)}
+__SCOPE__ :is(.thread-item-meta,.thread-item-last-reply,.thread-item-worktree){color:var(--ds-text-muted);font-size:var(--at-cds-small-size)}
+__SCOPE__ :is(.activity-marker,.activity-issue-count){color:var(--ds-error)}
+__SCOPE__ .todo-dock-list{padding:4px 14px 12px}
+__SCOPE__ .todo-dock-row{min-height:28px}
+/* Todo marker: states differ by SHAPE and FILL first, line style last.
+ * At 12px a dashed ring and a dotted ring are indistinguishable, so each state
+ * gets its own silhouette instead:
+ *   pending     hollow dashed ring          (nothing yet)
+ *   in_progress hollow solid ring, brand    (active, unfilled)
+ *   completed   filled disc + white check   (done)
+ *   cancelled   dot matrix, struck text     (abandoned)
+ * Ring and check share one centre via absolute positioning. */
+__SCOPE__ .todo-dock-row-symbol{position:relative;width:14px;height:14px;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:0}
+__SCOPE__ .todo-dock-row-symbol svg{display:none}
+__SCOPE__ .todo-dock-row-symbol::before,
+__SCOPE__ .todo-dock-row-symbol::after{content:"";position:absolute;top:50%;left:50%;box-sizing:border-box;border-radius:50%}
+/* Pending: hollow dashed ring. */
+__SCOPE__ .todo-dock-row-symbol::before{width:12px;height:12px;margin:-6px 0 0 -6px;border:1px dashed var(--ds-border-strong);background:none}
+__SCOPE__ .todo-dock-row-symbol::after{width:12px;height:12px;margin:-6px 0 0 -6px;border:0;background:none;transform:none;opacity:0}
+/* In progress: hollow solid ring in brand ink — the only coloured marker. */
+__SCOPE__ .todo-dock-row-in_progress .todo-dock-row-symbol::before{border:1.5px solid var(--at-cds-compose-accent);background:none}
+__SCOPE__ .todo-dock-row-in_progress .todo-dock-row-content{color:var(--ds-text-primary);font-weight:var(--at-cds-w-semibold)}
+/* Completed: solid filled disc plus a white check, so "done" is unmistakable. */
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-symbol::before{border:0;background:var(--ds-text-muted)}
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-symbol::after{width:6px;height:3px;margin:-2.5px 0 0 -3px;border-left:1.5px solid var(--ds-bg-elevated-opaque);border-bottom:1.5px solid var(--ds-bg-elevated-opaque);border-radius:0;transform:rotate(-45deg);opacity:1}
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-content{text-decoration:none;color:var(--ds-text-muted)}
+/* Cancelled: dotted ring plus struck-through, dimmed text. */
+__SCOPE__ .todo-dock-row-cancelled .todo-dock-row-symbol::before{border:1.5px dotted var(--ds-text-muted);background:none}
+__SCOPE__ .todo-dock-row-cancelled .todo-dock-row-content{text-decoration:line-through;color:var(--ds-text-muted);opacity:.7}
+/* Running state: one warm hue, strength decreasing rail > badge > row dot. */
+__SCOPE__ .project-run-badge{border-radius:0;background:none;padding:0;height:auto;color:var(--ds-text-muted)}
+__SCOPE__ .project-run-badge-dot{background:var(--at-cds-compose-accent)}
+__SCOPE__ .project-run-badge.waiting .project-run-badge-dot{background:var(--ds-text-muted)}
+__SCOPE__ .sidebar .thread-item-status.running::before{background:var(--at-cds-compose-accent)}

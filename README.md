@@ -27,11 +27,11 @@
 ## 特点
 
 - 浅色与深色两套配色，覆盖聊天、侧栏、设置和常用反馈界面。
-- 内嵌 Inter 与 JetBrains Mono 字体，无需联网加载；中文等字形使用系统字体回退。
+- 排版使用系统字体族：西文 Segoe UI、中文 Noto Sans SC、等宽 Cascadia Code，不内嵌字体、无网络加载。中文族须排在 `system-ui` 之前，否则 Windows 上的 `system-ui` 会先以微软雅黑接管中文字形。
 - 保留原生过程结构和折叠交互，不增加过程区整体外框，不截断正文。
 - 仅使用 `ui.theme` 权限，无网络请求、工具注册或运行时 DOM 脚本。
 
-主题只调整外观，不改变宿主业务行为。已在 PI-Desktop 0.20.1 上验证；未来宿主版本的兼容性以实际使用为准。
+主题只调整外观，不改变宿主业务行为。已在 PI-Desktop 0.21.0 上验证；未来宿主版本的兼容性以实际使用为准。
 
 ## 开发
 
@@ -48,6 +48,6 @@ npm run check:roles
 
 ## 许可与致谢
 
-代码使用 [MIT](LICENSE)，保留 ebo、Caho1 的版权声明。部分设计参考 [Caho1/open-claude-ui](https://github.com/Caho1/open-claude-ui)（提交 `2834bc158a4849f21c97cbb2e0b10525f6e646f1`）。字体使用 [SIL OFL 1.1](assets/licenses/OFL-1.1.txt)，详见 [字体说明](assets/README.md)。
+代码使用 [MIT](LICENSE)，保留 ebo、Caho1 的版权声明。部分设计参考 [Caho1/open-claude-ui](https://github.com/Caho1/open-claude-ui)（提交 `2834bc158a4849f21c97cbb2e0b10525f6e646f1`）。本版本不再随包分发字体，详见 [字体说明](assets/README.md)。
 
 本项目是非官方主题，不隶属于 Anthropic，也未获其背书；不包含其专有字体、logo 或官方产品代码。

@@ -21,6 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Bundled fonts are NOT licensed under this MIT license. They remain under
-SIL OFL 1.1; see assets/licenses/OFL-1.1.txt and assets/README.md.
-No proprietary Anthropic fonts, logos, audio or official product code are bundled.
+No bundled fonts, logos, audio or official product code are included in this
+distribution. Typography is resolved from system font families at runtime.
+No proprietary Anthropic assets are bundled.

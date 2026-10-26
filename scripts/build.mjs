@@ -7,16 +7,6 @@ import { factorPrefixes } from './css-prefixes.mjs';
 import { nestThemeRoots, mergeAdjacent, compressResidual } from './css-capacity.mjs';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const fonts = [
-  ['Inter', 'AT CDS Inter', 'Regular', 400, 'normal'],
-  ['Inter', 'AT CDS Inter', 'SemiBold', 600, 'normal'],
-  ['Inter', 'AT CDS Inter', 'Bold', 700, 'normal'],
-  ['Inter', 'AT CDS Inter', 'Italic', 400, 'italic'],
-  ['JetBrainsMono', 'AT CDS Mono', 'Regular', 400, 'normal'],
-  ['JetBrainsMono', 'AT CDS Mono', 'Italic', 400, 'italic'],
-].map(([file, family, face, weight, style]) => ({
-  family, path: `assets/fonts/${file}-${face}.woff2`, weight, style,
-}));
 export const id = 'io.github.b1eight.pi-desktop-claude-theme';
 export const scope = mode => `:root[data-theme="${mode}"][data-plugin-theme="plugin:${id}:claude-${mode}"]`;
 export const HARD_LIMIT = 256 * 1024;
@@ -36,15 +26,9 @@ export function enforceBudget(total) {
 
 export function themeArtifact(mode) {
   if (!['light', 'dark'].includes(mode)) throw new Error('Unknown theme');
-  let fontBytes = 0, payloadBytes = 0;
-  const faces = fonts.map(font => {
-    const raw = fs.readFileSync(path.join(root, font.path));
-    const data = raw.toString('base64'); fontBytes += raw.length; payloadBytes += bytes(data);
-    return `@font-face{font-family:"${font.family}";src:url("data:font/woff2;base64,${data}") format("woff2");font-weight:${font.weight};font-style:${font.style};font-display:swap}`;
-  }).join('');
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'));
-  const header = `/* Claude Theme ${manifest.version} ${mode}\n * Caho1/open-claude-ui@2834bc158a4849f21c97cbb2e0b10525f6e646f1 MIT\n * SIL OFL 1.1: LICENSE, assets/licenses/.\n * scripts/build.mjs\n */\n`;
-  const parts = [{ name: 'header', text: header }, { name: 'fonts', text: faces + '\n' }];
+  const header = `/* Claude Theme ${manifest.version} ${mode}\n * Caho1/open-claude-ui@2834bc158a4849f21c97cbb2e0b10525f6e646f1 MIT\n * No embedded fonts: typography uses host/system families.\n * scripts/build.mjs\n */\n`;
+  const parts = [{ name: 'header', text: header }];
   const sections = [
     ['palette', `palette.${mode}.css`], ['components', 'components.css'],
     ['refinements', 'refinements.css'], ['settings', 'settings.css'],
@@ -60,17 +44,16 @@ export function themeArtifact(mode) {
     contributions.push({ name, file: `src/${file}`, sourceBytes: bytes(source), sourceSha256: sha256(source), flatBytes: bytes(flat), scopedBytes: bytes(scoped), prefixSavedBytes: bytes(scoped) - bytes(factored), factoredBytes: bytes(factored), savedBytes: bytes(flat) - bytes(factored) });
   }
   parts.push({ name: 'trailingNewline', text: '\n' });
-  const beforeBody = parts.slice(2, -1).map(p => p.text).join('');
+  const beforeBody = parts.slice(1, -1).map(p => p.text).join('');
   const nested = nestThemeRoots(beforeBody, scope(mode));
   const merged = mergeAdjacent(nested.css);
   const compressed = compressResidual(merged.css);
-  const finalParts = [parts[0], parts[1], {name:'optimizedStyles',text:compressed.css}, parts.at(-1)];
+  const finalParts = [parts[0], {name:'optimizedStyles',text:compressed.css}, parts.at(-1)];
   const css = finalParts.map(p => p.text).join('');
   const status = enforceBudget(bytes(css));
   return { css, report: {
     mode, version: manifest.version, ...status, softReserve: SOFT_RESERVE, preferredReserve: PREFERRED_RESERVE,
-    sha256: sha256(css), fontFaces: fonts.length, fontBinaryBytes: fontBytes, fontPayloadBytes: payloadBytes,
-    fontDeclarationAndSeparatorBytes: bytes(faces + '\n') - payloadBytes,
+    sha256: sha256(css),
     parts: finalParts.map(p => ({ name: p.name, bytes: bytes(p.text) })), contributions,
     contributionScope: 'Per-source contributions before the three cross-section output transforms',
     optimization: { rootNestingSaved:bytes(beforeBody)-bytes(nested.css), adjacentMergingSaved:bytes(nested.css)-bytes(merged.css), residualCompressionSaved:bytes(merged.css)-bytes(compressed.css), mergeCount:merged.merges.length, scopesRemoved:nested.scopesRemoved },

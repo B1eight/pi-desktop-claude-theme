@@ -1,22 +1,32 @@
 /* Claude Theme Light palette. */
 __SCOPE__ {
   color-scheme: light;
+  /* Neutral ladder: six steps between page and deepest surface, so a "slightly darker" request has a real step to land on. */
+  --ds-neutral-0: #ffffff;
+  --ds-neutral-1: #fafaf9;
+  --ds-neutral-2: #f5f5f3;
+  --ds-neutral-3: #f0f0ee;
+  --ds-neutral-4: #e9e9e6;
+  --ds-neutral-5: #e4e4e3;
+  --ds-neutral-6: #d8d8d6;
   --ds-bg-primary: #fcfcfb;
   --ds-bg-under: #fcfcfb;
   --ds-bg-dock: #fcfcfb;
   --ds-bg-secondary: #fcfcfb;
-  --ds-bg-tertiary: #f0f0ee;
+  --ds-bg-tertiary: var(--ds-neutral-3);
   --ds-bg-inset: #eeeeeb;
-  --ds-bg-sidebar: #fafaf9;
+  --ds-bg-sidebar: var(--ds-neutral-1);
   --ds-settings-rail-bg: #fcfcfb;
-  --at-cds-region-line: #e4e4e3;
+  --at-cds-region-line: var(--ds-neutral-5);
   --at-cds-composer-focus-ink: #c6c6c5;
   --at-cds-composer-ring: 1px;
   --at-cds-ring-shadow: 0 6px 24px rgba(0, 0, 0, .06);
   --at-cds-input-border: #e1e1e0;
   --ds-sidebar-glass-tint: #fafaf9;
-  --ds-bg-composer: #ffffff;
-  --ds-composer-radius: 20px;
+  /* Field fill is translucent, matching the reference: a half-transparent white that
+   * lets the page beneath show through instead of reading as an opaque slab. */
+  --ds-bg-composer: rgba(255, 255, 255, .5);
+  --ds-composer-radius: 12px;
   --ds-bg-elevated-opaque: #ffffff;
   --ds-bg-elevated: rgba(255, 255, 255, .97);
   --ds-bg-elevated-primary: rgba(255, 255, 255, .97);
@@ -36,15 +46,15 @@ __SCOPE__ {
   --ds-border-strong: rgba(21, 21, 21, .20);
   --ds-elevation-stroke: rgba(21, 21, 21, .10);
   --ds-bg-hover: rgba(21, 21, 21, .05);
-  --ds-bg-active: rgba(21, 21, 21, .065);
-  --ds-settings-nav-active: rgba(21, 21, 21, .065);
+  --ds-bg-active: rgba(21, 21, 21, .06);
+  --ds-settings-nav-active: rgba(21, 21, 21, .06);
   --ds-error: #b42318;
   --ds-success: #167044;
   --ds-warning: #8d520d;
   --ds-info: #1f66a5;
   --ds-purple: #7356ad;
   --ds-settings-field-bg: #ffffff;
-  --ds-field-inset-bg: #f5f5f3;
+  --ds-field-inset-bg: var(--ds-neutral-2);
   --ds-field-inset-focus-bg: #ffffff;
   --ds-bg-chip: rgba(21, 21, 21, .05);
   --ds-tile: #ffffff;
@@ -66,6 +76,7 @@ __SCOPE__ {
   --ds-mermaid-canvas: #ffffff;
   --ds-shadow-composer: 0 4px 20px rgba(0, 0, 0, .035);
   --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 2px 8px rgba(0, 0, 0, .08);
+  --at-cds-shadow-chip: 0 1px 2px rgba(0, 0, 0, .06);
   --ds-shadow-dialog: 0 12px 32px rgba(0, 0, 0, .14), 0 3px 8px rgba(0, 0, 0, .10);
   --at-cds-popover-shadow: 0 8px 24px rgba(0, 0, 0, .12), 0 2px 6px rgba(0, 0, 0, .08);
   --ds-shadow-model-menu: var(--at-cds-popover-shadow);

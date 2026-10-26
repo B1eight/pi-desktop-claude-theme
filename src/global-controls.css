@@ -2,15 +2,15 @@
  * !important is limited to focus ownership/known host halos, not palette or elevation.
  * Native chrome and independent documents are explicitly outside this adapter. */
 __SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: #c6613f; }
-__SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn)):not(:disabled) {
+__SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn)):not(:disabled):not([aria-disabled="true"]) {
   outline: 2px solid var(--at-cds-focus-ink) !important; outline-offset: 2px !important;
   scroll-margin: 6px;
 }
 /* Text fields: one inset perimeter; native non-text controls keep their own focus. */
-__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error):not(.is-invalid)) {
+__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error)) {
   border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer);
 }
-__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):focus:not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error):not(.is-invalid)) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px;
+__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):focus:not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error)) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px;
 }
 /* Remove only actual focus-shadow consumers; NOT all focused buttons/cards.
  * Segment/preset selected shadows, idle elevation and recorder recording state survive. */
@@ -21,15 +21,19 @@ __SCOPE__ .chat-width-handle:focus-visible::before { box-shadow: none !important
 
 /* Real icon+input composite boundaries. :focus-within is intentionally NOT ownership:
  * clear/tool buttons have their own frame, not a second outer one. */
-__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):not([aria-invalid="true"]):not(.error):not(.is-invalid) { border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer); box-shadow: var(--at-cds-field-idle, none) !important; }
-__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):has(> :is(input, .message-edit-input):focus:not([readonly]):not([aria-invalid="true"])):not([aria-invalid="true"]):not(.error):not(.is-invalid) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px; }
+__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):not([aria-invalid="true"]):not(.error) { border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer); box-shadow: var(--at-cds-field-idle, none) !important; }
+__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):has(> :is(input, .message-edit-input):focus:not([readonly]):not([aria-invalid="true"])):not([aria-invalid="true"]):not(.error) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px; }
 __SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit) > :is(input, .message-edit-input):not(:disabled):not([readonly]):not([aria-invalid="true"]) { border: 0; background: transparent; outline: none !important; box-shadow: none !important; }
-__SCOPE__ .settings-search-wrap { border-radius: 8px; --at-cds-field-idle: inset 0 0 0 1px var(--at-cds-input-border); }
+__SCOPE__ .settings-search-wrap { border-radius: var(--at-cds-r-md); --at-cds-field-idle: inset 0 0 0 1px var(--at-cds-input-border); }
 __SCOPE__ .composer-shell:has(.composer-input:focus) {
   outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important;
   border-color: transparent; box-shadow: var(--at-cds-ring-shadow) !important; scroll-margin: 6px;
 }
-__SCOPE__ .composer-shell .composer-input { border: 0; }
+/* The generic text-field rule below paints --ds-bg-composer, and the shell
+ * already paints the same value: the input stacked a second 5%/50% wash on top,
+ * so the typing area read as a different colour than the shell around it.
+ * Inside the composer the input is a bare text plane; the shell owns the fill. */
+__SCOPE__ .composer-shell .composer-input { border: 0; background-color: transparent; }
 __SCOPE__ .composer-shell .composer-input:focus:not(:disabled) { outline: none !important; box-shadow: none !important; }
 /* Role separation: host accent is ordinary neutral, never the brand token.
  * Content links, semantic feedback, syntax and diff colors are NOT desaturated. */
@@ -62,6 +66,8 @@ __SCOPE__ input[type="range"]:not(.composer-thinking-range)::-moz-range-progress
 __SCOPE__ .composer-thinking-rail::before { height: 4px; background: var(--at-cds-slider-track); }
 __SCOPE__ .composer-thinking-rail::after { display: none; }
 __SCOPE__ .composer-thinking-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--at-cds-compose-accent); }
+/* Only the selected knob shrinks; the stop dots keep the host size. */
+__SCOPE__ .composer-thinking-thumb { width: 10px; height: 10px; top: 4px; }
 /* The original transparent native thumb remains transparent. Host --composer-thinking-progress
  * still positions its visible span, and stop markers/dragging/native step are untouched. */
 @media (forced-colors: active) {

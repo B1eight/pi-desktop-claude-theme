@@ -2,28 +2,71 @@
  * Preserve native chrome, pane widths, scroll pinning, content-visibility,
  * and inline drag/position measurements. */
 __SCOPE__ {
-  --font-sans: "AT CDS Inter", "Segoe UI", system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
-  --font-mono: "AT CDS Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Consolas, "Microsoft YaHei UI", monospace;
+  /* Latin resolves from Segoe UI; CJK resolves from Noto Sans SC. Noto must sit
+   * before system-ui: on Windows system-ui maps straight to Microsoft YaHei and
+   * would intercept every CJK run before the later entries are consulted. */
+  --font-sans: "Segoe UI", "Noto Sans SC", system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  --font-mono: "Cascadia Code", ui-monospace, "SFMono-Regular", Consolas, "Microsoft YaHei UI", monospace;
   --font-serif: Georgia, "Times New Roman", "Source Han Serif SC", serif;
-  --leading-chat: 1.5;
-  --leading-prose: 1.5;
+  /* Type scale. Every size comes with a paired line-height, so a rule never has to
+   * guess a leading value. One scale for prose, one for UI chrome, one for code. */
+  /* prose: long-form reading in the transcript */
   --at-cds-body-size: calc(16px * var(--font-scale, 1));
+  --at-cds-body-leading: 1.45;
+  /* display: in-transcript headings, one step up from prose */
+  --at-cds-display-size: calc(18px * var(--font-scale, 1));
+  --at-cds-display-leading: 1.4;
+  /* UI: menus, rows, labels, settings */
   --at-cds-ui-size: calc(14px * var(--font-scale, 1));
   --at-cds-ui-leading: calc(20px * var(--font-scale, 1));
+  /* compose: the input line, slightly larger than UI */
   --at-cds-compose-size: calc(15px * var(--font-scale, 1));
   --at-cds-compose-leading: calc(22px * var(--font-scale, 1));
+  /* code: inline and block code */
   --at-cds-code-size: calc(13px * var(--font-scale, 1));
+  --at-cds-code-leading: 1.42;
+  /* small: dense metadata and secondary lines */
   --at-cds-small-size: calc(12px * var(--font-scale, 1));
+  --at-cds-small-leading: 1.45;
+  /* title: page-level headings in settings */
+  --at-cds-title-size: calc(24px * var(--font-scale, 1));
+  --at-cds-title-leading: calc(30px * var(--font-scale, 1));
+  /* tiny: captions and language tags */
+  --at-cds-tiny-size: calc(11px * var(--font-scale, 1));
+  --at-cds-tiny-leading: 1.5;
   --at-cds-hairline: 1px;
   --at-cds-ease: cubic-bezier(.16, 1, .3, 1);
+  /* Radius scale: four steps only. 5 = small controls, 7 = menu items, 10 = panels, 12 = surfaces. */
+  --at-cds-r-sm: 5px;
+  --at-cds-r-md: 7px;
+  --at-cds-r-lg: 10px;
+  --at-cds-r-xl: 12px;
+  /* Motion scale: three steps only. */
+  --at-cds-t-fast: 60ms;
+  --at-cds-t-base: 150ms;
+  --at-cds-t-emph: 220ms;
+  /* Spacing rhythm: 6 / 8 / 12 / 20. New gaps should pick from these four. */
+  --at-cds-s-xs: 6px;
+  --at-cds-s-sm: 8px;
+  --at-cds-s-md: 12px;
+  --at-cds-s-lg: 20px;
+  /* Weight scale, measured against the fonts this theme actually resolves to.
+   * Segoe UI (Latin): 6 paint steps — 300 / 350 / 400-450 / 500-600 / 650-700 / 800-900.
+   * Noto Sans SC (CJK): 6 paint steps — 300 / 350 / 400 / 450-550 / 600-700 / 800-900.
+   * Three steps are used: regular body, medium for composer control labels, and
+   * semibold for headings. Both families separate all three, so the request now
+   * paints distinctly in either script — Microsoft YaHei only had three steps and
+   * rendered 500 and 600 identically, which is why it is no longer first for CJK. */
+  --at-cds-w-regular: 400;
+  --at-cds-w-medium: 500;
+  --at-cds-w-semibold: 600;
   font-family: var(--font-sans);
   accent-color: var(--at-cds-control-neutral);
 }
 __SCOPE__ :is(button, input, textarea, select) { font-family: var(--font-sans); }
 __SCOPE__ :is(.conversation-topbar .ct-title, .conversation-topbar .ct-back-label) { font-family: var(--font-sans); }
-__SCOPE__ .conversation-topbar .ct-title { font-weight: 600; letter-spacing: -.015em; }
+__SCOPE__ .conversation-topbar .ct-title { font-weight: var(--at-cds-w-semibold); letter-spacing: -.015em; }
 __SCOPE__ :is(.composer-model-option-ctx, .permission-card-queued, .permission-card-meta, .context-inspector-trigger, .code-block-lang, .composer-image-preview output) { font-variant-numeric: tabular-nums; }
-
 /* Selection has an explicit contrast-tested foreground, not an asserted native color. */
 __SCOPE__::selection, __SCOPE__ ::selection {
   background: var(--at-cds-selection-bg);
@@ -32,13 +75,12 @@ __SCOPE__::selection, __SCOPE__ ::selection {
 }
 /* Focus ownership stays centralized in global-controls.css. */
 __SCOPE__ :is(input, textarea, select)[aria-invalid="true"] { border-color: var(--ds-error); }
-__SCOPE__ :is(.field-error-message, .form-error) { color: var(--ds-error); }
 
 /* Reading rhythm. Keep host-controlled transcript width and virtualization. */
 __SCOPE__ .prose-chat {
   font-family: var(--font-sans);
   font-size: var(--at-cds-body-size);
-  line-height: 1.5; font-weight: 400;
+  line-height: var(--at-cds-body-leading); font-weight: var(--at-cds-w-regular);
   color: var(--ds-text-primary);
   letter-spacing: 0;
   overflow-wrap: break-word;
@@ -49,14 +91,14 @@ __SCOPE__ .prose-chat > :first-child { margin-top: 0; }
 __SCOPE__ .prose-chat > :last-child { margin-bottom: 0; }
 __SCOPE__ .prose-chat p { margin: .75em 0; }
 __SCOPE__ .prose-chat p + p { margin-top: .75em; }
-__SCOPE__ .prose-chat :is(strong, b) { font-weight: 600; }
+__SCOPE__ .prose-chat :is(strong, b) { font-weight: var(--at-cds-w-semibold); }
 __SCOPE__ .prose-chat :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-sans); font-weight: 600; line-height: 1.4;
+  font-family: var(--font-sans); font-weight: var(--at-cds-w-semibold); line-height: var(--at-cds-display-leading);
   letter-spacing: -.01em; text-wrap: balance; margin: 1.2em 0 .5em;
 }
-__SCOPE__ .prose-chat h1 { font-size: calc(18px * var(--font-scale, 1)); }
-__SCOPE__ .prose-chat h2 { font-size: calc(18px * var(--font-scale, 1)); }
-__SCOPE__ .prose-chat h3 { font-size: calc(16px * var(--font-scale, 1)); }
+__SCOPE__ .prose-chat h1 { font-size: var(--at-cds-display-size); }
+__SCOPE__ .prose-chat h2 { font-size: var(--at-cds-display-size); }
+__SCOPE__ .prose-chat h3 { font-size: var(--at-cds-body-size); }
 __SCOPE__ .prose-chat :is(h4, h5, h6) { font-size: 1em; }
 __SCOPE__ .prose-chat :is(ul, ol) { padding-inline-start: 1.5em; margin: .75em 0; }
 __SCOPE__ .prose-chat li { margin: .3em 0; }
@@ -65,7 +107,7 @@ __SCOPE__ .prose-chat :is(a, a:visited) {
   color: var(--at-cds-link); text-decoration-line: underline;
   text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   text-decoration-thickness: 1px; text-underline-offset: 3px;
-  transition: color 60ms ease, text-decoration-color 60ms ease;
+  transition: color var(--at-cds-t-fast) ease, text-decoration-color var(--at-cds-t-fast) ease;
 }
 __SCOPE__ .prose-chat a:is(:hover, :focus-visible) { color: var(--at-cds-link-hover); text-decoration-color: currentColor; }
 __SCOPE__ .prose-chat blockquote {
@@ -76,10 +118,10 @@ __SCOPE__ .prose-chat blockquote > :first-child { margin-top: 0; }
 __SCOPE__ .prose-chat blockquote > :last-child { margin-bottom: 0; }
 __SCOPE__ .prose-chat hr { border-color: var(--ds-border-default); margin: 1.5em 0; }
 __SCOPE__ .prose-chat :is(th, td) { min-width: 4em; overflow-wrap: break-word; word-break: normal; padding: .5em .75em; border: 0; border-bottom: 1px solid var(--at-cds-divider); font-size: 1em; letter-spacing: 0; }
-__SCOPE__ .prose-chat th { background: var(--at-cds-table-head); font-weight: 400; }
-__SCOPE__ .prose-chat img { border-radius: 10px; }
+__SCOPE__ .prose-chat th { background: var(--at-cds-table-head); font-weight: var(--at-cds-w-regular); }
+__SCOPE__ .prose-chat img { border-radius: var(--at-cds-r-lg); }
 __SCOPE__ .prose-chat kbd {
-  font-family: var(--font-mono); font-size: .8em; border-radius: 4px;
+  font-family: var(--font-mono); font-size: .8em; border-radius: var(--at-cds-r-sm);
   border: 1px solid var(--ds-border-default); box-shadow: 0 1px 0 var(--ds-border-default);
 }
 __SCOPE__ :is(.prose-chat, .thinking-prose) :not(pre) > code:not(pre code) {
@@ -91,9 +133,9 @@ __SCOPE__ .prose-chat .table-wrap :is(th, td) code { overflow-wrap: break-word; 
 __SCOPE__ .message-row.user .message-col:not(:has(.message-edit)) { max-width: 85%; }
 __SCOPE__ .message-row.user .message-bubble:not(:has(.message-edit)) {
   font-family: var(--font-sans); font-size: var(--at-cds-compose-size);
-  line-height: var(--at-cds-compose-leading); border-radius: 12px; padding: 10px 16px;
+  line-height: var(--at-cds-compose-leading); border-radius: var(--at-cds-r-xl); padding: 10px 16px;
   background: var(--at-cds-user-bg); color: var(--ds-text-primary);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+  box-shadow: var(--at-cds-shadow-chip);
 }
 __SCOPE__ .message-row.assistant .message-bubble { background: transparent; border: 0; box-shadow: none; }
 __SCOPE__ .message-user-text { overflow-wrap: anywhere; word-break: normal; }
@@ -102,7 +144,7 @@ __SCOPE__ .message-user-text { overflow-wrap: anywhere; word-break: normal; }
 __SCOPE__ .composer-shell {
   border: 1px solid var(--at-cds-input-border); border-radius: var(--ds-composer-radius); background: var(--ds-bg-composer);
   box-shadow: var(--ds-shadow-composer);
-  transition: box-shadow 220ms var(--at-cds-ease), background-color 150ms ease;
+  transition: box-shadow var(--at-cds-t-emph) var(--at-cds-ease), background-color var(--at-cds-t-base) ease;
 }
 __SCOPE__ .composer-shell:hover { box-shadow: var(--at-cds-composer-hover); }
 __SCOPE__ .composer-shell.is-drop-target {
@@ -115,17 +157,27 @@ __SCOPE__ :is(.composer-input, .composer-placeholder) {
 }
 __SCOPE__ .composer-input { caret-color: var(--ds-text-primary); }
 __SCOPE__ .composer-placeholder { color: var(--ds-placeholder-ink); -webkit-text-fill-color: var(--ds-placeholder-ink); opacity: 1; animation: none; }
-__SCOPE__ .composer-toolbar { padding: 8px 10px 10px; gap: 8px; }
-__SCOPE__ .composer-toolbar .icon-btn { border-radius: 8px; min-width: 28px; height: 28px; }
-__SCOPE__ .composer-model-thinking-chip { border-radius: 999px; min-height: 28px; }
-__SCOPE__ :is(.composer-chip, .chat-file-chip, .chat-image-chip, .message-attachment) { border-radius: 10px; }
+__SCOPE__ .composer-toolbar { padding: var(--at-cds-s-sm) 10px 10px; gap: var(--at-cds-s-sm); }
+__SCOPE__ .composer-toolbar .icon-btn { border-radius: var(--at-cds-r-md); min-width: 28px; height: 28px; }
+/* The text-button padding above is inherited here: the dock toggle is a fixed
+ * 32px box, so 14px of side padding left only 4px for the glyph and squeezed it
+ * into a sliver. .btn is declared later at equal specificity, so the toggle
+ * selector carries its extra class to keep this inset. */
+__SCOPE__ .dock-toggle.btn { padding-inline: 0; }
+/* The chip is a container, not a square icon button: the generic
+ * `.composer-toolbar .icon-btn` pins a fixed 28px height, which clips the
+ * thinking-level capsule as soon as its line box grows (17.5px type already
+ * reaches 27px, 21px type reaches 32px). Let the chip size to its content and
+ * keep 28px as the floor instead. */
+__SCOPE__ .composer-toolbar .composer-model-thinking-chip { border-radius: 999px; height: auto; min-height: 28px; }
+__SCOPE__ :is(.composer-chip, .chat-file-chip, .chat-image-chip, .message-attachment) { border-radius: var(--at-cds-r-lg); }
 __SCOPE__ :is(.chat-file-chip, .message-attachment) { border-color: var(--ds-border-default); background: var(--ds-tile); }
 
 /* Primary actions stay neutral; Composer send uses the accent color. */
 __SCOPE__ .btn {
-  min-height: 32px; padding: 5px 14px; border-radius: 8px;
-  font-size: var(--at-cds-ui-size); font-weight: 400; line-height: var(--at-cds-ui-leading);
-  transition: background-color 150ms var(--at-cds-ease), color 150ms ease, box-shadow 150ms ease;
+  min-height: 32px; padding: 5px 14px; border-radius: var(--at-cds-r-md);
+  font-size: var(--at-cds-ui-size); font-weight: var(--at-cds-w-regular); line-height: var(--at-cds-ui-leading);
+  transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-base) ease, box-shadow var(--at-cds-t-emph) ease;
 }
 __SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):not(:disabled):not([aria-disabled="true"]) {
   background: var(--at-cds-action-bg); color: var(--at-cds-action-fg); border-color: transparent;
@@ -139,30 +191,30 @@ __SCOPE__ .send-btn:not(:disabled):not([aria-disabled="true"]) {
 __SCOPE__ .send-btn:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); opacity: 1; }
 __SCOPE__ .composer-shell .send-btn:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-compose-accent); color: #fff; }
 __SCOPE__ .btn-secondary { background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); color: var(--ds-text-primary); }
-__SCOPE__ .btn-secondary:hover:not(:disabled) { background: var(--ds-bg-hover); }
+__SCOPE__ .btn-secondary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); }
 __SCOPE__ .btn-ghost { background: transparent; border: 0; }
-__SCOPE__ .btn-ghost:hover:not(:disabled) { background: var(--ds-bg-hover); color: var(--ds-text-primary); }
-__SCOPE__ .send-btn { width: 32px; height: 32px; flex-basis: 32px; border-radius: 8px; }
+__SCOPE__ .btn-ghost:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); color: var(--ds-text-primary); }
+__SCOPE__ .send-btn { width: 32px; height: 32px; flex-basis: 32px; border-radius: var(--at-cds-r-md); }
 __SCOPE__ .send-btn.message-edit-submit { width: auto; flex-basis: auto; }
 __SCOPE__ :is(.btn-primary, .send-btn, .copy-btn.primary):is(:disabled, [aria-disabled="true"]) { background: var(--ds-send-disabled-bg); color: var(--ds-send-disabled-fg); }
 __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn):active:not(:disabled):not([aria-disabled="true"]) { transform: none; transition-duration: 60ms; }
 __SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); }
 __SCOPE__ .send-btn:active:not(:disabled):not([aria-disabled="true"]):not(.composer-shell .send-btn) { background: var(--at-cds-action-hover); }
-__SCOPE__ :is(.btn-secondary, .btn-ghost, .icon-btn):not(.danger):not(.btn-danger):not(.stop-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-active); }
+__SCOPE__ :is(.btn-secondary, .btn-ghost, .icon-btn):not(.danger):not(.stop-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-active); }
 __SCOPE__ :is(.btn, .icon-btn, .settings-toggle):disabled { opacity: .45; cursor: not-allowed; transform: none; }
 __SCOPE__ :is(.btn, .icon-btn)[aria-disabled="true"] { opacity: .45; cursor: not-allowed; transform: none; }
 __SCOPE__ .asktool-card-header-actions .btn { min-height: 24px; font-size: var(--at-cds-small-size); line-height: calc(16px * var(--font-scale, 1)); padding: 3px 8px; }
-__SCOPE__ :is(.copy-btn, .code-copy-btn) { border-radius: 6px; }
-__SCOPE__ :is(.nav-item, .settings-nav-item, .thread-item, .sidebar-session-group-header) { border-radius: 8px; }
+__SCOPE__ :is(.copy-btn, .code-copy-btn) { border-radius: var(--at-cds-r-sm); }
+__SCOPE__ :is(.nav-item, .settings-nav-item, .thread-item, .sidebar-session-group-header) { border-radius: var(--at-cds-r-md); }
 __SCOPE__ :is(.nav-item.active, .settings-nav-item.active, .thread-item.active) { background: var(--ds-bg-active); color: var(--ds-text-primary); }
 __SCOPE__ .thread-item.selected:not(.active) { background: var(--ds-accent-soft); color: var(--ds-text-primary); }
 
 /* Existing segmented controls; no fabricated sliding-thumb DOM or JS. */
-__SCOPE__ .settings-segment { border-radius: 8px; padding: 2px; gap: 2px; background: var(--at-cds-segmented-track); }
-__SCOPE__ .settings-segment-item { border-radius: 6px; padding: 6px 12px; font-weight: 400; }
+__SCOPE__ .settings-segment { border-radius: var(--at-cds-r-md); padding: 2px; gap: 2px; background: var(--at-cds-segmented-track); }
+__SCOPE__ .settings-segment-item { border-radius: var(--at-cds-r-sm); padding: 6px 12px; font-weight: var(--at-cds-w-regular); }
 __SCOPE__ .settings-segment-item.active {
-  background: var(--at-cds-segmented-thumb); color: var(--ds-text-primary); font-weight: 600;
-  box-shadow: inset 0 0 0 var(--at-cds-hairline) var(--ds-border-default), 0 1px 2px rgba(0, 0, 0, .08);
+  background: var(--at-cds-segmented-thumb); color: var(--ds-text-primary); font-weight: var(--at-cds-w-semibold);
+  box-shadow: inset 0 0 0 var(--at-cds-hairline) var(--ds-border-default), var(--at-cds-shadow-chip);
 }
 __SCOPE__ .settings-toggle { width: 36px; height: 20px; }
 __SCOPE__ .settings-toggle-thumb { width: 16px; height: 16px; }
@@ -170,19 +222,34 @@ __SCOPE__ .settings-toggle.on .settings-toggle-thumb { transform: translateX(16p
 __SCOPE__ .settings-toggle.on { background: var(--at-cds-functional-selection); }
 __SCOPE__ .settings-toggle.on:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-functional-selection-hover); }
 __SCOPE__ .settings-toggle.on:is(:disabled, [aria-disabled="true"]):hover { background: var(--at-cds-functional-selection); }
-__SCOPE__ .ds-checkbox:hover:not(:disabled) { border-color: var(--at-cds-functional-selection); }
+__SCOPE__ .ds-checkbox:hover:not(:disabled):not([aria-disabled="true"]) { border-color: var(--at-cds-functional-selection); }
 __SCOPE__ .ds-checkbox:is(:checked, :indeterminate) { background: var(--at-cds-functional-selection); border-color: var(--at-cds-functional-selection); }
 __SCOPE__ .ds-checkbox:checked:not(:indeterminate)::after { border-style: solid; border-width: 0 2px 2px 0; border-color: var(--at-cds-functional-selection-fg); }
 __SCOPE__ .ds-checkbox:indeterminate::after { background: var(--at-cds-functional-selection-fg); }
 __SCOPE__ :is(.prose-chat .task-list-item > input[type="checkbox"], .settings-network-checkbox input, .provider-models-check) { accent-color: var(--at-cds-functional-selection); }
 __SCOPE__ .settings-font-size-slider input[type="range"] { accent-color: var(--ds-text-secondary); }
 __SCOPE__ :is(.settings-language-check, .settings-theme-check, .settings-menu-select-check, .settings-icon-button.is-action-highlight) { color: var(--ds-text-primary); }
-__SCOPE__ .settings-icon-button.is-action-highlight:hover:not(:disabled) { color: var(--ds-text-primary); background: var(--ds-bg-hover); }
+__SCOPE__ .settings-icon-button.is-action-highlight:hover:not(:disabled):not([aria-disabled="true"]) { color: var(--ds-text-primary); background: var(--ds-bg-hover); }
 __SCOPE__ :is(.mcpm-chip, .sklm-chip, .mcpm-page-btn, .sklm-page-btn).is-active { background: var(--ds-bg-active); color: var(--ds-text-primary); border-color: transparent; }
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) { color: var(--at-cds-status-neutral); }
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: var(--ds-info); }
 __SCOPE__ .composer-model-thinking-icon { color: var(--ds-text-secondary); }
 __SCOPE__ .composer-model-thinking-level, __SCOPE__ .composer-thinking-tick.active { color: var(--at-cds-compose-accent); }
+/* Composer control row, three separate concerns.
+ * 1. The mode chip must show its full label: the host pins it to 96px with an
+ *    ellipsis, which truncates "智能体" to "智...". Let it size to its content.
+ * 2. Context ring value keeps the host's own scale. It is a 11px / 600 numeric
+ *    readout next to a 14px glyph ring; forcing it to 14px / 400 made it compete
+ *    with the model name and read as body text instead of a gauge.
+ * 3. Model name and thinking level share 14px / regular. Only the level is
+ *    emphasised (medium), keeps its capsule padding so it never touches the
+ *    neighbouring text, and carries no chip fill. */
+__SCOPE__ .composer-mode-chip { flex: 0 1 auto; width: auto; min-width: 0; max-width: none; }
+__SCOPE__ .composer-mode-chip-label { overflow: visible; text-overflow: clip; }
+__SCOPE__ :is(.composer-model-thinking-model, .composer-model-thinking-level) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-regular); }
+__SCOPE__ .composer-model-thinking-level { font-weight: var(--at-cds-w-medium); background: none; padding: 1px 6px; }
+/* Host tick box is 14px tall against a 14.3px line box, which clips descenders. */
+__SCOPE__ .composer-thinking-tick { line-height: var(--at-cds-small-leading); min-height: 17px; padding-block: 1px; overflow: visible; }
 __SCOPE__ .composer-thinking-tick:not(.active), __SCOPE__ .composer-thinking-dot:not(.active) { color: var(--ds-text-muted); }
 __SCOPE__ :is(.composer-thinking-dot.active, .composer-thinking-thumb) { background: var(--at-cds-compose-accent); }
 __SCOPE__ .composer-thinking-dot[data-hovered]:not([data-filled]):not(.active) { background: var(--ds-text-muted); }
@@ -190,36 +257,42 @@ __SCOPE__ .composer-thinking-range:focus-visible { outline-color: var(--ds-focus
 
 /* Menus stay portaled/positioned by the host; no z-index or fixed offsets. */
 __SCOPE__ :is(.composer-model-menu, .composer-permission-menu, .composer-model-thinking-menu, .composer-autocomplete, .context-menu, .settings-menu-select-menu, .home-project-switcher-menu) {
-  border-radius: 12px; background: var(--ds-bg-elevated-opaque);
+  border-radius: var(--at-cds-r-xl); background: var(--ds-bg-elevated-opaque);
   border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-model-menu);
 }
-__SCOPE__ .composer-model-menu { border-radius: 12px; -webkit-backdrop-filter: none; backdrop-filter: none; }
-__SCOPE__ :is(.composer-plus-item, .composer-menu-entry, .composer-menu-back, .context-menu-item, .settings-menu-select-option) { border-radius: 8px; }
+__SCOPE__ .composer-model-menu { border-radius: var(--at-cds-r-xl); -webkit-backdrop-filter: none; backdrop-filter: none; }
+__SCOPE__ :is(.composer-plus-item, .composer-menu-entry, .composer-menu-back, .context-menu-item, .settings-menu-select-option) { border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease; }
 __SCOPE__ .composer-plus-item.active { background: var(--ds-bg-active); }
 __SCOPE__ .composer-plus-item.kb-active { background: var(--ds-bg-hover); outline: 1px solid var(--ds-border-strong); outline-offset: -1px; }
 __SCOPE__ .composer-plus-item.active.kb-active { background: var(--ds-bg-active); }
+/* Selected model: outline only, no fill, so the marks do not look like hover states. */
+__SCOPE__ .composer-model-option[aria-checked="true"],
+__SCOPE__ .composer-model-option[aria-checked="true"].kb-active,
+__SCOPE__ .composer-model-option[aria-checked="true"]:hover { background: none; border-radius: var(--at-cds-r-md); box-shadow: inset 0 0 0 1px var(--at-cds-compose-accent); }
+__SCOPE__ .composer-model-option[aria-checked="true"] .composer-model-label { color: var(--ds-text-primary); font-weight: var(--at-cds-w-semibold); }
+__SCOPE__ .composer-model-option[aria-checked="true"] .composer-model-option-badge { color: var(--at-cds-compose-accent); }
 __SCOPE__ .composer-model-menu .composer-model-group-label {
   padding: 8px 8px 4px; background: var(--ds-bg-elevated-opaque);
   -webkit-backdrop-filter: none; backdrop-filter: none;
-  color: var(--ds-text-muted); font-weight: 600; border: 0;
+  color: var(--ds-text-muted); font-weight: var(--at-cds-w-semibold); border: 0;
 }
 __SCOPE__ .composer-model-menu .composer-model-group + .composer-model-group {
   margin-top: 6px; padding-top: 4px; border-top: var(--at-cds-hairline) solid var(--ds-border-default);
 }
 __SCOPE__ .composer-model-label { overflow-wrap: anywhere; }
-__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog) { border-radius: 16px; border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-dialog); }
-__SCOPE__ .dialog { padding: 20px; }
-__SCOPE__ :is(.dialog, .p-dialog) :is(h2, h3) { font-size: calc(15px * var(--font-scale, 1)); font-weight: 600; }
+__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog) { border-radius: var(--at-cds-r-xl); border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-dialog); }
+__SCOPE__ .dialog { padding: var(--at-cds-s-lg); }
+__SCOPE__ :is(.dialog, .p-dialog) :is(h2, h3) { font-size: var(--at-cds-compose-size); font-weight: var(--at-cds-w-semibold); }
 
 /* Mode-aware code surface; native host one-light/one-dark syntax stays intact. */
 __SCOPE__ .code-block {
   --code-block-bg: var(--at-cds-code-bg);
-  background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: 12px;
+  background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: var(--at-cds-r-xl);
   border: 1px solid var(--at-cds-divider); box-shadow: none;
 }
 __SCOPE__ .prose-chat pre, __SCOPE__ .code-block pre {
-  font-family: var(--font-mono); font-size: var(--at-cds-code-size); line-height: 1.625;
-  background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: 12px;
+  font-family: var(--font-mono); font-size: var(--at-cds-code-size); line-height: var(--at-cds-code-leading);
+  background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: var(--at-cds-r-xl);
   padding: 14px; overflow: auto; tab-size: 2;
 }
 __SCOPE__ .prose-chat .code-block pre { border-radius: 0; margin: 0; padding: 14px; }
@@ -228,7 +301,7 @@ __SCOPE__ .prose-chat pre code, __SCOPE__ .code-block pre code {
   background: transparent; color: inherit; padding: 0; font-variant-ligatures: none;
 }
 __SCOPE__ .code-block-head { background: var(--ds-code-head-bg); min-height: 36px; padding: 4px 8px 4px 14px; border-bottom: 0; }
-__SCOPE__ .code-block .code-block-lang { color: var(--at-cds-code-muted); font-size: calc(11px * var(--font-scale, 1)); }
+__SCOPE__ .code-block .code-block-lang { color: var(--at-cds-code-muted); font-size: var(--at-cds-tiny-size); }
 __SCOPE__ .code-block .code-copy-btn { color: var(--at-cds-code-muted); opacity: 1; }
 __SCOPE__ .code-block .code-copy-btn:hover { color: var(--at-cds-code-fg); background: var(--ds-code-hover-bg); }
 __SCOPE__ .code-block .code-copy-btn.copied { color: var(--ds-success); }
@@ -237,11 +310,11 @@ __SCOPE__ :is(.tool-diff, .review-change-diff) .diff-line.add { background: colo
 __SCOPE__ :is(.tool-diff, .review-change-diff) .diff-line.del { background: color-mix(in srgb, var(--at-cds-diff-del) 20%, transparent); }
 
 /* Existing business states only; preserve risk and approval semantics. */
-__SCOPE__ :is(.permission-card, .asktool-card, .review-change-card) { border-radius: 12px; }
+__SCOPE__ :is(.permission-card, .asktool-card, .review-change-card) { border-radius: var(--at-cds-r-xl); }
 __SCOPE__ .permission-card { padding: 14px 16px; }
 __SCOPE__ .tool-row.thinking > .tool-row-body { color: var(--ds-text-secondary); }
-__SCOPE__ .thinking-prose { font-size: var(--at-cds-small-size); color: var(--ds-text-secondary); line-height: 1.625; }
-__SCOPE__ .composer-image-preview { border-radius: 16px; border-color: var(--ds-border-default); box-shadow: var(--ds-shadow-dialog); }
+__SCOPE__ .thinking-prose { font-size: var(--at-cds-small-size); color: var(--ds-text-secondary); line-height: var(--at-cds-small-leading); }
+__SCOPE__ .composer-image-preview { border-radius: var(--at-cds-r-xl); border-color: var(--ds-border-default); box-shadow: var(--ds-shadow-dialog); }
 __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); backdrop-filter: blur(8px); }
 
 /* Animate only host-provided states; no runtime spring engine. */
@@ -254,14 +327,19 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
   15%, 25% { opacity: 1; }
   65%, 100% { opacity: .2857; }
 }
+@keyframes at-cds-rise-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @media (prefers-reduced-motion: no-preference) {
-  __SCOPE__ :is(.composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu).is-open { animation: at-cds-popover-in 150ms var(--at-cds-ease) both; }
+  __SCOPE__ :is(.composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu).is-open { animation: at-cds-popover-in var(--at-cds-t-base) var(--at-cds-ease) both; }
+  __SCOPE__ .dock-panel:not([hidden]) { animation: at-cds-rise-in var(--at-cds-t-base) var(--at-cds-ease) both; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span { animation: at-cds-quiet-dot 1.8s linear infinite; transform: none; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(2) { animation-delay: .2s; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(3) { animation-delay: .4s; }
 }
 @media (prefers-reduced-motion: reduce) {
-  __SCOPE__ :is(.composer-shell, .btn, .icon-btn, .send-btn, .stop-btn, .settings-toggle, .settings-toggle-thumb, .settings-segment-item, .composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu, .working-indicator-mark > span) {
+  __SCOPE__ :is(.composer-shell, .btn, .icon-btn, .send-btn, .stop-btn, .settings-toggle, .settings-toggle-thumb, .settings-segment-item, .composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu, .working-indicator-mark > span, .dock-panel) {
     animation: none !important; transition-duration: .01ms !important;
   }
   __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn):active { transform: none; }
@@ -275,7 +353,7 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
   __SCOPE__ .dialog { padding: 16px; }
 }
 @container composer-stack (max-width: 480px) {
-  __SCOPE__ .composer-toolbar { flex-wrap: wrap; gap: 6px; }
+  __SCOPE__ .composer-toolbar { flex-wrap: wrap; gap: var(--at-cds-s-xs); }
   __SCOPE__ :is(.composer-left, .composer-right) { min-width: 0; gap: 4px; }
   __SCOPE__ .composer-model-thinking-chip { max-width: 100%; }
   __SCOPE__ .composer-model-thinking-model { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -293,3 +371,7 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
 @media (forced-colors: active) {
   __SCOPE__ :is(.prose-chat, .thinking-prose) :not(pre) > code:not(pre code) { border: 1px solid CanvasText; }
 }
+__SCOPE__ .composer-mode-menu{border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);border:1px solid var(--at-cds-border);box-shadow:var(--ds-shadow-model-menu)}
+__SCOPE__ .composer-mode-menu .active{border-radius: var(--at-cds-r-md);background:var(--ds-bg-active);color:var(--ds-text-primary)}
+__SCOPE__ :is(.composer-placeholder-suggestion,.composer-suggestion-text){font:var(--at-cds-compose-size)/var(--at-cds-compose-leading) var(--font-sans);color:var(--ds-placeholder-ink)}
+__SCOPE__ .turn-usage-popover-footer{color:var(--ds-text-secondary)}

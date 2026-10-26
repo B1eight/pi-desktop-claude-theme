@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { root, id, fonts, renderTheme, scope } from './build.mjs';
+import { root, id, renderTheme, scope } from './build.mjs';
 import { compact, expandRules } from './css-structure.mjs';
 
 const args = process.argv.slice(2);
@@ -20,16 +20,7 @@ assert.deepEqual(manifest.permissions, ['ui.theme']); checks++;
 assert.deepEqual(Object.keys(manifest.contributes), ['themes']); checks++;
 ok(manifest.engines.piDesktop === '>=0.20.1', 'Documented host floor');
 ok(manifest.contributes.themes.length === 2, 'Two themes');
-const fontDataUrls = fonts.map(f => `data:font/woff2;base64,${fs.readFileSync(path.join(root, f.path)).toString('base64')}`);
-ok(fonts.length === 6, 'Six embedded font faces');
-let assetBytes = 0;
-for (const font of fonts) {
-  const bytes = fs.readFileSync(path.join(root, font.path));
-  ok(bytes.subarray(0, 4).toString() === 'wOF2', `${font.path}: WOFF2 signature`);
-  assetBytes += bytes.length;
-}
-ok(assetBytes === 161172, 'Expected compact font payload');
-ok(read('assets/licenses/OFL-1.1.txt').includes('SIL OPEN FONT LICENSE Version 1.1'), 'Font license');
+ok(!/[A-Za-z0-9+/]{2000,}/.test(read('themes/claude-light.css').replace(/\/\*[\s\S]*?\*\//g, '')), 'No embedded binary payload in published theme');
 ok(read('LICENSE').includes('Caho1'), 'Reference attribution');
 const entries = { exports: {} };
 vm.runInNewContext(read('main.js'), { module: entries }, { timeout: 1000 });
@@ -47,6 +38,16 @@ if (hostBundle) {
 }
 const stripComments = s => s.replace(/\/\*[\s\S]*?\*\//g, '');
 const palette = mode => new Map([...read(`src/palette.${mode}.css`).matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(m => [m[1], m[2].trim()]));
+// Resolve one level of var(--token) so semantic slots can reference the neutral ladder.
+const resolvedPalette = mode => {
+  const raw = palette(mode);
+  const out = new Map();
+  for (const [k, v] of raw) {
+    const m = v.match(/^var\((--[\w-]+)\)$/);
+    out.set(k, m ? (raw.get(m[1]) ?? v) : v);
+  }
+  return out;
+};
 assert.deepEqual([...palette('light').keys()].sort(), [...palette('dark').keys()].sort()); checks++;
 for (const mode of ['light', 'dark']) {
   const declaration = manifest.contributes.themes.find(t => t.base === mode);
@@ -58,8 +59,7 @@ for (const mode of ['light', 'dark']) {
   const clean = stripComments(css);
   ok(!clean.includes('__SCOPE__') && !clean.includes('@import'), `${mode}: expanded, no imports`);
   ok(!/url\(["']?(?:https?:|file:|[a-z]:)/i.test(clean), `${mode}: no network/absolute asset paths`);
-  const embedded = [...clean.matchAll(/url\("([^"]+)"\)/g)].map(m => m[1]);
-  assert.deepEqual(embedded, fontDataUrls, `${mode}: exact embedded font bytes, no external URLs`); checks++;
+  assert.equal([...clean.matchAll(/url\(/g)].length, 0, `${mode}: no external or embedded asset URLs`); checks++;
   const defs = new Set([...clean.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));
   for (const m of clean.matchAll(/var\((--[\w-]+)/g)) ok(defs.has(m[1]) || m[1] === '--font-scale', `Defined token ${m[1]}`);
   for (const { selector } of expandRules(compact(css))) {
@@ -71,15 +71,40 @@ for (const mode of ['light', 'dark']) {
   if (sanitizer) {
     const result = sanitizer.sanitizeThemeCss(css, 256 * 1024);
     ok(result.ok, `${mode}: actual host sanitizer: ${result.error || 'accepted'}`);
-    ok(result.css === css.trim(), 'Sanitizer preserves all styling and inline fonts');
+    ok(result.css === css.trim(), 'Sanitizer preserves all styling');
     ok(!sanitizer.sanitizeThemeCss('@import "https://example.invalid/x.css";').ok, 'Sanitizer negative control');
     ok(!sanitizer.sanitizeThemeCss('a { background: url("missing.woff2"); }').ok, 'Undeclared asset rejected');
   }
   console.log(`${mode}: ${Buffer.byteLength(css)} CSS bytes, ${defs.size} variables`);
 }
 
-function luminance(hex) {
-  const rgb = hex.slice(1).match(/../g).map(x => parseInt(x, 16) / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+// Parse #rgb / #rrggbb / rgba(r,g,b,a) and composite any translucent colour onto the
+// page background before measuring, so a semi-transparent fill is judged by what the
+// user actually sees rather than by its raw declared value.
+function parseColor(value) {
+  const s = String(value || '').trim();
+  const short = s.match(/^#([0-9a-f]{3})$/i);
+  if (short) return [...short[1].split('').map(c => parseInt(c + c, 16)), 1];
+  const long = s.match(/^#([0-9a-f]{6})$/i);
+  if (long) return [parseInt(long[1].slice(0, 2), 16), parseInt(long[1].slice(2, 4), 16), parseInt(long[1].slice(4, 6), 16), 1];
+  const fn = s.match(/^rgba?\(([^)]+)\)$/i);
+  if (fn) {
+    const parts = fn[1].split(',').map(x => parseFloat(x.trim()));
+    if (parts.length >= 3) return [parts[0], parts[1], parts[2], parts.length > 3 ? parts[3] : 1];
+  }
+  return null;
+}
+function compositeOver(fg, bg) {
+  const a = fg[3];
+  return [
+    fg[0] * a + bg[0] * (1 - a),
+    fg[1] * a + bg[1] * (1 - a),
+    fg[2] * a + bg[2] * (1 - a),
+    1,
+  ];
+}
+function luminance(rgba) {
+  const rgb = rgba.slice(0, 3).map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
   return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722;
 }
 function contrast(fg, bg) { const [a, b] = [luminance(fg), luminance(bg)].sort((a, b) => b - a); return (a + .05) / (b + .05); }
@@ -93,28 +118,39 @@ for (const mode of ['light', 'dark']) {
     ['--ds-info', '--ds-bg-primary'], ['--at-cds-status-neutral', '--ds-bg-composer'],
     ['--at-cds-inline-fg', '--at-cds-inline-code-bg'], ['--ds-focus', '--ds-bg-composer'],
   ]) {
-    const color = token => vars.get(token).replace(/^var\((--[\w-]+)\)$/, (_, referenced) => vars.get(referenced));
-    const ratio = contrast(color(fg), color(bg));
+    const raw = token => vars.get(token).replace(/^var\((--[\w-]+)\)$/, (_, referenced) => vars.get(referenced));
+    // Composite any translucent colour over the page so the ratio reflects what renders.
+    const page = parseColor(raw('--ds-bg-primary')) ?? [255, 255, 255, 1];
+    const paint = token => {
+      const c = parseColor(raw(token));
+      if (!c) return null;
+      return c[3] < 1 ? compositeOver(c, page) : c;
+    };
+    const fgC = paint(fg), bgC = paint(bg);
+    ok(fgC && bgC, `${mode} ${fg}/${bg}: unparsable colour`);
+    const ratio = contrast(fgC, bgC);
     ok(ratio >= 4.5, `${mode} ${fg}/${bg}: ${ratio.toFixed(2)} < 4.5`);
     console.log(`contrast ${mode} ${fg}: ${ratio.toFixed(2)}:1`);
   }
 }
-ok(contrast('#8e2626', '#efefee') >= 4.5, 'Independent red inline code contrast');
-ok(contrast('#383a42', '#fafafa') >= 4.5, 'Plain code contrast');
-ok(contrast('#151515', '#f0f0ee') >= 4.5, 'User bubble contrast');
+ok(contrast(parseColor('#8e2626'), parseColor('#efefee')) >= 4.5, 'Independent red inline code contrast');
+ok(contrast(parseColor('#383a42'), parseColor('#fafafa')) >= 4.5, 'Plain code contrast');
+ok(contrast(parseColor('#151515'), parseColor('#f0f0ee')) >= 4.5, 'User bubble contrast');
 const expectedLight = {
   '--ds-bg-primary': '#fcfcfb', '--ds-bg-under': '#fcfcfb',
   '--ds-bg-sidebar': '#fafaf9', '--ds-settings-rail-bg': '#fcfcfb', '--ds-sidebar-glass-tint': '#fafaf9',
   '--ds-bg-secondary': '#fcfcfb', '--ds-bg-dock': '#fcfcfb', '--ds-bg-tertiary': '#f0f0ee',
   '--ds-code-head-bg': '#fdfdfd', '--ds-code-hover-bg': '#e8e8e2', '--ds-thinking-code-bg': '#fafafa',
   '--at-cds-user-bg': '#f0f0ee', '--at-cds-inline-code-bg': '#efefee',
-  '--ds-bg-composer': '#ffffff', '--ds-bg-elevated-opaque': '#ffffff', '--at-cds-surface': '#fafafa',
+  '--ds-bg-composer': 'rgba(255, 255, 255, .5)', '--ds-bg-elevated-opaque': '#ffffff', '--at-cds-surface': '#fafafa',
 };
-for (const [token, value] of Object.entries(expectedLight)) ok(palette('light').get(token) === value, `Expected light token ${token}`);
+for (const [token, value] of Object.entries(expectedLight)) ok(resolvedPalette('light').get(token) === value, `Expected light token ${token}`);
 ok(palette('light').get('--ds-text-muted') === '#707069' && palette('dark').get('--ds-text-muted') === '#96948d', 'Muted text uses contrast-safe near-reference values');
-ok(read('src/components.css').includes('font-weight: 400') && !palette('dark').has('--at-cds-body-weight'), 'Both modes use genuine static regular prose');
-ok(read('src/components.css').includes('--font-sans: "AT CDS Inter",') && read('src/components.css').includes('"AT CDS Mono"'), 'Licensed packaged fonts remain first');
-for (const mode of ['light', 'dark']) { const p = palette(mode); ok(contrast(p.get('--ds-text-primary'), p.get('--at-cds-user-bg')) >= 4.5, `${mode}: user bubble contrast >= 4.5`); }
+ok(read('src/components.css').includes('font-weight: var(--at-cds-w-regular)') && read('src/components.css').includes('--at-cds-w-regular: 400;') && !palette('dark').has('--at-cds-body-weight'), 'Both modes use genuine static regular prose');
+const sansStack = '--font-sans: "Segoe UI", "Noto Sans SC", system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;';
+ok(read('src/components.css').includes(sansStack) && read('src/components.css').includes('--font-mono: "Cascadia Code"'), 'System typography stack, no packaged fonts');
+ok(!read('src/components.css').includes('@font-face') && !themeRead('light').includes('@font-face') && !themeRead('dark').includes('@font-face'), 'No @font-face declarations; every family is installed locally');
+for (const mode of ['light', 'dark']) { const p = palette(mode); ok(contrast(parseColor(p.get('--ds-text-primary')), parseColor(p.get('--at-cds-user-bg'))) >= 4.5, `${mode}: user bubble contrast >= 4.5`); }
 const refinements = read('src/refinements.css');
 const settingsOverrides = read('src/settings.css');
 const sharedTail = mode => {
@@ -158,5 +194,4 @@ for (const mode of ['light', 'dark']) {
   const roles = fs.readFileSync(path.join(root, 'scripts/check-color-roles.mjs'), 'utf8');
   ok(/color role matrix/i.test(roles), `${mode}: role assertions installed`);
 }
-
-console.log(`PASS: ${checks} assertions; ${fonts.length} fonts / ${assetBytes} bytes. ${sanitizer ? 'Actual host sanitizer tested.' : 'Host sanitizer not supplied.'}`);
+console.log(`PASS: ${checks} assertions. ${sanitizer ? 'Actual host sanitizer tested.' : 'Host sanitizer not supplied.'}`);

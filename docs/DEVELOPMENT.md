@@ -49,10 +49,9 @@ node scripts/check-host-contract.mjs --host-root <external-evidence-directory> -
 manifest.json
 main.js
 LICENSE
+README.md
 themes/claude-light.css
 themes/claude-dark.css
-assets/README.md
-assets/licenses/OFL-1.1.txt
 ```
 
 使用 PI-Desktop 官方 **PluginCheck → PluginPack** 生成安装包，不用普通 ZIP 工具替代。核对解包内容、主题哈希与声明身份。安装包适合作为 GitHub Release 附件，不提交到源码仓库。市场上传按实际表单要求另行准备。

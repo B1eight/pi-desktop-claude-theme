@@ -8,7 +8,7 @@ import {nestThemeRoots,mergeAdjacent,compressResidual} from '../scripts/css-capa
 // Baseline is current source + same complete long identity, before capacity steps.
 // The over-budget baseline is test data only, never an installable output option.
 export function stages(mode){
- const final=themeArtifact(mode),prefixBytes=final.report.parts.slice(0,2).reduce((n,p)=>n+p.bytes,0),prefix=Buffer.from(final.css).subarray(0,prefixBytes).toString('utf8');
+ const final=themeArtifact(mode),prefixBytes=final.report.parts.slice(0,1).reduce((n,p)=>n+p.bytes,0),prefix=Buffer.from(final.css).subarray(0,prefixBytes).toString('utf8');
  const names=[`palette.${mode}.css`,'components.css','refinements.css','settings.css','global-controls.css'];
  const baselineBody=names.map(f=>factorPrefixes(factorScope(compact(fs.readFileSync(path.join(root,'src',f),'utf8')).replaceAll('__SCOPE__',scope(mode)),scope(mode)))).join('');
  const a=nestThemeRoots(baselineBody,scope(mode)),b=mergeAdjacent(a.css),c=compressResidual(b.css);
