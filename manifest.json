@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.b1eight.pi-desktop-claude-theme",
   "name": "Claude Theme",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "非官方 Claude 风格纯声明式主题，提供浅色与深色两套配色。",
   "author": "B1eight",
   "license": "MIT",

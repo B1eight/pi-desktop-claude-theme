@@ -14,7 +14,7 @@ function contrast(a,b){const x=[luminance(a),luminance(b)].sort((a,b)=>b-a);retu
 const ratios=[];
 for(const mode of ['light','dark']){
  const p=palette(mode),value=k=>p.get(k)?.replace(/^var\((--[\w-]+)\)$/,(_,k)=>p.get(k));
- const literals=mode==='light'?{'--at-cds-action-bg':'#0b0b0b','--at-cds-inline-fg':'#8e2626','--at-cds-functional-selection':'#2674cf'}:{'--at-cds-action-bg':'#f0efec','--ds-text-primary':'#f0efec','--ds-text-secondary':'#c3c2b7','--ds-text-muted':'#96948d','--at-cds-inline-fg':'#f1a6a6','--at-cds-functional-selection':'#397ed4'};
+ const literals=mode==='light'?{'--at-cds-action-bg':'#0b0b0b','--at-cds-inline-fg':'#8e2626','--at-cds-functional-selection':'#2674cf'}:{'--at-cds-action-bg':'#f0efec','--ds-text-primary':'#f5f4f0','--ds-text-secondary':'#c3c2b7','--ds-text-muted':'#a3a29b','--at-cds-inline-fg':'#f1a6a6','--at-cds-functional-selection':'#397ed4'};
  for(const[k,v]of Object.entries(literals))expect(p.get(k)===v,`${mode}/${k} palette literal`);
  expect(p.get('--at-cds-brand')==='#d97757',`${mode}/brand retained`);
  expect(new Set(['--at-cds-action-bg','--at-cds-brand','--at-cds-functional-selection','--at-cds-inline-fg','--ds-error'].map(value)).size===5,`${mode}/action-brand-selection-code-error independent`);

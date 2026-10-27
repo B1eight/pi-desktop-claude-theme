@@ -145,7 +145,7 @@ const expectedLight = {
   '--ds-bg-composer': 'rgba(255, 255, 255, .5)', '--ds-bg-elevated-opaque': '#ffffff', '--at-cds-surface': '#fafafa',
 };
 for (const [token, value] of Object.entries(expectedLight)) ok(resolvedPalette('light').get(token) === value, `Expected light token ${token}`);
-ok(palette('light').get('--ds-text-muted') === '#707069' && palette('dark').get('--ds-text-muted') === '#96948d', 'Muted text uses contrast-safe near-reference values');
+ok(palette('light').get('--ds-text-muted') === '#75746d' && palette('dark').get('--ds-text-muted') === '#a3a29b', 'Muted text uses contrast-safe near-reference values');
 ok(read('src/components.css').includes('font-weight: var(--at-cds-w-regular)') && read('src/components.css').includes('--at-cds-w-regular: 400;') && !palette('dark').has('--at-cds-body-weight'), 'Both modes use genuine static regular prose');
 const sansStack = '--font-sans: "Segoe UI", "Noto Sans SC", system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;';
 ok(read('src/components.css').includes(sansStack) && read('src/components.css').includes('--font-mono: "Cascadia Code"'), 'System typography stack, no packaged fonts');

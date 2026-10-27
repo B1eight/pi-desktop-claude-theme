@@ -1,7 +1,7 @@
 /* Single-focus contract. CSS only; no state emulation.
  * !important is limited to focus ownership/known host halos, not palette or elevation.
  * Native chrome and independent documents are explicitly outside this adapter. */
-__SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: #c6613f; }
+__SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: #bd562f; }
 __SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn)):not(:disabled):not([aria-disabled="true"]) {
   outline: 2px solid var(--at-cds-focus-ink) !important; outline-offset: 2px !important;
   scroll-margin: 6px;

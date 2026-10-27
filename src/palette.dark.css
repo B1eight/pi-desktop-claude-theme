@@ -32,11 +32,11 @@ __SCOPE__ {
   --ds-bg-elevated-primary: rgba(34, 34, 32, .97);
   --ds-raised: #1a1a19;
   --ds-bg-dock-raised: #20201e;
-  --ds-text-primary: #f0efec;
+  --ds-text-primary: #f5f4f0;
   --ds-text-secondary: #c3c2b7;
-  --ds-text-muted: #96948d;
-  --ds-text-faint: #96948d;
-  --ds-placeholder-ink: #96948d;
+  --ds-text-muted: #a3a29b;
+  --ds-text-faint: #a3a29b;
+  --ds-placeholder-ink: #a3a29b;
   --ds-accent: #e5e5e2;
   --ds-accent-hover: #ffffff;
   --ds-accent-soft: #3d3d39;

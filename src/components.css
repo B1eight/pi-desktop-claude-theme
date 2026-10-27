@@ -65,7 +65,10 @@ __SCOPE__ {
 }
 __SCOPE__ :is(button, input, textarea, select) { font-family: var(--font-sans); }
 __SCOPE__ :is(.conversation-topbar .ct-title, .conversation-topbar .ct-back-label) { font-family: var(--font-sans); }
-__SCOPE__ .conversation-topbar .ct-title { font-weight: var(--at-cds-w-semibold); letter-spacing: -.015em; }
+__SCOPE__ .conversation-topbar .ct-title { font-size: calc(14.5px * var(--font-scale, 1)); font-weight: var(--at-cds-w-semibold); letter-spacing: -.015em; }
+__SCOPE__ .conversation-topbar .ct-title-input { font-size: calc(14.5px * var(--font-scale, 1)); }
+/* Top bar breadcrumb companions follow the title +2px so the whole row scales together. */
+__SCOPE__ .conversation-topbar :is(.ct-project, .ct-sep) { font-size: calc(13px * var(--font-scale, 1)); }
 __SCOPE__ :is(.composer-model-option-ctx, .permission-card-queued, .permission-card-meta, .context-inspector-trigger, .code-block-lang, .composer-image-preview output) { font-variant-numeric: tabular-nums; }
 /* Selection has an explicit contrast-tested foreground, not an asserted native color. */
 __SCOPE__::selection, __SCOPE__ ::selection {
@@ -235,19 +238,29 @@ __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critic
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: var(--ds-info); }
 __SCOPE__ .composer-model-thinking-icon { color: var(--ds-text-secondary); }
 __SCOPE__ .composer-model-thinking-level, __SCOPE__ .composer-thinking-tick.active { color: var(--at-cds-compose-accent); }
-/* Composer control row, three separate concerns.
- * 1. The mode chip must show its full label: the host pins it to 96px with an
- *    ellipsis, which truncates "智能体" to "智...". Let it size to its content.
- * 2. Context ring value keeps the host's own scale. It is a 11px / 600 numeric
- *    readout next to a 14px glyph ring; forcing it to 14px / 400 made it compete
- *    with the model name and read as body text instead of a gauge.
- * 3. Model name and thinking level share 14px / regular. Only the level is
- *    emphasised (medium), keeps its capsule padding so it never touches the
- *    neighbouring text, and carries no chip fill. */
+/* Composer control row: model name, thinking level and the context % readout all
+ * share one size and weight (14px / medium), matching Claude's composer control
+ * row where every control reads at the same scale and weight. The mode chip must
+ * still show its full label: the host pins it to 96px with an ellipsis, which
+ * truncates "智能体" to "智...", so let it size to its content. Only the thinking
+ * level carries the brand colour; it keeps capsule padding so it never touches
+ * neighbouring text, and carries no chip fill. */
 __SCOPE__ .composer-mode-chip { flex: 0 1 auto; width: auto; min-width: 0; max-width: none; }
+/* Composer control row. Host specificity is beaten on purpose:
+ *  - "智能体"/"全自动" chips render as .icon-btn.mode-chip with text in .mode-chip > span,
+ *    and the label also carries the Tailwind .text-sm utility (0-2-0). A bare
+ *    .composer-mode-chip-label (0-1-0) loses, so we climb via .composer-toolbar.
+ *  - The context % trigger inherits its size from .composer-right .context-inspector-trigger
+ *    (0-2-0, --text-sm); only the ring value span was bumped before, which left the trigger
+ *    container big. We set both the trigger and the ring value so they read as one control. */
 __SCOPE__ .composer-mode-chip-label { overflow: visible; text-overflow: clip; }
-__SCOPE__ :is(.composer-model-thinking-model, .composer-model-thinking-level) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-regular); }
-__SCOPE__ .composer-model-thinking-level { font-weight: var(--at-cds-w-medium); background: none; padding: 1px 6px; }
+/* Mode/permission chips: at 12px the system sans (Segoe UI) rasterizes 500 as muddy,
+ * so these read at regular weight like the host's other small-size text (84% of which
+ * is weight 400). The 14px model row keeps 500. */
+__SCOPE__ .composer-toolbar .composer-mode-chip-label, __SCOPE__ .composer-toolbar .mode-chip > span { font-size: calc(12px * var(--font-scale, 1)); font-weight: var(--at-cds-w-regular); }
+__SCOPE__ :is(.composer-model-thinking-model, .composer-model-thinking-level, .context-inspector-ring-value) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-medium); }
+__SCOPE__ .composer-right .context-inspector-trigger { font-size: var(--at-cds-ui-size); font-weight: var(--at-cds-w-medium); }
+__SCOPE__ .composer-model-thinking-level { background: none; padding: 1px 0; border-radius: 0; }
 /* Host tick box is 14px tall against a 14.3px line box, which clips descenders. */
 __SCOPE__ .composer-thinking-tick { line-height: var(--at-cds-small-leading); min-height: 17px; padding-block: 1px; overflow: visible; }
 __SCOPE__ .composer-thinking-tick:not(.active), __SCOPE__ .composer-thinking-dot:not(.active) { color: var(--ds-text-muted); }
