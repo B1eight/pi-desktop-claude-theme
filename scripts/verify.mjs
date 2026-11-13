@@ -56,17 +56,23 @@ for (const mode of ['light', 'dark']) {
   const css = themeRead(mode);
   ok(css === renderTheme(mode), `${mode}: generated file is current`);
   ok(Buffer.byteLength(css) <= 256 * 1024, `${mode}: CSS budget`);
+  ok(Buffer.byteLength(css) <= 65000, `${mode}: visual CSS target`);
   const clean = stripComments(css);
   ok(!clean.includes('__SCOPE__') && !clean.includes('@import'), `${mode}: expanded, no imports`);
   ok(!/url\(["']?(?:https?:|file:|[a-z]:)/i.test(clean), `${mode}: no network/absolute asset paths`);
   assert.equal([...clean.matchAll(/url\(/g)].length, 0, `${mode}: no external or embedded asset URLs`); checks++;
   const defs = new Set([...clean.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));
-  for (const m of clean.matchAll(/var\((--[\w-]+)/g)) ok(defs.has(m[1]) || m[1] === '--font-scale', `Defined token ${m[1]}`);
+  for (const m of clean.matchAll(/var\((--[\w-]+)/g)) ok(defs.has(m[1]) || ['--font-scale', '--composer-dock-height'].includes(m[1]), `Defined or measured host token ${m[1]}`);
   for (const { selector } of expandRules(compact(css))) {
     if (selector.startsWith('@')) continue;
     ok(selector.startsWith(scope(mode)), `${mode}: expanded scoped rule ${selector.slice(0, 100)}`);
   }
-  ok(!/--radius-(?:xs|sm|md|lg|xl)\s*:/.test(clean), 'No host global radius reset');
+  /* The host token layer is bridged deliberately: its ten radius steps are compressed onto
+   * one grid so surfaces the theme never names share the same ladder. Every bridged value
+   * must be present and correct; --radius-full/--radius-round stay untouched. */
+  const bridge = { '3xs': 6, '2xs': 7, xs: 8, sm: 9, md: 10, 'md-plus': 11, lg: 12, 'lg-plus': 13, xl: 14, '2xl': 16 };
+  for (const [step, px] of Object.entries(bridge)) ok(clean.includes(`--radius-${step}:${px}px`) || clean.includes(`--radius-${step}: ${px}px`), `${mode}: host radius ${step} bridged to ${px}px`);
+  ok(!/--radius-(?:full|round)\s*:/.test(clean), 'Host shape radii left to the host');
   ok(/prefers-reduced-motion:\s*reduce/.test(clean) && /forced-colors:\s*active/.test(clean), 'Accessibility fallbacks');
   if (sanitizer) {
     const result = sanitizer.sanitizeThemeCss(css, 256 * 1024);
@@ -112,8 +118,8 @@ for (const mode of ['light', 'dark']) {
   const vars = palette(mode);
   for (const [fg, bg] of [
     ['--ds-text-primary', '--ds-bg-primary'], ['--ds-text-secondary', '--ds-bg-primary'],
-    ['--ds-text-muted', '--ds-bg-elevated-opaque'], ['--ds-placeholder-ink', '--ds-bg-composer'],
-    ['--at-cds-action-fg', '--at-cds-action-bg'], ['--at-cds-action-fg', '--at-cds-action-hover'],
+    ['--ds-text-muted', '--ds-bg-elevated-opaque'], ['--at-cds-action-fg', '--at-cds-action-bg'],
+    ['--at-cds-action-fg', '--at-cds-action-hover'],
     ['--at-cds-selection-fg', '--at-cds-selection-bg'], ['--at-cds-link', '--ds-bg-primary'],
     ['--ds-info', '--ds-bg-primary'], ['--at-cds-status-neutral', '--ds-bg-composer'],
     ['--at-cds-inline-fg', '--at-cds-inline-code-bg'], ['--ds-focus', '--ds-bg-composer'],
@@ -134,22 +140,63 @@ for (const mode of ['light', 'dark']) {
   }
 }
 ok(contrast(parseColor('#8e2626'), parseColor('#efefee')) >= 4.5, 'Independent red inline code contrast');
-ok(contrast(parseColor('#383a42'), parseColor('#fafafa')) >= 4.5, 'Plain code contrast');
-ok(contrast(parseColor('#151515'), parseColor('#f0f0ee')) >= 4.5, 'User bubble contrast');
+ok(contrast(parseColor('#383a42'), parseColor('#f4f2ec')) >= 4.5, 'Plain code contrast');
+ok(contrast(parseColor('#151514'), parseColor('#f0eee9')) >= 4.5, 'Light user bubble contrast');
+ok(contrast(parseColor('#f5f4f0'), parseColor('#20201e')) >= 4.5, 'Dark user bubble contrast');
 const expectedLight = {
   '--ds-bg-primary': '#fcfcfb', '--ds-bg-under': '#fcfcfb',
-  '--ds-bg-sidebar': '#fafaf9', '--ds-settings-rail-bg': '#fcfcfb', '--ds-sidebar-glass-tint': '#fafaf9',
-  '--ds-bg-secondary': '#fcfcfb', '--ds-bg-dock': '#fcfcfb', '--ds-bg-tertiary': '#f0f0ee',
-  '--ds-code-head-bg': '#fdfdfd', '--ds-code-hover-bg': '#e8e8e2', '--ds-thinking-code-bg': '#fafafa',
-  '--at-cds-user-bg': '#f0f0ee', '--at-cds-inline-code-bg': '#efefee',
+  '--ds-bg-sidebar': '#f9f9f7', '--ds-settings-rail-bg': '#fcfcfb', '--ds-sidebar-glass-tint': '#f9f9f7',
+  '--ds-bg-secondary': '#fcfcfb', '--ds-bg-dock': '#fcfcfb', '--ds-bg-tertiary': '#f0efec',
+  '--ds-code-head-bg': '#f4f2ec', '--ds-code-hover-bg': '#e8e8e2', '--ds-thinking-code-bg': '#f4f2ec',
+  '--at-cds-user-bg': '#f0eee9', '--at-cds-inline-code-bg': '#efefee', '--at-cds-code-bg': '#f4f2ec',
   '--ds-bg-composer': 'rgba(255, 255, 255, .5)', '--ds-bg-elevated-opaque': '#ffffff', '--at-cds-surface': '#fafafa',
 };
+const expectedDark = {
+  '--ds-bg-primary': '#191815', '--ds-bg-under': '#191815',
+  '--ds-bg-sidebar': '#151411', '--ds-settings-rail-bg': '#191815', '--ds-sidebar-glass-tint': '#151411',
+  '--ds-bg-secondary': '#191815', '--ds-bg-dock': '#191815', '--ds-bg-tertiary': '#1d1c19',
+  '--ds-code-head-bg': '#0d0d0c', '--ds-code-hover-bg': '#292927', '--ds-thinking-code-bg': '#0d0d0c',
+  '--at-cds-user-bg': '#20201e', '--at-cds-inline-code-bg': '#292827', '--at-cds-code-bg': '#0d0d0c',
+  '--ds-bg-composer': 'rgba(255, 255, 255, .05)', '--ds-bg-elevated-opaque': '#222220', '--at-cds-surface': '#1a1a19',
+};
 for (const [token, value] of Object.entries(expectedLight)) ok(resolvedPalette('light').get(token) === value, `Expected light token ${token}`);
-ok(palette('light').get('--ds-text-muted') === '#75746d' && palette('dark').get('--ds-text-muted') === '#a3a29b', 'Muted text uses contrast-safe near-reference values');
-ok(read('src/components.css').includes('font-weight: var(--at-cds-w-regular)') && read('src/components.css').includes('--at-cds-w-regular: 400;') && !palette('dark').has('--at-cds-body-weight'), 'Both modes use genuine static regular prose');
-const sansStack = '--font-sans: "Segoe UI", "Noto Sans SC", system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;';
-ok(read('src/components.css').includes(sansStack) && read('src/components.css').includes('--font-mono: "Cascadia Code"'), 'System typography stack, no packaged fonts');
-ok(!read('src/components.css').includes('@font-face') && !themeRead('light').includes('@font-face') && !themeRead('dark').includes('@font-face'), 'No @font-face declarations; every family is installed locally');
+for (const [token, value] of Object.entries(expectedDark)) ok(resolvedPalette('dark').get(token) === value, `Expected dark token ${token}`);
+ok(palette('light').get('--ds-text-primary') === '#151514' && palette('dark').get('--ds-text-primary') === '#f5f4f0', 'Primary text uses approved mode values');
+ok(palette('light').get('--ds-text-secondary') === '#52514c' && palette('dark').get('--ds-text-secondary') === '#c2c0b8', 'Secondary text uses approved mode values');
+ok(palette('light').get('--ds-text-muted') === '#75746d' && palette('dark').get('--ds-text-muted') === '#96948d', 'Muted text uses approved mode values');
+ok(palette('light').get('--ds-text-faint') === '#94928b' && palette('dark').get('--ds-text-faint') === '#6e6d68', 'Faint text uses approved mode values');
+ok(palette('light').get('--ds-placeholder-ink') === '#94928b' && palette('dark').get('--ds-placeholder-ink') === '#6e6d68', 'Placeholder uses approved mode values');
+for (const mode of ['light', 'dark']) {
+  const vars = palette(mode);
+  const raw = token => vars.get(token).replace(/^var\((--[\w-]+)\)$/, (_, referenced) => vars.get(referenced));
+  const page = parseColor(raw('--ds-bg-primary'));
+  const composer = parseColor(raw('--ds-bg-composer'));
+  const composed = composer[3] < 1 ? compositeOver(composer, page) : composer;
+  const faintRatio = contrast(parseColor(raw('--ds-text-faint')), page);
+  const placeholderRatio = contrast(parseColor(raw('--ds-placeholder-ink')), composed);
+  ok(faintRatio >= 2.8 && faintRatio <= 3.6, `${mode}: faint/page visual ratio ${faintRatio.toFixed(2)} in 2.8-3.6`);
+  ok(placeholderRatio >= 2.8 && placeholderRatio <= 3.6, `${mode}: placeholder/composer visual ratio ${placeholderRatio.toFixed(2)} in 2.8-3.6`);
+  ok(Math.abs(luminance(parseColor(raw('--ds-text-muted'))) - luminance(parseColor(raw('--ds-text-faint')))) >= .10, `${mode}: muted/faint luminance separation`);
+}
+ok(palette('light').get('--at-cds-user-bg') === '#f0eee9' && palette('dark').get('--at-cds-user-bg') === '#20201e', 'User bubble surfaces use approved mode values');
+ok(palette('light').get('--at-cds-clay-ink') === '#bd562f' && palette('dark').get('--at-cds-clay-ink') === '#d97757', 'Clay ink values');
+ok(palette('light').get('--at-cds-clay-vivid') === '#d97757' && palette('dark').get('--at-cds-clay-vivid') === '#cc6b49', 'Clay vivid values');
+/* I4：陶土只用于品牌与运行态。聚焦环是中性强调，不能借陶土；拖放目标才是动作态。 */
+ok(!String(palette('light').get('--at-cds-composer-focus')).includes('clay') && !String(palette('dark').get('--at-cds-composer-focus')).includes('clay'), 'Composer focus ring stays neutral');
+ok(String(palette('light').get('--at-cds-composer-drop')).includes('--at-cds-clay-vivid') && String(palette('dark').get('--at-cds-composer-drop')).includes('--at-cds-clay-vivid'), 'Composer drop target keeps the clay affordance');
+const components = read('src/components.css');
+ok(components.includes('font-weight: var(--at-cds-w-regular)') && components.includes('--at-cds-w-regular: 400;') && !palette('dark').has('--at-cds-body-weight'), 'Both modes use genuine static regular prose');
+const sansStack = '--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", system-ui, "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;';
+const proseStack = '--font-prose: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;';
+ok(components.includes(sansStack) && components.includes(proseStack) && components.includes('--font-serif: var(--font-prose)') && components.includes('--font-mono: "Cascadia Code"'), 'Approved system UI, prose, mono stacks and serif alias; no packaged fonts');
+ok(components.includes('.prose-chat {\n  font-family: var(--font-prose);') && components.includes('font-family: var(--font-prose); font-weight: var(--at-cds-w-semibold)'), 'Prose and headings use the reading family');
+ok(components.includes('--at-cds-body-leading: 1.68;') && components.includes('.prose-chat p { margin: .85em 0; }'), 'Prose line height and paragraph rhythm');
+ok(components.includes('--at-cds-r-bubble: 14px;') && components.includes('--at-cds-r-dialog: 10px;') && ['light', 'dark'].every(mode => palette(mode).get('--ds-composer-radius') === '12px'), 'Composer, bubble and dialog radii');
+ok(components.includes('--at-cds-r-sm: 6px;') && components.includes('--at-cds-r-md: 7px;') && components.includes('--at-cds-r-lg: 10px;') && components.includes('--at-cds-r-xl: 12px;'), 'Existing radius scale preserved');
+ok(components.includes('--at-cds-ease-out-expo: cubic-bezier(.16, 1, .3, 1)') && components.includes('--at-cds-spring-snappy: var(--at-cds-ease-out-expo)') && components.includes('--at-cds-t-press: 70ms'), 'Motion tokens installed');
+ok(/linear\(0,\s*\.45 14%,\s*\.82 29%,\s*1\.01 44%,\s*1\.05 56%,\s*1\.02 74%,\s*1\)/.test(components), 'Progressive spring easing supported');
+ok(read('src/palette.dark.css').includes('font-smoothing: antialiased') || /data-theme="dark"[\s\S]*?font-smoothing: antialiased/.test(components), 'Dark mode declares local font smoothing');
+ok(!components.includes('@font-face') && !themeRead('light').includes('@font-face') && !themeRead('dark').includes('@font-face'), 'No @font-face declarations; every family is installed locally');
 for (const mode of ['light', 'dark']) { const p = palette(mode); ok(contrast(parseColor(p.get('--ds-text-primary')), parseColor(p.get('--at-cds-user-bg'))) >= 4.5, `${mode}: user bubble contrast >= 4.5`); }
 const refinements = read('src/refinements.css');
 const settingsOverrides = read('src/settings.css');
@@ -181,7 +228,11 @@ ok(!/overflow:\s*hidden|position:|z-index:|settings-nav/.test(stripComments(sett
 ok(settings.includes(':not(:has(> :not(.settings-row)))'), 'Mixed/complex panels retain host gaps');
 const workpanel = sourceBlock('workpanel');
 ok(workpanel.includes('svg[fill="none"][stroke="currentColor"]'), 'Only verified host line icons adapted');
-ok(workpanel.includes('box-sizing: border-box; padding-left: 1px;') && !/(?:^|[;{])\s*(?:width|height|min-width|max-width|flex|position|z-index|padding(?:-[a-z]+)?|margin|animation|transform|fill)\s*:/.test(stripComments(workpanel).replace('padding-left: 1px;', '')), 'Only authorized 1px internal seam reserve; other geometry/chrome/motion preserved');
+const workpanelGeometry = stripComments(workpanel)
+  .replaceAll('padding-left: 1px;', '')   // 发丝线内衬
+  .replaceAll('height: 36px;', '')        // 批准的 36px 标签条（I11）
+  .replaceAll('padding: 12px;', '');      // 批准的正文留白（I9）
+ok(workpanel.includes('box-sizing: border-box; padding-left: 1px;') && !/(?:^|[;{])\s*(?:width|height|min-width|max-width|flex|position|z-index|padding(?:-[a-z]+)?|margin|animation|transform|fill)\s*:/.test(workpanelGeometry), 'Only the seam, the 36px tab row and the 12px body gutter are authored; other geometry/chrome/motion preserved');
 ok(!/\.md-|file-tree|work-panel-resize/.test(stripComments(workpanel)), 'No plugin internals, tree semantics or resize override');
 for (const name of ['loading', 'settings', 'workpanel']) ok(sourceBlock(name).includes('__SCOPE__'), `Shared ${name} remains scoped`);
 for (const mode of ['light', 'dark']) {
@@ -191,6 +242,7 @@ for (const mode of ['light', 'dark']) {
   ok(vars.get('--at-cds-action-bg') !== vars.get('--at-cds-brand'), `${mode}: brand and action are separate roles`);
   ok(vars.get('--at-cds-focus-shadow') === 'none', `${mode}: no extra focus shadow`);
   ok(vars.get('--at-cds-control-neutral') !== vars.get('--at-cds-brand'), `${mode}: inactive controls remain neutral`);
+  ok(vars.get('--at-cds-functional-selection') === (mode === 'light' ? '#2674cf' : '#397ed4'), `${mode}: functional selection retains its own color`);
   const roles = fs.readFileSync(path.join(root, 'scripts/check-color-roles.mjs'), 'utf8');
   ok(/color role matrix/i.test(roles), `${mode}: role assertions installed`);
 }

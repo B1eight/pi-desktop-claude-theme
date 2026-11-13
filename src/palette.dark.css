@@ -1,28 +1,34 @@
 /* Claude Theme Dark palette. */
 __SCOPE__ {
   color-scheme: dark;
-  /* Neutral ladder mirrors the light set: index 0 is the most elevated surface, higher indexes go deeper. */
-  --ds-neutral-0: #232322;
-  --ds-neutral-1: #1e1e1d;
-  --ds-neutral-2: #1a1a19;
-  --ds-neutral-3: #171716;
-  --ds-neutral-4: #141414;
-  --ds-neutral-5: #111111;
-  --ds-neutral-6: #0c0c0c;
-  --ds-bg-primary: #151515;
-  --ds-bg-under: #151515;
-  --ds-bg-dock: #151515;
-  --ds-bg-secondary: #151515;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 暖度规则（与 light 同向）：暗面统一 +4 暖偏移，R = B+4、G = B+3，只抬红绿、不动蓝。
+   * 明度层次完全保留（层级仍靠 L 区分），暖偏移不随秩位忽强忽弱。
+   * light 取 Claude 的 gray-20/40/50/70/90/150 原值；dark 无原生基准，按本条规则推导。 */
+  --ds-neutral-0: #262522;
+  --ds-neutral-1: #21201d;
+  --ds-neutral-2: #1d1c19;
+  --ds-neutral-3: #1a1916;
+  --ds-neutral-4: #181714;
+  --ds-neutral-5: #151411;
+  --ds-neutral-6: #100f0c;
+  --ds-bg-primary: #191815;
+  --ds-bg-under: #191815;
+  --ds-bg-dock: #191815;
+  --ds-bg-secondary: #191815;
   --ds-bg-tertiary: var(--ds-neutral-2);
-  --ds-bg-inset: #080808;
+  --ds-bg-inset: #0c0b08;
   --ds-bg-sidebar: var(--ds-neutral-5);
-  --ds-settings-rail-bg: #151515;
+  /* 同 light：侧栏的 background-image 钩子固定为 none。 */
+  --ds-bg-sidebar-image: none;
+  --ds-settings-rail-bg: #191815;
   --at-cds-region-line: var(--ds-neutral-3);
   --at-cds-composer-focus-ink: #777770;
   --at-cds-composer-ring: 1px;
-  --at-cds-ring-shadow: 0 6px 24px rgba(0, 0, 0, .4);
+  --at-cds-ring-shadow: var(--at-cds-composer-focus);
   --at-cds-input-border: #42423e;
-  --ds-sidebar-glass-tint: #111111;
+  --ds-sidebar-glass-tint: #151411;
   /* Same translucent field fill as light mode: white at 5% over the page reads as a
    * subtly raised surface without becoming an opaque slab. */
   --ds-bg-composer: rgba(255, 255, 255, .05);
@@ -30,13 +36,13 @@ __SCOPE__ {
   --ds-bg-elevated-opaque: #222220;
   --ds-bg-elevated: rgba(34, 34, 32, .97);
   --ds-bg-elevated-primary: rgba(34, 34, 32, .97);
-  --ds-raised: #1a1a19;
-  --ds-bg-dock-raised: #20201e;
+  --ds-raised: #1d1c19;
+  --ds-bg-dock-raised: #22211e;
   --ds-text-primary: #f5f4f0;
-  --ds-text-secondary: #c3c2b7;
-  --ds-text-muted: #a3a29b;
-  --ds-text-faint: #a3a29b;
-  --ds-placeholder-ink: #a3a29b;
+  --ds-text-secondary: #c2c0b8;
+  --ds-text-muted: #96948d;
+  --ds-text-faint: #6e6d68;
+  --ds-placeholder-ink: #6e6d68;
   --ds-accent: #e5e5e2;
   --ds-accent-hover: #ffffff;
   --ds-accent-soft: #3d3d39;
@@ -57,9 +63,9 @@ __SCOPE__ {
   --ds-field-inset-bg: #10100f;
   --ds-field-inset-focus-bg: #20201e;
   --ds-bg-chip: rgba(255, 255, 255, .06);
-  --ds-tile: #1a1a19;
-  --ds-tile-hover: #20201e;
-  --ds-tile-deep: #10100f;
+  --ds-tile: #1d1c19;
+  --ds-tile-hover: #22211e;
+  --ds-tile-deep: #13120f;
   --ds-code-head-bg: #0d0d0c;
   --ds-code-hover-bg: #292927;
   --ds-thinking-code-bg: #0d0d0c;
@@ -74,13 +80,15 @@ __SCOPE__ {
   --ds-modal-veil: #0b0b0a;
   --ds-scrim: rgba(0, 0, 0, .60);
   --ds-mermaid-canvas: #1a1a19;
-  --ds-shadow-composer: 0 4px 20px rgba(0, 0, 0, .4);
-  --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, .40), 0 2px 8px rgba(0, 0, 0, .40);
+  --ds-shadow-composer: 0 0 0 .5px var(--ds-border-default), 0 2px 8px -2px rgba(0, 0, 0, .25), 0 8px 24px -4px rgba(0, 0, 0, .22);
+  --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, .40);
+  /* 暗面同一层高度要压得更实，否则 6% 黑在暖炭上不可见。 */
+  --at-cds-card-elevation: 0 1px 2px rgba(0, 0, 0, .55);
   --at-cds-shadow-chip: 0 1px 2px rgba(0, 0, 0, .40);
   --ds-shadow-dialog: 0 12px 32px rgba(0, 0, 0, .45), 0 3px 8px rgba(0, 0, 0, .24);
   --at-cds-popover-shadow: 0 8px 24px rgba(0, 0, 0, .32), 0 2px 6px rgba(0, 0, 0, .20);
   --ds-shadow-model-menu: var(--at-cds-popover-shadow);
-  --at-cds-user-bg: #242423;
+  --at-cds-user-bg: #20201e;
   --at-cds-link: #91b9ef;
   --at-cds-link-hover: #bed8fa;
   --at-cds-selection-bg: #50504c;
@@ -88,8 +96,9 @@ __SCOPE__ {
   --at-cds-action-bg: #f0efec;
   --at-cds-action-hover: #e1e0d9;
   --at-cds-action-fg: #0b0b0b;
-  --at-cds-composer-hover: var(--ds-shadow-composer);
-  --at-cds-composer-focus: var(--ds-shadow-composer);
+  --at-cds-composer-hover: 0 0 0 .5px var(--ds-border-strong), 0 4px 16px -4px rgba(0, 0, 0, .32);
+  --at-cds-composer-focus: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1.5px var(--at-cds-focus-ink), 0 8px 24px -4px rgba(0, 0, 0, .32);
+  --at-cds-composer-drop: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1.5px var(--at-cds-clay-vivid), 0 0 8px 1px color-mix(in oklab, var(--at-cds-clay-vivid) 24%, transparent), 0 8px 24px -4px rgba(0, 0, 0, .32);
   --at-cds-focus-shadow: none;
   --at-cds-card-hover: 0 0 0 1px var(--ds-border-strong), 0 6px 20px rgba(0, 0, 0, .60);
   --at-cds-segmented-track: rgba(255, 255, 255, .08);
@@ -101,6 +110,9 @@ __SCOPE__ {
   --at-cds-control-fg: #1a1a19;
   --at-cds-brand: #d97757;
   --at-cds-brand-hover: #e08a6b;
+  --at-cds-clay-ink: #d97757;
+  --at-cds-clay-vivid: #cc6b49;
+  --at-cds-code-ring: rgba(255, 255, 255, .08);
   --at-cds-result-success-bg: #20372c;
   --at-cds-result-error-bg: #3c2525;
   --at-cds-slider-track: #666660;

@@ -19,6 +19,21 @@ test('over-budget output cannot bypass the hard limit',()=>assert.throws(()=>enf
 for(const mode of ['light','dark']){
  const r=stages(mode);
  for(const step of ['step1','step2','step3'])test(`${mode}/${step}: exact expanded selector, conditions and declaration order`,()=>assert.deepEqual(normalizedRecords(r.body[step]),normalizedRecords(r.body.baseline)));
- test(`${mode}: complete ID retained and transformations accounted for`,()=>{assert(r.body.step3.includes(scope(mode)));assert.equal(r.rootNesting.scopesRemoved,28);assert.equal(r.adjacent.merges.length,7);assert.equal(r.residual.removed,14);const n=r.report.optimization;assert.equal(Buffer.byteLength(r.css.baseline)-Buffer.byteLength(r.css.step3),n.rootNestingSaved+n.adjacentMergingSaved+n.residualCompressionSaved);});
+ test(`${mode}: complete ID retained and transformations accounted for`,()=>{
+  assert(r.body.step3.includes(scope(mode)));
+  const bytes=text=>Buffer.byteLength(text,'utf8'),n=r.report.optimization;
+  // Each reported saving must match its own stage, rather than a style-dependent count.
+  assert.equal(n.rootNestingSaved,bytes(r.body.baseline)-bytes(r.body.step1));
+  assert.equal(n.adjacentMergingSaved,bytes(r.body.step1)-bytes(r.body.step2));
+  assert.equal(n.residualCompressionSaved,bytes(r.body.step2)-bytes(r.body.step3));
+  assert.equal(bytes(r.css.baseline)-bytes(r.css.step3),n.rootNestingSaved+n.adjacentMergingSaved+n.residualCompressionSaved);
+  assert.equal(n.scopesRemoved,r.rootNesting.scopesRemoved);
+  assert.equal(n.mergeCount,r.adjacent.merges.length);
+  // Once normalized, repeating a transform is a no-op; new styles need no rebaseline.
+  assert.equal(nestThemeRoots(r.body.step1,scope(mode)).css,r.body.step1);
+  assert.equal(mergeAdjacent(r.body.step2).css,r.body.step2);
+  assert.equal(compressResidual(r.body.step3).css,r.body.step3);
+  for(const saved of [n.rootNestingSaved,n.adjacentMergingSaved,n.residualCompressionSaved])assert(saved>=0);
+ });
  test(`${mode}: generated theme, manifest mapping and part totals are current`,()=>{const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8')),t=m.contributes.themes.find(t=>t.base===mode);assert.equal(t.id,'claude-'+mode);assert.equal(t.path,`themes/claude-${mode}.css`);assert.equal(fs.readFileSync(path.join(root,t.path),'utf8'),r.css.step3);assert.equal(r.report.parts.reduce((s,p)=>s+p.bytes,0),Buffer.byteLength(r.css.step3));assert(r.report.total<=HARD_LIMIT);});
 }

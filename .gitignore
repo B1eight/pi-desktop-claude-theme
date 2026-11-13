@@ -18,3 +18,51 @@ Thumbs.db
 /patch-roles.mjs
 /docs/review-*.html
 /docs/claude-desktop-reference-audit.md
+# 一次性审计/验收报告是过程产物：结论只认 docs/acceptance-states.json，
+# 报告本身不随源码分发，也不再作为"已验收"的证据。
+/docs/*.html
+/docs/*.cmd
+/docs/shots/
+
+# ── 开发资料：不入公开仓库 ────────────────────────────────────────────────
+# 公开仓库只放"运行 + 构建"需要的东西。以下文件留在本机，靠 backups/ 里的
+# 时间戳压缩包保底；新增同类文件时请在这里补一条，避免 git add -A 误传。
+#
+# 基准系统（Claude 令牌、关系表、阶梯表、角色与绑定、宿主快照、棘轮基线）
+/docs/design-baseline.json
+/docs/design-map.json
+/docs/surface-contract.json
+/docs/roles.json
+/docs/bindings.json
+/docs/host-inventory.json
+/docs/acceptance-states.json
+/docs/attribution-baseline.json
+/docs/role-deviations.json
+/docs/SYSTEM.md
+/docs/baseline-audit.md
+#
+# 开发工具链。构建只依赖 build.mjs 与 css-*.mjs，其余不出现在插件里。
+/scripts/check-acceptance.mjs
+/scripts/check-attribution.mjs
+/scripts/check-coverage.mjs
+/scripts/check-design-baseline.mjs
+/scripts/check-host.mjs
+/scripts/check-role-cohesion.mjs
+/scripts/check-surface-grammar.mjs
+/scripts/check-visual-styles.mjs
+/scripts/claude-install.mjs
+/scripts/design-tokens.mjs
+/scripts/extract-claude-tokens.mjs
+/scripts/generate-roles.mjs
+/scripts/host-styles.mjs
+/scripts/resync.mjs
+/scripts/roles.mjs
+/scripts/check-vars.mjs
+/tests/visual-contract.test.mjs
+#
+# 本机工具与备份产物
+/.local/
+/backups/
+#
+# 注意：src/generated.roles.css 必须入库（scripts/build.mjs 的构建输入），
+# 不要加进这里。

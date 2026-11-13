@@ -2,17 +2,16 @@
  * Preserve native chrome, pane widths, scroll pinning, content-visibility,
  * and inline drag/position measurements. */
 __SCOPE__ {
-  /* Latin resolves from Segoe UI; CJK resolves from Noto Sans SC. Noto must sit
-   * before system-ui: on Windows system-ui maps straight to Microsoft YaHei and
-   * would intercept every CJK run before the later entries are consulted. */
-  --font-sans: "Segoe UI", "Noto Sans SC", system-ui, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  /* UI follows the platform first; prose has an independent installed-font stack. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", system-ui, "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
   --font-mono: "Cascadia Code", ui-monospace, "SFMono-Regular", Consolas, "Microsoft YaHei UI", monospace;
-  --font-serif: Georgia, "Times New Roman", "Source Han Serif SC", serif;
+  --font-prose: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --font-serif: var(--font-prose);
   /* Type scale. Every size comes with a paired line-height, so a rule never has to
    * guess a leading value. One scale for prose, one for UI chrome, one for code. */
   /* prose: long-form reading in the transcript */
   --at-cds-body-size: calc(16px * var(--font-scale, 1));
-  --at-cds-body-leading: 1.45;
+  --at-cds-body-leading: 1.68;
   /* display: in-transcript headings, one step up from prose */
   --at-cds-display-size: calc(18px * var(--font-scale, 1));
   --at-cds-display-leading: 1.4;
@@ -35,41 +34,54 @@ __SCOPE__ {
   --at-cds-tiny-size: calc(11px * var(--font-scale, 1));
   --at-cds-tiny-leading: 1.5;
   --at-cds-hairline: 1px;
-  --at-cds-ease: cubic-bezier(.16, 1, .3, 1);
-  /* Radius scale: four steps only. 5 = small controls, 7 = menu items, 10 = panels, 12 = surfaces. */
-  --at-cds-r-sm: 5px;
+  --at-cds-ease-out-expo: cubic-bezier(.16, 1, .3, 1);
+  --at-cds-ease: var(--at-cds-ease-out-expo);
+  --at-cds-spring-snappy: var(--at-cds-ease-out-expo);
+  /* Small controls retain four steps; conversation containers have their own radii. */
+  --at-cds-r-sm: 6px;
   --at-cds-r-md: 7px;
   --at-cds-r-lg: 10px;
   --at-cds-r-xl: 12px;
-  /* Motion scale: three steps only. */
+  --at-cds-r-bubble: 14px;
+  --at-cds-r-dialog: 10px;
+  /* Three base transition speeds plus a dedicated press response. */
   --at-cds-t-fast: 60ms;
   --at-cds-t-base: 150ms;
   --at-cds-t-emph: 220ms;
+  --at-cds-t-press: 70ms;
+  /* Three elevation rungs. A shadow literal anywhere else is a new dialect; the
+   * grammar check only accepts these three strings, `none`, or a token reference. */
+  --at-cds-shadow-sm: var(--at-cds-card-elevation, 0 1px 2px rgba(0, 0, 0, .05));
+  --at-cds-shadow-md: 0 3px 14px rgba(0, 0, 0, .06);
+  --at-cds-shadow-popover: var(--at-cds-popover-shadow);
   /* Spacing rhythm: 6 / 8 / 12 / 20. New gaps should pick from these four. */
   --at-cds-s-xs: 6px;
   --at-cds-s-sm: 8px;
   --at-cds-s-md: 12px;
   --at-cds-s-lg: 20px;
-  /* Weight scale, measured against the fonts this theme actually resolves to.
-   * Segoe UI (Latin): 6 paint steps — 300 / 350 / 400-450 / 500-600 / 650-700 / 800-900.
-   * Noto Sans SC (CJK): 6 paint steps — 300 / 350 / 400 / 450-550 / 600-700 / 800-900.
-   * Three steps are used: regular body, medium for composer control labels, and
-   * semibold for headings. Both families separate all three, so the request now
-   * paints distinctly in either script — Microsoft YaHei only had three steps and
-   * rendered 500 and 600 identically, which is why it is no longer first for CJK. */
+  --at-cds-fade-top: 20px;
+  --at-cds-fade-bottom: 24px;
+  --at-cds-scroll-end: 100%;
+  /* Static weights keep UI roles distinct; installed font metrics remain platform-dependent. */
   --at-cds-w-regular: 400;
   --at-cds-w-medium: 500;
   --at-cds-w-semibold: 600;
   font-family: var(--font-sans);
   accent-color: var(--at-cds-control-neutral);
 }
+@supports (transition-timing-function: linear(0, .5, 1)) {
+  __SCOPE__ { --at-cds-spring-snappy: linear(0, .45 14%, .82 29%, 1.01 44%, 1.05 56%, 1.02 74%, 1); }
+}
 __SCOPE__ :is(button, input, textarea, select) { font-family: var(--font-sans); }
 __SCOPE__ :is(.conversation-topbar .ct-title, .conversation-topbar .ct-back-label) { font-family: var(--font-sans); }
-__SCOPE__ .conversation-topbar .ct-title { font-size: calc(14.5px * var(--font-scale, 1)); font-weight: var(--at-cds-w-semibold); letter-spacing: -.015em; }
-__SCOPE__ .conversation-topbar .ct-title-input { font-size: calc(14.5px * var(--font-scale, 1)); }
+__SCOPE__ .conversation-topbar .ct-title { font-size: calc(14px * var(--font-scale, 1)); font-weight: var(--at-cds-w-semibold); letter-spacing: -.015em; }
+__SCOPE__ .conversation-topbar .ct-title-input { font-size: calc(14px * var(--font-scale, 1)); }
 /* Top bar breadcrumb companions follow the title +2px so the whole row scales together. */
 __SCOPE__ .conversation-topbar :is(.ct-project, .ct-sep) { font-size: calc(13px * var(--font-scale, 1)); }
-__SCOPE__ :is(.composer-model-option-ctx, .permission-card-queued, .permission-card-meta, .context-inspector-trigger, .code-block-lang, .composer-image-preview output) { font-variant-numeric: tabular-nums; }
+/* 读数类由角色生成（reading）；这里只留不属于 readout 的 tabular 项。 */
+__SCOPE__ :is(.composer-model-option-ctx, .permission-card-queued, .permission-card-meta, .context-inspector-trigger, .code-block-lang, .composer-image-preview output, .turn-usage-popover, .project-run-badge, .dock-tab, .todo-dock-row-symbol) { font-variant-numeric: tabular-nums; }
+/* Reserve the full 0..100% width; tabular digits alone do not stabilize 9% -> 10%. */
+__SCOPE__ .composer-right .context-inspector-ring-value { min-inline-size: 4ch; text-align: right; }
 /* Selection has an explicit contrast-tested foreground, not an asserted native color. */
 __SCOPE__::selection, __SCOPE__ ::selection {
   background: var(--at-cds-selection-bg);
@@ -81,7 +93,7 @@ __SCOPE__ :is(input, textarea, select)[aria-invalid="true"] { border-color: var(
 
 /* Reading rhythm. Keep host-controlled transcript width and virtualization. */
 __SCOPE__ .prose-chat {
-  font-family: var(--font-sans);
+  font-family: var(--font-prose);
   font-size: var(--at-cds-body-size);
   line-height: var(--at-cds-body-leading); font-weight: var(--at-cds-w-regular);
   color: var(--ds-text-primary);
@@ -92,12 +104,12 @@ __SCOPE__ .prose-chat {
 }
 __SCOPE__ .prose-chat > :first-child { margin-top: 0; }
 __SCOPE__ .prose-chat > :last-child { margin-bottom: 0; }
-__SCOPE__ .prose-chat p { margin: .75em 0; }
-__SCOPE__ .prose-chat p + p { margin-top: .75em; }
+__SCOPE__ .prose-chat p { margin: .85em 0; }
+__SCOPE__ .prose-chat p + p { margin-top: .85em; }
 __SCOPE__ .prose-chat :is(strong, b) { font-weight: var(--at-cds-w-semibold); }
 __SCOPE__ .prose-chat :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-sans); font-weight: var(--at-cds-w-semibold); line-height: var(--at-cds-display-leading);
-  letter-spacing: -.01em; text-wrap: balance; margin: 1.2em 0 .5em;
+  font-family: var(--font-prose); font-weight: var(--at-cds-w-semibold); line-height: var(--at-cds-display-leading);
+  letter-spacing: -.015em; text-wrap: balance; margin: 1.2em 0 .5em;
 }
 __SCOPE__ .prose-chat h1 { font-size: var(--at-cds-display-size); }
 __SCOPE__ .prose-chat h2 { font-size: var(--at-cds-display-size); }
@@ -136,23 +148,47 @@ __SCOPE__ .prose-chat .table-wrap :is(th, td) code { overflow-wrap: break-word; 
 __SCOPE__ .message-row.user .message-col:not(:has(.message-edit)) { max-width: 85%; }
 __SCOPE__ .message-row.user .message-bubble:not(:has(.message-edit)) {
   font-family: var(--font-sans); font-size: var(--at-cds-compose-size);
-  line-height: var(--at-cds-compose-leading); border-radius: var(--at-cds-r-xl); padding: 10px 16px;
+  line-height: var(--at-cds-compose-leading); border-radius: var(--at-cds-r-bubble); padding: 10px 16px;
   background: var(--at-cds-user-bg); color: var(--ds-text-primary);
-  box-shadow: var(--at-cds-shadow-chip);
+  border: 0; box-shadow: none;
 }
 __SCOPE__ .message-row.assistant .message-bubble { background: transparent; border: 0; box-shadow: none; }
 __SCOPE__ .message-user-text { overflow-wrap: anywhere; word-break: normal; }
 
+/* The transcript mask stays above the host-measured composer dock, not the window bottom. */
+__SCOPE__ .thread-scroll { --at-cds-scroll-end: calc(100% - var(--composer-dock-height, 168px) + 2px); }
+__SCOPE__ :is(.thread-scroll, .sidebar-session-group-body.standalone, .sidebar-session-group-body.pinned) {
+  /* Resolve here, not on :root: the dock measurement belongs to the scroll element. */
+  --at-cds-scroll-mask: linear-gradient(to bottom,
+    transparent,
+    #0000000d calc(var(--at-cds-fade-top) * .15),
+    #00000026 calc(var(--at-cds-fade-top) * .30),
+    #0000004d calc(var(--at-cds-fade-top) * .45),
+    #00000080 calc(var(--at-cds-fade-top) * .60),
+    #000000b3 calc(var(--at-cds-fade-top) * .75),
+    #000000d9 calc(var(--at-cds-fade-top) * .87),
+    #000 var(--at-cds-fade-top),
+    #000 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom)),
+    #000000d9 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .87),
+    #000000b3 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .75),
+    #00000080 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .60),
+    #0000004d calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .45),
+    #00000026 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .30),
+    #0000000d calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .15),
+    transparent var(--at-cds-scroll-end), transparent);
+  -webkit-mask-image: var(--at-cds-scroll-mask); mask-image: var(--at-cds-scroll-mask);
+}
+
 /* Composer retains contenteditable, ghost placeholder, sizing and toolbar order. */
 __SCOPE__ .composer-shell {
-  border: 1px solid var(--at-cds-input-border); border-radius: var(--ds-composer-radius); background: var(--ds-bg-composer);
+  border: 1px solid transparent; border-radius: var(--ds-composer-radius); background: var(--ds-bg-composer);
   box-shadow: var(--ds-shadow-composer);
   transition: box-shadow var(--at-cds-t-emph) var(--at-cds-ease), background-color var(--at-cds-t-base) ease;
 }
 __SCOPE__ .composer-shell:hover { box-shadow: var(--at-cds-composer-hover); }
 __SCOPE__ .composer-shell.is-drop-target {
   outline: 2px solid var(--ds-focus); outline-offset: 3px;
-  box-shadow: var(--at-cds-composer-focus);
+  box-shadow: var(--at-cds-composer-drop);
 }
 __SCOPE__ .composer-input-wrap { padding: 14px 14px 0; }
 __SCOPE__ :is(.composer-input, .composer-placeholder) {
@@ -175,13 +211,19 @@ __SCOPE__ .dock-toggle.btn { padding-inline: 0; }
 __SCOPE__ .composer-toolbar .composer-model-thinking-chip { border-radius: 999px; height: auto; min-height: 28px; }
 __SCOPE__ :is(.composer-chip, .chat-file-chip, .chat-image-chip, .message-attachment) { border-radius: var(--at-cds-r-lg); }
 __SCOPE__ :is(.chat-file-chip, .message-attachment) { border-color: var(--ds-border-default); background: var(--ds-tile); }
+/* One idle perimeter: inner controls retain their independent keyboard focus. */
+__SCOPE__ .composer-toolbar :is(.composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .icon-btn:not(.send-btn):not(.stop-btn)),
+__SCOPE__ .composer-shell .composer-chip { border-color: transparent; background: transparent; box-shadow: none; }
+__SCOPE__ .composer-toolbar :is(.composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .icon-btn:not(.send-btn):not(.stop-btn)):hover:not(:disabled):not([aria-disabled="true"]),
+__SCOPE__ .composer-shell .composer-chip:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-neutral-2); }
 
 /* Primary actions stay neutral; Composer send uses the accent color. */
 __SCOPE__ .btn {
-  min-height: 32px; padding: 5px 14px; border-radius: var(--at-cds-r-md);
   font-size: var(--at-cds-ui-size); font-weight: var(--at-cds-w-regular); line-height: var(--at-cds-ui-leading);
   transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-base) ease, box-shadow var(--at-cds-t-emph) ease;
 }
+/* Disclosure headings keep their compact host dimensions, not action-button spacing. */
+__SCOPE__ .btn:where(:not(.turn-changes-head)) { min-height: 32px; padding: 6px 14px; border-radius: var(--at-cds-r-md); }
 __SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):not(:disabled):not([aria-disabled="true"]) {
   background: var(--at-cds-action-bg); color: var(--at-cds-action-fg); border-color: transparent;
 }
@@ -192,7 +234,7 @@ __SCOPE__ .send-btn:not(:disabled):not([aria-disabled="true"]) {
   background: var(--at-cds-action-bg); color: var(--at-cds-action-fg); border-color: transparent;
 }
 __SCOPE__ .send-btn:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); opacity: 1; }
-__SCOPE__ .composer-shell .send-btn:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-compose-accent); color: #fff; }
+__SCOPE__ .composer-shell .send-btn:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-clay-vivid); color: #fff; border-radius: var(--at-cds-r-md); }
 __SCOPE__ .btn-secondary { background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); color: var(--ds-text-primary); }
 __SCOPE__ .btn-secondary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); }
 __SCOPE__ .btn-ghost { background: transparent; border: 0; }
@@ -200,13 +242,16 @@ __SCOPE__ .btn-ghost:hover:not(:disabled):not([aria-disabled="true"]) { backgrou
 __SCOPE__ .send-btn { width: 32px; height: 32px; flex-basis: 32px; border-radius: var(--at-cds-r-md); }
 __SCOPE__ .send-btn.message-edit-submit { width: auto; flex-basis: auto; }
 __SCOPE__ :is(.btn-primary, .send-btn, .copy-btn.primary):is(:disabled, [aria-disabled="true"]) { background: var(--ds-send-disabled-bg); color: var(--ds-send-disabled-fg); }
-__SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn):active:not(:disabled):not([aria-disabled="true"]) { transform: none; transition-duration: 60ms; }
+__SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .settings-nav-item, .dock-tab, .dock-toggle, .task-action, .code-copy-btn) {
+  transition: transform var(--at-cds-t-base) var(--at-cds-spring-snappy), background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease, box-shadow var(--at-cds-t-emph) var(--at-cds-ease);
+}
+__SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .settings-nav-item, .dock-tab, .dock-toggle, .task-action, .code-copy-btn):active:not(:disabled):not([aria-disabled="true"]) { transform: scale(.98); transition-duration: var(--at-cds-t-press); }
 __SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); }
 __SCOPE__ .send-btn:active:not(:disabled):not([aria-disabled="true"]):not(.composer-shell .send-btn) { background: var(--at-cds-action-hover); }
 __SCOPE__ :is(.btn-secondary, .btn-ghost, .icon-btn):not(.danger):not(.stop-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-active); }
 __SCOPE__ :is(.btn, .icon-btn, .settings-toggle):disabled { opacity: .45; cursor: not-allowed; transform: none; }
 __SCOPE__ :is(.btn, .icon-btn)[aria-disabled="true"] { opacity: .45; cursor: not-allowed; transform: none; }
-__SCOPE__ .asktool-card-header-actions .btn { min-height: 24px; font-size: var(--at-cds-small-size); line-height: calc(16px * var(--font-scale, 1)); padding: 3px 8px; }
+__SCOPE__ .asktool-card-header-actions .btn { min-height: 24px; font-size: var(--at-cds-small-size); line-height: calc(16px * var(--font-scale, 1)); padding: 4px 8px; }
 __SCOPE__ :is(.copy-btn, .code-copy-btn) { border-radius: var(--at-cds-r-sm); }
 __SCOPE__ :is(.nav-item, .settings-nav-item, .thread-item, .sidebar-session-group-header) { border-radius: var(--at-cds-r-md); }
 __SCOPE__ :is(.nav-item.active, .settings-nav-item.active, .thread-item.active) { background: var(--ds-bg-active); color: var(--ds-text-primary); }
@@ -237,7 +282,7 @@ __SCOPE__ :is(.mcpm-chip, .sklm-chip, .mcpm-page-btn, .sklm-page-btn).is-active 
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) { color: var(--at-cds-status-neutral); }
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: var(--ds-info); }
 __SCOPE__ .composer-model-thinking-icon { color: var(--ds-text-secondary); }
-__SCOPE__ .composer-model-thinking-level, __SCOPE__ .composer-thinking-tick.active { color: var(--at-cds-compose-accent); }
+__SCOPE__ .composer-model-thinking-level { color: var(--at-cds-compose-accent); }
 /* Composer control row: model name, thinking level and the context % readout all
  * share one size and weight (14px / medium), matching Claude's composer control
  * row where every control reads at the same scale and weight. The mode chip must
@@ -261,18 +306,13 @@ __SCOPE__ .composer-toolbar .composer-mode-chip-label, __SCOPE__ .composer-toolb
 __SCOPE__ :is(.composer-model-thinking-model, .composer-model-thinking-level, .context-inspector-ring-value) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-medium); }
 __SCOPE__ .composer-right .context-inspector-trigger { font-size: var(--at-cds-ui-size); font-weight: var(--at-cds-w-medium); }
 __SCOPE__ .composer-model-thinking-level { background: none; padding: 1px 0; border-radius: 0; }
-/* Host tick box is 14px tall against a 14.3px line box, which clips descenders. */
-__SCOPE__ .composer-thinking-tick { line-height: var(--at-cds-small-leading); min-height: 17px; padding-block: 1px; overflow: visible; }
-__SCOPE__ .composer-thinking-tick:not(.active), __SCOPE__ .composer-thinking-dot:not(.active) { color: var(--ds-text-muted); }
-__SCOPE__ :is(.composer-thinking-dot.active, .composer-thinking-thumb) { background: var(--at-cds-compose-accent); }
-__SCOPE__ .composer-thinking-dot[data-hovered]:not([data-filled]):not(.active) { background: var(--ds-text-muted); }
+__SCOPE__ .composer-thinking-tick:not(.active) { color: var(--ds-text-muted); }
+/* v0.22 segmented labels get a quiet hover without changing the selected level. */
+__SCOPE__ .composer-thinking-rail > .composer-thinking-ticks > .composer-thinking-tick[data-hovered]:not(.active) { color: var(--ds-text-secondary); }
 __SCOPE__ .composer-thinking-range:focus-visible { outline-color: var(--ds-focus); }
 
-/* Menus stay portaled/positioned by the host; no z-index or fixed offsets. */
-__SCOPE__ :is(.composer-model-menu, .composer-permission-menu, .composer-model-thinking-menu, .composer-autocomplete, .context-menu, .settings-menu-select-menu, .home-project-switcher-menu) {
-  border-radius: var(--at-cds-r-xl); background: var(--ds-bg-elevated-opaque);
-  border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-model-menu);
-}
+/* Menus stay portaled/positioned by the host; shape comes from the `overlay` role
+ * (src/generated.roles.css). Only the blur reset is component-specific. */
 __SCOPE__ .composer-model-menu { border-radius: var(--at-cds-r-xl); -webkit-backdrop-filter: none; backdrop-filter: none; }
 __SCOPE__ :is(.composer-plus-item, .composer-menu-entry, .composer-menu-back, .context-menu-item, .settings-menu-select-option) { border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease; }
 __SCOPE__ .composer-plus-item.active { background: var(--ds-bg-active); }
@@ -293,7 +333,7 @@ __SCOPE__ .composer-model-menu .composer-model-group + .composer-model-group {
   margin-top: 6px; padding-top: 4px; border-top: var(--at-cds-hairline) solid var(--ds-border-default);
 }
 __SCOPE__ .composer-model-label { overflow-wrap: anywhere; }
-__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog) { border-radius: var(--at-cds-r-xl); border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-dialog); }
+__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog) { border-radius: var(--at-cds-r-dialog); border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-dialog); }
 __SCOPE__ .dialog { padding: var(--at-cds-s-lg); }
 __SCOPE__ :is(.dialog, .p-dialog) :is(h2, h3) { font-size: var(--at-cds-compose-size); font-weight: var(--at-cds-w-semibold); }
 
@@ -301,7 +341,7 @@ __SCOPE__ :is(.dialog, .p-dialog) :is(h2, h3) { font-size: var(--at-cds-compose-
 __SCOPE__ .code-block {
   --code-block-bg: var(--at-cds-code-bg);
   background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: var(--at-cds-r-xl);
-  border: 1px solid var(--at-cds-divider); box-shadow: none;
+  border: 0; padding: .5px; box-shadow: inset 0 0 0 .5px var(--at-cds-code-ring); overflow: hidden;
 }
 __SCOPE__ .prose-chat pre, __SCOPE__ .code-block pre {
   font-family: var(--font-mono); font-size: var(--at-cds-code-size); line-height: var(--at-cds-code-leading);
@@ -314,8 +354,9 @@ __SCOPE__ .prose-chat pre code, __SCOPE__ .code-block pre code {
   background: transparent; color: inherit; padding: 0; font-variant-ligatures: none;
 }
 __SCOPE__ .code-block-head { background: var(--ds-code-head-bg); min-height: 36px; padding: 4px 8px 4px 14px; border-bottom: 0; }
-__SCOPE__ .code-block .code-block-lang { color: var(--at-cds-code-muted); font-size: var(--at-cds-tiny-size); }
-__SCOPE__ .code-block .code-copy-btn { color: var(--at-cds-code-muted); opacity: 1; }
+__SCOPE__ .code-block .code-block-lang { color: var(--ds-text-faint); font: var(--at-cds-small-size)/var(--at-cds-small-leading) var(--font-mono); text-transform: lowercase; }
+__SCOPE__ .code-block .code-copy-btn { color: var(--at-cds-code-muted); opacity: .6; }
+__SCOPE__ .code-block:is(:hover, :focus-within) .code-copy-btn { opacity: 1; }
 __SCOPE__ .code-block .code-copy-btn:hover { color: var(--at-cds-code-fg); background: var(--ds-code-hover-bg); }
 __SCOPE__ .code-block .code-copy-btn.copied { color: var(--ds-success); }
 __SCOPE__ :is(.tool-diff, .review-change-diff) { font-family: var(--font-mono); font-size: var(--at-cds-small-size); line-height: 1.65; }
@@ -323,22 +364,24 @@ __SCOPE__ :is(.tool-diff, .review-change-diff) .diff-line.add { background: colo
 __SCOPE__ :is(.tool-diff, .review-change-diff) .diff-line.del { background: color-mix(in srgb, var(--at-cds-diff-del) 20%, transparent); }
 
 /* Existing business states only; preserve risk and approval semantics. */
-__SCOPE__ :is(.permission-card, .asktool-card, .review-change-card) { border-radius: var(--at-cds-r-xl); }
-__SCOPE__ .permission-card { padding: 14px 16px; }
+/* 卡片与提问卡的外形由角色生成（src/generated.roles.css 的 card），这里不再重复。 */
 __SCOPE__ .tool-row.thinking > .tool-row-body { color: var(--ds-text-secondary); }
 __SCOPE__ .thinking-prose { font-size: var(--at-cds-small-size); color: var(--ds-text-secondary); line-height: var(--at-cds-small-leading); }
 __SCOPE__ .composer-image-preview { border-radius: var(--at-cds-r-xl); border-color: var(--ds-border-default); box-shadow: var(--ds-shadow-dialog); }
 __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); backdrop-filter: blur(8px); }
 
-/* Animate only host-provided states; no runtime spring engine. */
+/* Animate only host-provided states; the spring is a CSS approximation, not a runtime engine. */
 @keyframes at-cds-popover-in {
   from { opacity: 0; transform: translateY(3px) scale(.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-@keyframes at-cds-quiet-dot {
-  0%, 5% { opacity: .2857; }
-  15%, 25% { opacity: 1; }
-  65%, 100% { opacity: .2857; }
+@keyframes at-cds-clay-breathe {
+  0%, 100% { opacity: .45; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+@keyframes at-cds-shimmer-text-shine {
+  0%, 12% { background-position: 140% 0; }
+  70%, 100% { background-position: -140% 0; }
 }
 @keyframes at-cds-rise-in {
   from { opacity: 0; transform: translateY(3px); }
@@ -347,19 +390,37 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
 @media (prefers-reduced-motion: no-preference) {
   __SCOPE__ :is(.composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu).is-open { animation: at-cds-popover-in var(--at-cds-t-base) var(--at-cds-ease) both; }
   __SCOPE__ .dock-panel:not([hidden]) { animation: at-cds-rise-in var(--at-cds-t-base) var(--at-cds-ease) both; }
-  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span { animation: at-cds-quiet-dot 1.8s linear infinite; transform: none; }
+  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span,
+  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge:not(.waiting) .project-run-badge-dot),
+  __SCOPE__ .sidebar .thread-item-status.running::before { background: var(--at-cds-clay-vivid); animation: at-cds-clay-breathe 2.4s var(--at-cds-ease) infinite; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(2) { animation-delay: .2s; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(3) { animation-delay: .4s; }
+  @supports (background-clip: text) {
+    __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running),
+    __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-label {
+      color: var(--ds-text-muted); background-image: linear-gradient(100deg, var(--ds-text-muted) 38%, var(--at-cds-clay-vivid) 50%, var(--ds-text-muted) 62%);
+      background-size: 240% 100%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: at-cds-shimmer-text-shine 2.4s var(--at-cds-ease) infinite;
+    }
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  __SCOPE__ :is(.composer-shell, .btn, .icon-btn, .send-btn, .stop-btn, .settings-toggle, .settings-toggle-thumb, .settings-segment-item, .composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu, .working-indicator-mark > span, .dock-panel) {
+  __SCOPE__ :is(.composer-shell, .btn, .icon-btn, .send-btn, .stop-btn, .settings-toggle, .settings-toggle-thumb, .settings-segment-item, .composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu, .working-indicator-mark > span, .dock-panel, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .settings-nav-item, .dock-tab, .dock-toggle, .task-action, .code-copy-btn) {
     animation: none !important; transition-duration: .01ms !important;
   }
-  __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn):active { transform: none; }
+  __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .settings-nav-item, .dock-tab, .dock-toggle, .task-action, .code-copy-btn):active { transform: none !important; }
+  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge-dot, .tool-activity-label.running, .tool-row-name.running),
+  __SCOPE__ .sidebar .thread-item-status.running::before { animation: none !important; }
   __SCOPE__ .working-indicator-mark > span { opacity: .7; transform: none; }
 }
 @media (min-resolution: 2dppx) { __SCOPE__ { --at-cds-hairline: .5px; } }
 @media (min-resolution: 3dppx) { __SCOPE__ { --at-cds-hairline: calc(1px / 3); } }
+@media (forced-colors: active) {
+  __SCOPE__ :is(.thread-scroll, .sidebar-session-group-body.standalone, .sidebar-session-group-body.pinned) { -webkit-mask-image: none; mask-image: none; }
+  __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running, .working-indicator-label) { background: none !important; color: CanvasText !important; -webkit-text-fill-color: currentColor !important; animation: none !important; }
+  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge-dot) { background: Highlight; animation: none !important; }
+  __SCOPE__ .code-block { border: 1px solid CanvasText; box-shadow: none; }
+}
 @media (min-width: 640px) { __SCOPE__ .message-row.user .message-col:not(:has(.message-edit)) { max-width: 75%; } }
 @media (max-width: 640px) {
   __SCOPE__ .thread-content { padding-inline: 16px; }
@@ -388,3 +449,8 @@ __SCOPE__ .composer-mode-menu{border-radius: var(--at-cds-r-xl);background:var(-
 __SCOPE__ .composer-mode-menu .active{border-radius: var(--at-cds-r-md);background:var(--ds-bg-active);color:var(--ds-text-primary)}
 __SCOPE__ :is(.composer-placeholder-suggestion,.composer-suggestion-text){font:var(--at-cds-compose-size)/var(--at-cds-compose-leading) var(--font-sans);color:var(--ds-placeholder-ink)}
 __SCOPE__ .turn-usage-popover-footer{color:var(--ds-text-secondary)}
+/* Composition bar: a 6px graphic ribbon reads as one element at a glance; the
+ * segments still tile edge to edge with a 1px seam from the host. */
+__SCOPE__ :is(.turn-usage-bar,.turn-usage-popover .turn-usage-bar){height:6px}
+/* Review-all button matches the 28px control row (I11). */
+__SCOPE__ .turn-changes-view-all{min-height:28px;display:inline-flex;align-items:center}

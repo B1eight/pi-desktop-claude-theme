@@ -228,5 +228,8 @@
         "only host-document chrome; no independent plugin .md-* content"
       ]
     }
-  ]
+  ],
+  "status": "deprecated",
+  "deprecatedAt": "2026-11-12",
+  "deprecationReason": "停在 0.20.1，检查器需要 --host-root/--runtime-json 且没有接线；宿主侧契约已由 docs/host-inventory.json + check:host 接替（版本与 asar 指纹 + 类名清单）。保留文件只为历史对照，不再作为兼容性证据。"
 }

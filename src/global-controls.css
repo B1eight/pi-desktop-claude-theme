@@ -1,8 +1,27 @@
 /* Single-focus contract. CSS only; no state emulation.
  * !important is limited to focus ownership/known host halos, not palette or elevation.
  * Native chrome and independent documents are explicitly outside this adapter. */
-__SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: #bd562f; }
-__SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn)):not(:disabled):not([aria-disabled="true"]) {
+/* Host radius bridge. PI-Desktop 0.22 ships a ten-step ladder under @layer theme
+ * (4/6/8/10/12/14/16/18/20/24 via --radius-3xs … --radius-2xl). Left alone, the
+ * app would carry that ladder for every surface the theme never names, and the
+ * theme's own rungs for the ones it does — two radius languages at once.
+ * Compressing 4–24 onto 6–16 is linear with a 0.5 factor, so each 2px host step
+ * lands on a 1px grid; the theme's own rungs (6/7/10/12/14) are a subset of it.
+ * --radius-full and --radius-round are shapes, not rungs, and stay untouched. */
+__SCOPE__ {
+  --radius-3xs: 6px;     /* 4  */
+  --radius-2xs: 7px;     /* 6  */
+  --radius-xs: 8px;      /* 8  */
+  --radius-sm: 9px;      /* 10 */
+  --radius-md: 10px;     /* 12 */
+  --radius-md-plus: 11px;/* 14 */
+  --radius-lg: 12px;     /* 16 */
+  --radius-lg-plus: 13px;/* 18 */
+  --radius-xl: 14px;     /* 20 */
+  --radius-2xl: 16px;    /* 24 */
+}
+__SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: var(--at-cds-clay-ink); }
+__SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn):not(.radial-menu-item)):not(:disabled):not([aria-disabled="true"]) {
   outline: 2px solid var(--at-cds-focus-ink) !important; outline-offset: 2px !important;
   scroll-margin: 6px;
 }
@@ -26,7 +45,7 @@ __SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-mo
 __SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit) > :is(input, .message-edit-input):not(:disabled):not([readonly]):not([aria-invalid="true"]) { border: 0; background: transparent; outline: none !important; box-shadow: none !important; }
 __SCOPE__ .settings-search-wrap { border-radius: var(--at-cds-r-md); --at-cds-field-idle: inset 0 0 0 1px var(--at-cds-input-border); }
 __SCOPE__ .composer-shell:has(.composer-input:focus) {
-  outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important;
+  outline: none !important; outline-offset: 0 !important;
   border-color: transparent; box-shadow: var(--at-cds-ring-shadow) !important; scroll-margin: 6px;
 }
 /* The generic text-field rule below paints --ds-bg-composer, and the shell
@@ -63,20 +82,15 @@ __SCOPE__ input[type="range"]:not(.composer-thinking-range)::-moz-range-thumb {
   width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--at-cds-control-neutral); box-shadow: none;
 }
 __SCOPE__ input[type="range"]:not(.composer-thinking-range)::-moz-range-progress { background: transparent; }
-__SCOPE__ .composer-thinking-rail::before { height: 4px; background: var(--at-cds-slider-track); }
-__SCOPE__ .composer-thinking-rail::after { display: none; }
-__SCOPE__ .composer-thinking-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--at-cds-compose-accent); }
-/* Only the selected knob shrinks; the stop dots keep the host size. */
-__SCOPE__ .composer-thinking-thumb { width: 10px; height: 10px; top: 4px; }
-/* The original transparent native thumb remains transparent. Host --composer-thinking-progress
- * still positions its visible span, and stop markers/dragging/native step are untouched. */
+/* v0.22 reuses the thumb for a full-column segmented pill: its geometry and
+ * surface stay host-owned, and the transparent range is left untouched. */
 @media (forced-colors: active) {
   __SCOPE__ { --at-cds-focus-ink: Highlight; --at-cds-composer-focus-ink: Highlight; --at-cds-composer-ring: 2px; --at-cds-ring-shadow: none; --at-cds-slider-track: GrayText; --at-cds-control-neutral: CanvasText; }
   __SCOPE__ :is(input, textarea, [contenteditable="true"]):focus { outline-color: Highlight !important; box-shadow: none !important; }
   __SCOPE__ .composer-shell .composer-input:focus { outline: none !important; }
-  __SCOPE__ :is(input[type="range"], .composer-thinking-thumb), __SCOPE__ .composer-thinking-rail::before { forced-color-adjust: none; }
-  __SCOPE__ .composer-thinking-thumb { background: Highlight !important; }
-  __SCOPE__ :is(.composer-model-thinking-level, .composer-thinking-tick.active) { color: Highlight !important; }
-  __SCOPE__ .composer-thinking-dot.active { background: Highlight !important; }
+  __SCOPE__ input[type="range"] { forced-color-adjust: none; }
+  __SCOPE__ .composer-model-thinking-level { color: Highlight !important; }
   __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: Highlight; }
+  __SCOPE__ .composer-shell { border-color: CanvasText; box-shadow: none; }
+  __SCOPE__ .composer-shell:has(.composer-input:focus) { outline: 2px solid Highlight !important; outline-offset: -2px !important; box-shadow: none !important; }
 }

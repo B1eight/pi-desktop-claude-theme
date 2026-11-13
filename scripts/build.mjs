@@ -30,9 +30,9 @@ export function themeArtifact(mode) {
   const header = `/* Claude Theme ${manifest.version} ${mode}\n * Caho1/open-claude-ui@2834bc158a4849f21c97cbb2e0b10525f6e646f1 MIT\n * No embedded fonts: typography uses host/system families.\n * scripts/build.mjs\n */\n`;
   const parts = [{ name: 'header', text: header }];
   const sections = [
-    ['palette', `palette.${mode}.css`], ['components', 'components.css'],
-    ['refinements', 'refinements.css'], ['settings', 'settings.css'],
-    ['globalControls', 'global-controls.css'],
+    ['palette', `palette.${mode}.css`], ['generated', 'generated.roles.css'],
+    ['components', 'components.css'], ['refinements', 'refinements.css'],
+    ['settings', 'settings.css'], ['globalControls', 'global-controls.css'],
   ];
   const contributions = [];
   for (const [name, file] of sections) {
