@@ -154,6 +154,9 @@ __SCOPE__ .message-row.user .message-bubble:not(:has(.message-edit)) {
 }
 __SCOPE__ .message-row.assistant .message-bubble { background: transparent; border: 0; box-shadow: none; }
 __SCOPE__ .message-user-text { overflow-wrap: anywhere; word-break: normal; }
+/* 回复页脚：模型名与用量是同一行读数，不该一边是胶囊一边是纯文字。
+ * 去掉宿主的 5% 底色与胶囊内衬，两者同字号同色，只靠 6px 间距分组。 */
+__SCOPE__ .message-meta-chip { background: transparent; padding: 0; }
 
 /* The transcript mask stays above the host-measured composer dock, not the window bottom. */
 __SCOPE__ .thread-scroll { --at-cds-scroll-end: calc(100% - var(--composer-dock-height, 168px) + 2px); }
@@ -393,12 +396,17 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span,
   __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge:not(.waiting) .project-run-badge-dot),
   __SCOPE__ .sidebar .thread-item-status.running::before { background: var(--at-cds-clay-vivid); animation: at-cds-clay-breathe 2.4s var(--at-cds-ease) infinite; }
+  /* 呼吸点改用中性文字色：陶土留给发送键与侧栏会话点，状态行的三点只做明暗呼吸。 */
+  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span { background: var(--ds-text-muted); }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(2) { animation-delay: .2s; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(3) { animation-delay: .4s; }
   @supports (background-clip: text) {
     __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running),
     __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-label {
-      color: var(--ds-text-muted); background-image: linear-gradient(100deg, var(--ds-text-muted) 38%, var(--at-cds-clay-vivid) 50%, var(--ds-text-muted) 62%);
+      /* 流光只提亮，不换色：原来渐变的中心是陶土，扫过中文时整段突然变橙，很跳。
+       * 现在中心取次级文字色，视觉上是「一道更亮的光扫过去」，运行态仍由左侧陶土点和
+       * 呼吸节奏表达。 */
+      color: var(--ds-text-muted); background-image: linear-gradient(100deg, var(--ds-text-muted) 38%, var(--ds-text-secondary) 50%, var(--ds-text-muted) 62%);
       background-size: 240% 100%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       animation: at-cds-shimmer-text-shine 2.4s var(--at-cds-ease) infinite;
     }

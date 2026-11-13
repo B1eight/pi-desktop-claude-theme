@@ -97,7 +97,8 @@ __SCOPE__ {
   --at-cds-action-hover: #e1e0d9;
   --at-cds-action-fg: #0b0b0b;
   --at-cds-composer-hover: 0 0 0 .5px var(--ds-border-strong), 0 4px 16px -4px rgba(0, 0, 0, .32);
-  --at-cds-composer-focus: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1.5px var(--at-cds-focus-ink), 0 8px 24px -4px rgba(0, 0, 0, .32);
+  /* 同 light：1px 环，不带光晕。 */
+  --at-cds-composer-focus: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1px var(--at-cds-focus-ink);
   --at-cds-composer-drop: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1.5px var(--at-cds-clay-vivid), 0 0 8px 1px color-mix(in oklab, var(--at-cds-clay-vivid) 24%, transparent), 0 8px 24px -4px rgba(0, 0, 0, .32);
   --at-cds-focus-shadow: none;
   --at-cds-card-hover: 0 0 0 1px var(--ds-border-strong), 0 6px 20px rgba(0, 0, 0, .60);

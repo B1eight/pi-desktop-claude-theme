@@ -13,7 +13,7 @@ __SCOPE__ .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="
 __SCOPE__ .working-indicator:not(.run-activity-indicator) .working-indicator-label { color: inherit; }
 __SCOPE__ .run-activity-indicator:is([data-phase="retrying"], [data-phase="recovering"]) { color: var(--ds-warning); }
 __SCOPE__ .working-indicator:not(.run-activity-indicator) .working-indicator-mark > span,
-__SCOPE__ .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"]) .working-indicator-mark > span { background: var(--at-cds-clay-vivid); }
+__SCOPE__ .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"]) .working-indicator-mark > span { background: var(--ds-text-muted); }
 __SCOPE__ .run-activity-indicator:is([data-phase="retrying"], [data-phase="recovering"]) .working-indicator-mark > span { background: currentColor; }
 __SCOPE__ .working-indicator .working-elapsed { color: var(--ds-text-muted); }
 @media (forced-colors: active) {
@@ -176,10 +176,13 @@ __SCOPE__ .todo-dock-row{min-height:28px}
  * Decided after the host-DOM comparison (surface-comparison §4). */
 /* In progress: primary ink and semibold — the only emphasised row. */
 __SCOPE__ .todo-dock-row-in_progress .todo-dock-row-content{color:var(--ds-text-primary);font-weight:var(--at-cds-w-semibold)}
-/* Completed: de-emphasised text, no strikethrough (the icon already says done). */
-__SCOPE__ .todo-dock-row-completed .todo-dock-row-content{text-decoration:none;color:var(--ds-text-muted)}
-/* Cancelled: struck-through and dimmed. */
-__SCOPE__ .todo-dock-row-cancelled .todo-dock-row-content{text-decoration:line-through;color:var(--ds-text-muted);opacity:.7}
+__SCOPE__ .todo-dock-row-completed{color:var(--ds-text-secondary)}
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-content{text-decoration:none;color:var(--ds-text-secondary)}
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-symbol{color:var(--ds-text-secondary)}
+/* 三态层次：进行中（主文字 + 半粗）> 已完成（次级文字 + ✓）> 已取消（弱化 + 删除线）。
+ * 之前完成态和取消态都是 muted，只靠删除线区分，看过去一片浅灰。
+ * 取消态不再叠主题自己的透明度：宿主已给整行 opacity .72，再叠 .7 会合成 0.50。 */
+__SCOPE__ .todo-dock-row-cancelled .todo-dock-row-content{text-decoration:line-through;color:var(--ds-text-muted)}
 /* Shared warm running tone; a waiting project keeps its neutral marker. */
 __SCOPE__ .project-run-badge{border-radius:0;background:none;padding: 0;height:auto;color:var(--ds-text-muted)}
 __SCOPE__ .project-run-badge-dot{background:var(--at-cds-clay-vivid)}
