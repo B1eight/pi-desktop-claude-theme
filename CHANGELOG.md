@@ -1,11 +1,10 @@
 # Changelog
-## 1.1.0（未发布）
+## 1.1.0
 
 > 三波：令牌层 → 状态层 → 焦点与真机走查。1.0.3 与 1.0.4 从未单独发布，改动全部并入本版。
-> 本版仍未发布：本轮改了 CSS 之后 `npm run check:acceptance` 报 26 项 open —— 13 项是原有 verified
-> 因证据过期（`check:evidence`: `Current build/evidence mismatch: light`），13 项本未验。封存一轮后可回到
-> 13 项：其中 2 项范围外或需读屏软件（`business-operations`、`screen-reader`）、3 项本轮已在真机验证但尚未
-> 写进判据（`sidebar-sessions`、`code-block`、`theme-installation`）、8 项只有合成夹具证据。
+> 本版已发布：证据封存于 2026-11-14 的隔离宿主 0.22.0.0，`check:acceptance` 为 0 problems / 13 open。
+> 13 项 open 不是没改完，而是证据层级不足：2 项范围外或需读屏软件（`business-operations`、`screen-reader`）、
+> 3 项已在真机验证但尚未写进判据（`sidebar-sessions`、`code-block`、`theme-installation`）、8 项只有合成夹具证据。
 
 ### 状态层（本版新增的第 5 层）
 
