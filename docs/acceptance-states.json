@@ -1,0 +1,446 @@
+{
+  "schemaVersion": 1,
+  "note": "当前构建的限定范围验收目录。verified 只证明 evidence.scope、modes 与 notes 指定的真实宿主 React 样本渲染/交互；不代表真实业务、安装或所有状态。合成 HTML、静态检查不可替代。完整证据锁与逐模式断言由 check:evidence/check:acceptance 检查。未覆盖保留 unverified，默认全验收门禁仍失败。",
+  "host": {
+    "product": "PI-Desktop",
+    "version": "0.22.0",
+    "productVersion": "0.22.0.0",
+    "electron": "43.6.0",
+    "chrome": "150.0.7871.250",
+    "asarSha256": "68c641f7109c2aa0391ba329d9fd49f1a55d4180d659a2bb6be69f76ea823f8d",
+    "asarSha256Prefix": "68c641f7109c"
+  },
+  "artifacts": {
+    "light": {
+      "file": "themes/claude-light.css",
+      "bytes": 59666,
+      "sha256": "69b5f80fe0b9d06d4999c337b576385e7a111375af3a924ec24ecb6674c4b1db",
+      "sha256Prefix": "69b5f80fe0b9"
+    },
+    "dark": {
+      "file": "themes/claude-dark.css",
+      "bytes": 59738,
+      "sha256": "6c8a6de68be74140c6e03cc4436b4a3962b2dc790adc80ff1c1bcd8bd0a542b5",
+      "sha256Prefix": "6c8a6de68be7"
+    }
+  },
+  "run": {
+    "at": "2026-11-14",
+    "buildVersion": "1.1.0-unreleased-working-build",
+    "method": "独立 PI_DESKTOP_DATA_DIR/user-data-dir；当前安装宿主真实 React + capture/store 安全样本；真实设置主题菜单选择与 CDP 鼠标/键盘。任务接口与剪贴板为明确标记的 mock。无模型请求、真实任务进程、授权、回滚或计费。",
+    "viewport": {
+      "width": 1200,
+      "height": 800,
+      "devicePixelRatio": 1.25,
+      "fontScale": 1
+    },
+    "report": "docs/CURRENT-BUILD-ACCEPTANCE.md"
+  },
+  "evidenceLock": {
+    "relativePath": "../claude-theme-acceptance/run-2026-11-14T11-50-09-427Z",
+    "manifestSha256": "68b02f5cc4fa6cbbd4a3037fcdf493f523e3cd7a015dabe66975c692602badaa"
+  },
+  "history": [
+    {
+      "at": "2026-11-12",
+      "file": "history/acceptance-2026-11-12.json",
+      "note": "完整旧目录保留在本次外部证据并纳入校验；包含旧 Todo 失败/fixed 记录与旧 verified。它们不是当前构建通过。"
+    }
+  ],
+  "fixes": [
+    {
+      "id": "heading-leading",
+      "before": "18px × 1.4 = 25.2px",
+      "after": "18px × 1.45 = 26.1px",
+      "regression": "tests/heading-leading.test.mjs",
+      "evidence": [
+        "before/heading-regression.log",
+        "before/grammar.log",
+        "final/interactions.json",
+        "checks/unit-final.log"
+      ]
+    },
+    {
+      "id": "task-running-tone",
+      "before": "running task-state inherited success green",
+      "after": "running-only scoped clay token; light rgb(217,119,87), dark rgb(204,107,73)",
+      "regression": "tests/task-running-tone.test.mjs",
+      "evidence": [
+        "before/task-tone-red.log",
+        "after/task-color-reproduced.json",
+        "final/focused-focused.json",
+        "checks/unit-final.log"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "id": "theme-activation",
+      "area": "主题启用",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "设置菜单选择、宿主注入样式、根主题身份与 CSS 逐字相等",
+        "files": [
+          "final/interactions.json",
+          "final/focused-focused.json",
+          "final/light-settings.png",
+          "final/dark-settings.png"
+        ]
+      },
+      "notes": "pluginThemes 通过 capture/store 提供；不是安装/权限流程验收。"
+    },
+    {
+      "id": "task-dock",
+      "area": "任务坞",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "输出展开、Enter 切换、运行点最终色",
+        "files": [
+          "final/interactions.json",
+          "final/focused-focused.json",
+          "final/focused-light-task-keyboard.png",
+          "final/focused-dark-task-keyboard.png"
+        ]
+      },
+      "notes": "任务 list/output 使用 mock；无真实后台进程。"
+    },
+    {
+      "id": "todo-cancelled-real-component",
+      "area": "Todo 四态",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "pending/in_progress/completed/cancelled 均实际可见，取消行单层 opacity .72",
+        "files": [
+          "final/interactions.json",
+          "final/light-todo.png",
+          "final/dark-todo.png"
+        ]
+      },
+      "notes": "保留原生状态符号、完成降级和取消删除线；不宣称辅助技术验收。"
+    },
+    {
+      "id": "markdown-table",
+      "area": "正文表格",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "真实表格、Markdown 复制 payload、视口内放大对话框",
+        "files": [
+          "final/interactions.json",
+          "final/light-table.png",
+          "final/dark-table.png"
+        ]
+      },
+      "notes": "剪贴板写入 mock；OS 剪贴板与 CSV 下载未验。"
+    },
+    {
+      "id": "turn-changes-summary",
+      "area": "改动摘要",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "折叠→鼠标展开→Enter 折叠，条目可见",
+        "files": [
+          "final/focused-focused.json",
+          "final/focused-light-changes-focused.png",
+          "final/focused-dark-changes-focused.png"
+        ]
+      },
+      "notes": "capture-rig 安全样本；没有改文件或回滚。"
+    },
+    {
+      "id": "review-inline",
+      "area": "内联 Review diff",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "工具组与 Review 卡展开，六条 diff 可见",
+        "files": [
+          "final/focused-focused.json",
+          "final/focused-light-review-focused.png",
+          "final/focused-dark-review-focused.png"
+        ]
+      },
+      "notes": "不包含工作面板后台记录、真实复制/回滚。"
+    },
+    {
+      "id": "usage-popover",
+      "area": "用量弹层",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "指针与焦点打开、portal 可见且在视口内、Escape 关闭",
+        "files": [
+          "final/interactions.json",
+          "final/focused-focused.json",
+          "final/light-usage.png",
+          "final/dark-usage.png"
+        ]
+      },
+      "notes": "1000 input/200 output/1200 total、100 tokens/s 为样本；无价格/账单确认。原生浅深色对照见 before/interactions.json。"
+    },
+    {
+      "id": "composer-states",
+      "area": "输入区",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "真实草稿键入、焦点与壳边界",
+        "files": [
+          "final/interactions.json",
+          "final/light-composer.png",
+          "final/dark-composer.png"
+        ]
+      },
+      "notes": "仅草稿/焦点样本；未发送、未配置模型，不覆盖所有禁用原因。"
+    },
+    {
+      "id": "renderer-menus",
+      "area": "渲染器菜单",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "空模型菜单打开，位置在视口内",
+        "files": [
+          "final/interactions.json",
+          "final/light-menu.png",
+          "final/dark-menu.png"
+        ]
+      },
+      "notes": "没有模型/服务选择或权限模式切换；原生菜单另列边界。"
+    },
+    {
+      "id": "risk-feedback",
+      "area": "风险反馈",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "高风险卡、标签、参数与动作可见，卡片在视口内",
+        "files": [
+          "final/focused-focused.json",
+          "final/focused-light-risk-focused.png",
+          "final/focused-dark-risk-focused.png"
+        ]
+      },
+      "notes": "未点击拒绝或允许，不验证权限 resolver。"
+    },
+    {
+      "id": "keyboard-focus",
+      "area": "键盘焦点",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "风险动作 Tab focus-visible 及单 outline；任务 Enter 操作",
+        "files": [
+          "final/focused-focused.json",
+          "final/focused-light-task-keyboard.png",
+          "final/focused-dark-task-keyboard.png"
+        ]
+      },
+      "notes": "DOM 设置起始焦点后发真实 CDP Tab/Enter；不是全应用键盘路径或读屏验收。"
+    },
+    {
+      "id": "heading-leading",
+      "area": "正文标题行高",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "18px 标题 computed line-height 26.1px，I6 合规",
+        "files": [
+          "final/interactions.json",
+          "checks/unit-final.log"
+        ]
+      }
+    },
+    {
+      "id": "task-stop-callback",
+      "area": "任务停止 UI 回调",
+      "status": "verified",
+      "evidence": {
+        "kind": "real-host-cdp",
+        "scope": "real-host-renderer-fixture",
+        "modes": [
+          "dark"
+        ],
+        "at": "2026-11-13",
+        "ref": "mock stop 回调及已停止状态渲染",
+        "files": [
+          "final/focused-focused.json",
+          "final/focused-dark-stop-mocked.png"
+        ]
+      },
+      "notes": "仅深色样本；不代表真实进程停止或浅色停止流程已测。"
+    },
+    {
+      "id": "sidebar-sessions",
+      "area": "侧栏全状态",
+      "status": "unverified",
+      "blocker": "仅当前安全会话可见，未重验旧目录中的运行/完成/失败/selected 全状态；旧证据不得换哈希沿用。"
+    },
+    {
+      "id": "code-block",
+      "area": "代码块完整交互",
+      "status": "unverified",
+      "blocker": "本轮截图包含代码块，但未单独完成复制/悬停全状态断言；不迁移旧 verified。"
+    },
+    {
+      "id": "review-changes",
+      "area": "工作面板 Review",
+      "status": "unverified",
+      "blocker": "真实工作面板后台为空态；只验证了内联 React diff，不等于后台变更列表与回退业务。"
+    },
+    {
+      "id": "tool-run-states",
+      "area": "工具运行全状态",
+      "status": "unverified",
+      "blocker": "未重跑旧成功/失败/运行全状态；任务坞样本不能代替工具运行组件。"
+    },
+    {
+      "id": "delegation",
+      "area": "委托与子代理",
+      "status": "unverified",
+      "blocker": "本轮未重验当前构建的完整委托拓扑/生命周期。"
+    },
+    {
+      "id": "notifications",
+      "area": "通知与 Toast",
+      "status": "unverified",
+      "blocker": "未完成当前构建通知中心和全部级别 Toast 的定点复验。"
+    },
+    {
+      "id": "scheduled-tasks",
+      "area": "定时任务页",
+      "status": "unverified",
+      "blocker": "本轮未覆盖；不触发或创建真实自动化。"
+    },
+    {
+      "id": "plugin-pages",
+      "area": "插件页与独立启动器",
+      "status": "unverified",
+      "blocker": "主文档插件页、市场状态与独立启动器未逐项验收；独立文档内部另列边界。"
+    },
+    {
+      "id": "theme-installation",
+      "area": "安装与权限流程",
+      "status": "unverified",
+      "blocker": "主题记录通过宿主 capture/store 提供；未打开安装/开发加载原生文件选择器，未验证首次授权和重启持久化。PluginCheck 只证明静态合法。"
+    },
+    {
+      "id": "business-operations",
+      "area": "真实业务操作",
+      "status": "unverified",
+      "blocker": "无真实任务启动/停止、模型请求、服务选择、OS 剪贴板、下载、权限决议、回滚或计费；样本/mock 回调不替代这些操作。"
+    },
+    {
+      "id": "reduced-motion",
+      "area": "减少动态效果真机",
+      "status": "unverified",
+      "blocker": "仅补充合成 Chromium 检查通过，未在真实宿主该系统设置下逐项验收。"
+    },
+    {
+      "id": "forced-colors",
+      "area": "强制色真机",
+      "status": "unverified",
+      "blocker": "仅补充合成 Chromium 检查通过，未在 Windows 高对比度真实宿主逐项验收。"
+    },
+    {
+      "id": "screen-reader",
+      "area": "屏幕阅读器",
+      "status": "unverified",
+      "blocker": "未进行辅助技术朗读、导航与状态播报验收。"
+    },
+    {
+      "id": "native-menus",
+      "area": "原生菜单",
+      "status": "out-of-scope",
+      "reason": "不进入主文档 CSS 层叠；不为统一外观扩大 ui.theme 权限。"
+    },
+    {
+      "id": "os-dialogs",
+      "area": "系统对话框",
+      "status": "out-of-scope",
+      "reason": "原生文件选择、保存和 OS 权限对话框不受主题 CSS 控制；业务流程未覆盖另记未验。"
+    },
+    {
+      "id": "independent-documents",
+      "area": "独立文档内部",
+      "status": "out-of-scope",
+      "reason": "iframe/webview、插件独立 surface、浏览器页面等不继承主文档主题；只按已有宿主壳边界处理，不注入或扩大权限。"
+    }
+  ]
+}

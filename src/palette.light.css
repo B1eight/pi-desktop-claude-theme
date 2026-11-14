@@ -21,7 +21,9 @@ __SCOPE__ {
   --ds-bg-sidebar-image: none;
   --ds-settings-rail-bg: #fcfcfb;
   --at-cds-region-line: var(--ds-neutral-5);
-  --at-cds-composer-focus-ink: #c6c6c5;
+  /* 字段环色不再是单独一档浅灰（#c6c6c5 只有 1.6:1，等于没有环）：跟普通焦点同一个参数，
+   * 环宽留作可调项。见 docs/STATE-LAYER.md §6.2.3。 */
+  --at-cds-composer-focus-ink: var(--at-cds-focus-ink);
   --at-cds-composer-ring: 1px;
   --at-cds-ring-shadow: var(--at-cds-composer-focus);
   --at-cds-input-border: #e1e1e0;
@@ -39,18 +41,26 @@ __SCOPE__ {
   --ds-text-secondary: #52514c;
   --ds-text-muted: #75746d;
   --ds-text-faint: #94928b;
+  /* 流光中心色：浅色必须「更亮」才像光，因此取 faint（比 muted 更浅）；深色取 secondary。 */
+  --at-cds-shimmer-ink: var(--ds-text-faint);
   --ds-placeholder-ink: #94928b;
   --ds-accent: #1f1f1f;
   --ds-accent-hover: #333333;
   --ds-accent-soft: #e8e8e4;
-  --ds-focus: #525252;
+  /* 焦点环 = Claude --cds-role-accent-450 = --cds-gray-450 #7b7974（基准值，直接采用）。
+   * 对页底 #fcfcfb 是 4.57:1；Claude 对它的页底 #f9f9f7 是 4.13:1，两边同一档。
+   * 曾经因为把「焦点墨 ≥4.5:1」这条文本门槛套到环上，被推到 #75746d（4.57→偏重 11%）。
+   * 环是非文本元素，按 WCAG 1.4.11 判 3:1 即可；基准优先于自定门槛，门槛已随之修正（verify.mjs）。
+   * 更早写 #525252（7.81:1），那才是"点进输入框很重"的原始主因。 */
+  --ds-focus: #7b7974;
   --ds-border-default: rgba(21, 21, 21, .10);
   --ds-border-subtle: rgba(21, 21, 21, .06);
   --ds-border-strong: rgba(21, 21, 21, .20);
   --ds-elevation-stroke: rgba(21, 21, 21, .10);
-  --ds-bg-hover: rgba(21, 21, 21, .05);
-  --ds-bg-active: rgba(21, 21, 21, .06);
-  --ds-settings-nav-active: rgba(21, 21, 21, .06);
+  /* alpha 阶梯（D1）：叠墨取 Claude --cds-neutral-900 #0b0b0b；hover 一档 5%，selected / active 两档 10%。 */
+  --ds-bg-hover: rgba(11, 11, 11, .05);
+  --ds-bg-active: rgba(11, 11, 11, .10);
+  --ds-settings-nav-active: rgba(11, 11, 11, .10);
   --ds-error: #b42318;
   --ds-success: #167044;
   --ds-warning: #8d520d;
@@ -94,11 +104,16 @@ __SCOPE__ {
   --at-cds-action-hover: #2c2c2a;
   --at-cds-action-fg: #ffffff;
   --at-cds-composer-hover: 0 0 0 .5px var(--ds-border-default), 0 4px 16px -4px rgba(20, 19, 18, .08);
-  /* 聚焦环：原来 1.5px 环 + 8/24 光晕，浅深两色都显重（像描了一圈粗边）。收到 1px、
-   * 去掉光晕；颜色仍用 --at-cds-focus-ink，键盘聚焦的可辨识度不变。 */
-  --at-cds-composer-focus: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1px var(--at-cds-focus-ink);
-  --at-cds-composer-drop: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1.5px var(--at-cds-clay-vivid), 0 0 8px 1px color-mix(in oklab, var(--at-cds-clay-vivid) 24%, transparent), 0 8px 24px -4px rgba(20, 19, 18, .06);
-  --at-cds-focus-shadow: none;
+  /* 聚焦配方（D2）：逐层等于 Claude 的 --cds-focus-shadow ——
+   *   inset 0 0 0 1px 页底  →  0 0 0 1px 环  →  0 0 6px 1px 柔光
+   * 内衬用页底（不是白色）：它的语义是「环与填充之间那道页底色的缝」，
+   * 用白色等于没有缝（对填充 1.01:1）。柔光取环色 18% alpha，
+   * 在页底 #fcfcfb 上合成 #e4e4e1，对比 1.24:1；Claude 的 #e1e0d9 对它的页底是 1.26:1，同一档。 */
+  --at-cds-composer-focus: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-primary)), 0 0 0 var(--at-cds-composer-ring) var(--at-cds-composer-focus-ink), 0 0 6px 1px color-mix(in oklab, var(--at-cds-focus-ink) 18%, transparent);
+  --at-cds-composer-drop: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-elevated-primary)), 0 0 0 1.5px var(--at-cds-focus-ink), 0 0 8px 1px color-mix(in oklab, var(--at-cds-focus-ink) 24%, transparent), 0 8px 24px -4px rgba(20, 19, 18, .06);
+  /* 字段与其它元素用同一条配方（Claude 的 --cds-focus-shadow 也是同一个值贴 20 处），
+   * 只靠 --at-cds-composer-ring 的符号决定环在内还是在外。 */
+  --at-cds-focus-shadow: var(--at-cds-composer-focus);
   --at-cds-card-hover: 0 0 0 1px var(--ds-border-strong), 0 4px 16px -2px rgba(0, 0, 0, .09);
   --at-cds-segmented-track: rgba(0, 0, 0, .06);
   --at-cds-segmented-thumb: #ffffff;
@@ -121,6 +136,11 @@ __SCOPE__ {
   --at-cds-divider: #e4e4e3;
   --at-cds-row-even: #f8f8f6;
   --at-cds-row-hover: #eeeee9;
+  /* 第 5 层（状态）别名。写成 var() 形式：别名不计入归因棘轮。见 docs/states.json */
+  --at-cds-fill-row-hover: var(--ds-bg-hover);
+  --at-cds-fill-ghost-hover: var(--ds-bg-hover);
+  --at-cds-fill-ghost-active: var(--ds-bg-active);
+  --at-cds-fill-row-selected: var(--ds-bg-active);
   --at-cds-code-bg: #f4f2ec;
   --at-cds-code-fg: #383a42;
   --at-cds-code-muted: #62625b;

@@ -14,7 +14,7 @@ __SCOPE__ {
   --at-cds-body-leading: 1.68;
   /* display: in-transcript headings, one step up from prose */
   --at-cds-display-size: calc(18px * var(--font-scale, 1));
-  --at-cds-display-leading: 1.4;
+  --at-cds-display-leading: 1.45;
   /* UI: menus, rows, labels, settings */
   --at-cds-ui-size: calc(14px * var(--font-scale, 1));
   --at-cds-ui-leading: calc(20px * var(--font-scale, 1));
@@ -47,7 +47,7 @@ __SCOPE__ {
   /* Three base transition speeds plus a dedicated press response. */
   --at-cds-t-fast: 60ms;
   --at-cds-t-base: 150ms;
-  --at-cds-t-emph: 220ms;
+  --at-cds-t-emph: 200ms;   /* 对齐 Claude --cds-dur-base=.2s；原 220ms 不在 Claude 阶梯上 */
   --at-cds-t-press: 70ms;
   /* Three elevation rungs. A shadow literal anywhere else is a new dialect; the
    * grammar check only accepts these three strings, `none`, or a token reference. */
@@ -158,9 +158,9 @@ __SCOPE__ .message-user-text { overflow-wrap: anywhere; word-break: normal; }
  * 去掉宿主的 5% 底色与胶囊内衬，两者同字号同色，只靠 6px 间距分组。 */
 __SCOPE__ .message-meta-chip { background: transparent; padding: 0; }
 
-/* The transcript mask stays above the host-measured composer dock, not the window bottom. */
+/* 遮罩只给聊天正文：侧栏会话/项目列表与宿主一致，不加边缘渐隐（2026-11-14 验收：侧栏渐隐会削掉末行、且与项目组格式不一致）。 */
 __SCOPE__ .thread-scroll { --at-cds-scroll-end: calc(100% - var(--composer-dock-height, 168px) + 2px); }
-__SCOPE__ :is(.thread-scroll, .sidebar-session-group-body.standalone, .sidebar-session-group-body.pinned) {
+__SCOPE__ .thread-scroll {
   /* Resolve here, not on :root: the dock measurement belongs to the scroll element. */
   --at-cds-scroll-mask: linear-gradient(to bottom,
     transparent,
@@ -189,6 +189,18 @@ __SCOPE__ .composer-shell {
   transition: box-shadow var(--at-cds-t-emph) var(--at-cds-ease), background-color var(--at-cds-t-base) ease;
 }
 __SCOPE__ .composer-shell:hover { box-shadow: var(--at-cds-composer-hover); }
+/* 焦点环画在伪元素上，**不替换外壳自己的高度阴影**。两个理由都是实测出来的：
+ *  1. 焦点配方首层是 inset，静止/悬停全是 outset → box-shadow 整条不可插值，浏览器按离散处理，
+ *     所以那条 220ms 的 transition 从引入 inset 衬线那版起就是死的（采样只有 1 个值）。
+ *  2. 焦点一旦替换 box-shadow，静止态那两层环境影就被整体删掉，盒子在一帧内"变平"。
+ * 改成伪元素后：外壳高度照旧（静止/悬停过渡继续有效），环单独淡入（opacity 可插值、200ms）。
+ * 环的三层与 Claude --cds-focus-shadow 逐层相同；inset: -1px 对齐 border box（外壳有 1px 透明边框）。 */
+__SCOPE__ .composer-shell::after {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  box-shadow: var(--at-cds-ring-shadow);
+  opacity: 0; transition: opacity var(--at-cds-t-emph) var(--at-cds-ease);
+}
+__SCOPE__ .composer-shell:has(.composer-input:focus)::after { opacity: 1; }
 __SCOPE__ .composer-shell.is-drop-target {
   outline: 2px solid var(--ds-focus); outline-offset: 3px;
   box-shadow: var(--at-cds-composer-drop);
@@ -217,7 +229,6 @@ __SCOPE__ :is(.chat-file-chip, .message-attachment) { border-color: var(--ds-bor
 /* One idle perimeter: inner controls retain their independent keyboard focus. */
 __SCOPE__ .composer-toolbar :is(.composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .icon-btn:not(.send-btn):not(.stop-btn)),
 __SCOPE__ .composer-shell .composer-chip { border-color: transparent; background: transparent; box-shadow: none; }
-__SCOPE__ .composer-toolbar :is(.composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .icon-btn:not(.send-btn):not(.stop-btn)):hover:not(:disabled):not([aria-disabled="true"]),
 __SCOPE__ .composer-shell .composer-chip:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-neutral-2); }
 
 /* Primary actions stay neutral; Composer send uses the accent color. */
@@ -239,9 +250,7 @@ __SCOPE__ .send-btn:not(:disabled):not([aria-disabled="true"]) {
 __SCOPE__ .send-btn:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); opacity: 1; }
 __SCOPE__ .composer-shell .send-btn:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-clay-vivid); color: #fff; border-radius: var(--at-cds-r-md); }
 __SCOPE__ .btn-secondary { background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); color: var(--ds-text-primary); }
-__SCOPE__ .btn-secondary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); }
 __SCOPE__ .btn-ghost { background: transparent; border: 0; }
-__SCOPE__ .btn-ghost:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); color: var(--ds-text-primary); }
 __SCOPE__ .send-btn { width: 32px; height: 32px; flex-basis: 32px; border-radius: var(--at-cds-r-md); }
 __SCOPE__ .send-btn.message-edit-submit { width: auto; flex-basis: auto; }
 __SCOPE__ :is(.btn-primary, .send-btn, .copy-btn.primary):is(:disabled, [aria-disabled="true"]) { background: var(--ds-send-disabled-bg); color: var(--ds-send-disabled-fg); }
@@ -251,13 +260,15 @@ __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-
 __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .settings-nav-item, .dock-tab, .dock-toggle, .task-action, .code-copy-btn):active:not(:disabled):not([aria-disabled="true"]) { transform: scale(.98); transition-duration: var(--at-cds-t-press); }
 __SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); }
 __SCOPE__ .send-btn:active:not(:disabled):not([aria-disabled="true"]):not(.composer-shell .send-btn) { background: var(--at-cds-action-hover); }
-__SCOPE__ :is(.btn-secondary, .btn-ghost, .icon-btn):not(.danger):not(.stop-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-active); }
-__SCOPE__ :is(.btn, .icon-btn, .settings-toggle):disabled { opacity: .45; cursor: not-allowed; transform: none; }
-__SCOPE__ :is(.btn, .icon-btn)[aria-disabled="true"] { opacity: .45; cursor: not-allowed; transform: none; }
+/* 禁用（D3 双档）：动作控件 .4，输入控件 .55（settings.css）。见 docs/STATE-LAYER.md §6.2.1 */
+__SCOPE__ :is(.btn, .icon-btn, .settings-toggle):disabled { opacity: .4; cursor: not-allowed; transform: none; }
+__SCOPE__ :is(.btn, .icon-btn)[aria-disabled="true"] { opacity: .4; cursor: not-allowed; transform: none; }
 __SCOPE__ .asktool-card-header-actions .btn { min-height: 24px; font-size: var(--at-cds-small-size); line-height: calc(16px * var(--font-scale, 1)); padding: 4px 8px; }
 __SCOPE__ :is(.copy-btn, .code-copy-btn) { border-radius: var(--at-cds-r-sm); }
 __SCOPE__ :is(.nav-item, .settings-nav-item, .thread-item, .sidebar-session-group-header) { border-radius: var(--at-cds-r-md); }
-__SCOPE__ :is(.nav-item.active, .settings-nav-item.active, .thread-item.active) { background: var(--ds-bg-active); color: var(--ds-text-primary); }
+/* Selected 已交给第 5 层（src/generated.states.css 的 row/selected）：.nav-item 不是行家族成员，留在这里。 */
+__SCOPE__ .nav-item.active { background: var(--ds-bg-active); color: var(--ds-text-primary); }
+/* 例外（states.json）：多选勾选标记，用强调柔色而非中性洗色。 */
 __SCOPE__ .thread-item.selected:not(.active) { background: var(--ds-accent-soft); color: var(--ds-text-primary); }
 
 /* Existing segmented controls; no fabricated sliding-thumb DOM or JS. */
@@ -280,7 +291,6 @@ __SCOPE__ .ds-checkbox:indeterminate::after { background: var(--at-cds-functiona
 __SCOPE__ :is(.prose-chat .task-list-item > input[type="checkbox"], .settings-network-checkbox input, .provider-models-check) { accent-color: var(--at-cds-functional-selection); }
 __SCOPE__ .settings-font-size-slider input[type="range"] { accent-color: var(--ds-text-secondary); }
 __SCOPE__ :is(.settings-language-check, .settings-theme-check, .settings-menu-select-check, .settings-icon-button.is-action-highlight) { color: var(--ds-text-primary); }
-__SCOPE__ .settings-icon-button.is-action-highlight:hover:not(:disabled):not([aria-disabled="true"]) { color: var(--ds-text-primary); background: var(--ds-bg-hover); }
 __SCOPE__ :is(.mcpm-chip, .sklm-chip, .mcpm-page-btn, .sklm-page-btn).is-active { background: var(--ds-bg-active); color: var(--ds-text-primary); border-color: transparent; }
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) { color: var(--at-cds-status-neutral); }
 __SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: var(--ds-info); }
@@ -318,13 +328,13 @@ __SCOPE__ .composer-thinking-range:focus-visible { outline-color: var(--ds-focus
  * (src/generated.roles.css). Only the blur reset is component-specific. */
 __SCOPE__ .composer-model-menu { border-radius: var(--at-cds-r-xl); -webkit-backdrop-filter: none; backdrop-filter: none; }
 __SCOPE__ :is(.composer-plus-item, .composer-menu-entry, .composer-menu-back, .context-menu-item, .settings-menu-select-option) { border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease; }
-__SCOPE__ .composer-plus-item.active { background: var(--ds-bg-active); }
+/* 选中底色与文字色由第 5 层产出（row/selected，含 .composer-plus-item.active）。
+ * 这里只留键盘游标：它不是「选中」，是 hover 的键盘替身。 */
 __SCOPE__ .composer-plus-item.kb-active { background: var(--ds-bg-hover); outline: 1px solid var(--ds-border-strong); outline-offset: -1px; }
-__SCOPE__ .composer-plus-item.active.kb-active { background: var(--ds-bg-active); }
-/* Selected model: outline only, no fill, so the marks do not look like hover states. */
+/* Selected model: Claude 的 aria-checked 只换中性底 + 主文字，不画彩色环（.aria-checked:bg-bg-400 / text-text-100）。 */
 __SCOPE__ .composer-model-option[aria-checked="true"],
 __SCOPE__ .composer-model-option[aria-checked="true"].kb-active,
-__SCOPE__ .composer-model-option[aria-checked="true"]:hover { background: none; border-radius: var(--at-cds-r-md); box-shadow: inset 0 0 0 1px var(--at-cds-compose-accent); }
+__SCOPE__ .composer-model-option[aria-checked="true"]:hover { background: var(--ds-bg-active); border-radius: var(--at-cds-r-md); box-shadow: none; }
 __SCOPE__ .composer-model-option[aria-checked="true"] .composer-model-label { color: var(--ds-text-primary); font-weight: var(--at-cds-w-semibold); }
 __SCOPE__ .composer-model-option[aria-checked="true"] .composer-model-option-badge { color: var(--at-cds-compose-accent); }
 __SCOPE__ .composer-model-menu .composer-model-group-label {
@@ -382,6 +392,11 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
   0%, 100% { opacity: .45; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.15); }
 }
+
+/* Claude 的 --animate-spin: spin 1s linear infinite；这里同名同参，供侧栏运行弧使用。 */
+@keyframes at-cds-spin {
+  to { transform: rotate(360deg); }
+}
 @keyframes at-cds-shimmer-text-shine {
   0%, 12% { background-position: 140% 0; }
   70%, 100% { background-position: -140% 0; }
@@ -394,8 +409,9 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
   __SCOPE__ :is(.composer-model-menu, .composer-permission-menu, .composer-autocomplete, .context-menu).is-open { animation: at-cds-popover-in var(--at-cds-t-base) var(--at-cds-ease) both; }
   __SCOPE__ .dock-panel:not([hidden]) { animation: at-cds-rise-in var(--at-cds-t-base) var(--at-cds-ease) both; }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span,
-  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge:not(.waiting) .project-run-badge-dot),
-  __SCOPE__ .sidebar .thread-item-status.running::before { background: var(--at-cds-clay-vivid); animation: at-cds-clay-breathe 2.4s var(--at-cds-ease) infinite; }
+  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge:not(.waiting) .project-run-badge-dot) { background: var(--at-cds-clay-vivid); animation: at-cds-clay-breathe 2.4s var(--at-cds-ease) infinite; }
+  /* 侧栏运行态：陶土旋转弧，12px / 1px 环 / 90° 实弧；周期 1s（Claude --animate-spin 原值，2026-11-14 按用户要求保留）。 */
+  __SCOPE__ .sidebar .thread-item-status.running::before { animation: at-cds-spin 1s linear infinite; }
   /* 呼吸点改用中性文字色：陶土留给发送键与侧栏会话点，状态行的三点只做明暗呼吸。 */
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span { background: var(--ds-text-muted); }
   __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(2) { animation-delay: .2s; }
@@ -403,12 +419,11 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
   @supports (background-clip: text) {
     __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running),
     __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-label {
-      /* 流光只提亮，不换色：原来渐变的中心是陶土，扫过中文时整段突然变橙，很跳。
-       * 现在中心取次级文字色，视觉上是「一道更亮的光扫过去」，运行态仍由左侧陶土点和
-       * 呼吸节奏表达。 */
-      color: var(--ds-text-muted); background-image: linear-gradient(100deg, var(--ds-text-muted) 38%, var(--ds-text-secondary) 50%, var(--ds-text-muted) 62%);
+      /* 流光只提亮，不换色：中心取 --at-cds-shimmer-ink（浅色=faint、深色=secondary），
+       * 两个模式都朝「更亮」方向偏移；2.4s 保持既有档位，改用 linear 消除「前冲后停」。 */
+      color: var(--ds-text-muted); background-image: linear-gradient(100deg, var(--ds-text-muted) 44%, var(--at-cds-shimmer-ink) 50%, var(--ds-text-muted) 56%);
       background-size: 240% 100%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: at-cds-shimmer-text-shine 2.4s var(--at-cds-ease) infinite;
+      animation: at-cds-shimmer-text-shine 2.4s linear infinite;
     }
   }
 }
@@ -424,7 +439,7 @@ __SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); ba
 @media (min-resolution: 2dppx) { __SCOPE__ { --at-cds-hairline: .5px; } }
 @media (min-resolution: 3dppx) { __SCOPE__ { --at-cds-hairline: calc(1px / 3); } }
 @media (forced-colors: active) {
-  __SCOPE__ :is(.thread-scroll, .sidebar-session-group-body.standalone, .sidebar-session-group-body.pinned) { -webkit-mask-image: none; mask-image: none; }
+  __SCOPE__ .thread-scroll { -webkit-mask-image: none; mask-image: none; }
   __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running, .working-indicator-label) { background: none !important; color: CanvasText !important; -webkit-text-fill-color: currentColor !important; animation: none !important; }
   __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge-dot) { background: Highlight; animation: none !important; }
   __SCOPE__ .code-block { border: 1px solid CanvasText; box-shadow: none; }

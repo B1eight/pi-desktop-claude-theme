@@ -31,6 +31,7 @@ export function themeArtifact(mode) {
   const parts = [{ name: 'header', text: header }];
   const sections = [
     ['palette', `palette.${mode}.css`], ['generated', 'generated.roles.css'],
+    ['states', 'generated.states.css'],
     ['components', 'components.css'], ['refinements', 'refinements.css'],
     ['settings', 'settings.css'], ['globalControls', 'global-controls.css'],
   ];

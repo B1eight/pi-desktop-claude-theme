@@ -29,7 +29,6 @@ __SCOPE__ .work-panel-tab { border-radius: var(--at-cds-r-md); color: var(--ds-t
 __SCOPE__ .work-panel-tab-strip { height: 36px; }
 /* Document body inside the panel: mono 12 / 1.6 with a 12px gutter (I6 / I9). */
 __SCOPE__ .work-panel-body { padding: 12px; font-family: var(--font-mono); font-size: var(--at-cds-small-size); line-height: 1.6; }
-__SCOPE__ .work-panel-tab:hover { background: var(--at-cds-row-hover); color: var(--ds-text-primary); }
 __SCOPE__ .work-panel-tab.active { background: var(--ds-bg-elevated-opaque); color: var(--ds-text-primary); box-shadow: inset 0 0 0 1px var(--at-cds-border); }
 __SCOPE__ .work-panel-tab-close { border-radius: var(--at-cds-r-sm); }
 __SCOPE__ .work-panel-tab-close:hover { background: var(--ds-code-hover-bg); color: var(--ds-text-primary); }
@@ -55,22 +54,30 @@ __SCOPE__ .sidebar .sidebar-session-group-title { font-weight: var(--at-cds-w-se
 __SCOPE__ .sidebar .thread-item.active .thread-item-title { font-weight: var(--at-cds-w-semibold); }
 __SCOPE__ .sidebar .sidebar-session-group-list { gap: 2px; padding-block: var(--at-cds-s-xs) var(--at-cds-s-md); }
 __SCOPE__ .sidebar .sidebar-project-active-dot { display: none; }
-/* Sidebar navigation: project-only dates, title-only activity, five-row standalone viewport. */
+/* Sidebar navigation: project-only dates, title-only activity, five-row standalone viewport.
+ * 行高 32px（20 正文行 + 12 间距），与项目组同节奏；上限 = 5 行 + 6px 余量，不加边缘遮罩也不加留白。 */
 __SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone { max-height: calc(5 * calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)) + 6px); }
 __SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone > .thread-item { flex-shrink: 0; }
 /* Status gutter: a 16px marker inside the row, content starts after it plus the small step. */
 __SCOPE__ .sidebar .thread-item-main { padding-left: calc(16px + var(--at-cds-s-md)); }
 __SCOPE__ .sidebar .thread-item-status { width: 16px; height: 16px; left: var(--at-cds-s-xs); }
-__SCOPE__ .sidebar .thread-item-status.running::before { width: 10px; height: 10px; background: var(--at-cds-clay-vivid); box-shadow: none; }
+/* 侧栏运行弧对齐 Claude Spinner 字形：270° 单色弧 + 90° 缺口、1px 环带、无淡轨道。
+ * 圆头端点需要 SVG，纯 CSS 只能做到直线切口（已登记为限制）。 */
+__SCOPE__ .sidebar .thread-item-status.running::before {
+  width: 14px; height: 14px; box-sizing: border-box;
+  background: conic-gradient(from 0deg, var(--at-cds-clay-ink) 0 270deg, color-mix(in srgb, var(--at-cds-clay-ink) 10%, transparent) 270deg 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
+  box-shadow: none;
+}
 __SCOPE__ .sidebar .thread-item-status.permission::before { width: 8px; height: 8px; }
 __SCOPE__ .sidebar .thread-item-status.selected::before { width: 10px; height: 10px; }
 __SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) { box-sizing: border-box; border: 1.5px solid currentColor; border-radius: 50%; background: var(--at-cds-result-success-bg); }
 __SCOPE__ .sidebar .thread-item-status.failed { border-radius: var(--at-cds-r-sm); background: var(--at-cds-result-error-bg); }
 __SCOPE__ .sidebar .thread-item-status:is(.completed, .failed) svg { width: 12px; height: 12px; stroke-width: 2.4px; stroke-linecap: round; stroke-linejoin: round; }
 __SCOPE__ .sidebar :is(.sidebar-toolbar-button, .sidebar-session-group-add) { width: 26px; height: 26px; }
-/* Running uses the clay breath; permission keeps its separate native phase. */
+/* Running is a spinning arc (1s, set in components.css); permission keeps the 2.4s breath. */
 @media (prefers-reduced-motion: no-preference) {
-  __SCOPE__ .sidebar .thread-item-status.running::before { animation-duration: 2.4s; animation-iteration-count: infinite; }
   __SCOPE__ .sidebar .thread-item-status.permission::before { animation-duration: 2.4s; animation-iteration-count: infinite; }
 }
 @media (forced-colors: active) {
@@ -163,8 +170,9 @@ __SCOPE__ .dock-header-text{font-size:var(--at-cds-small-size);font-weight:var(-
 __SCOPE__ .dock-header-current{font-size:var(--at-cds-small-size);color:var(--ds-text-primary)}
 __SCOPE__ .dock-tab{font-size:var(--at-cds-small-size)}
 __SCOPE__ :is(.dock-tab,.dock-toggle,.task-action){border-radius: var(--at-cds-r-md);border-color:transparent;background:transparent;color:var(--ds-text-muted)}
-__SCOPE__ :is(.dock-tab:hover,.dock-toggle:hover,.task-action:hover){background:var(--ds-bg-hover);color:var(--ds-text-primary)}
-__SCOPE__ :is(.dock-tab[aria-selected="true"],.dock-tab.active){background:var(--ds-bg-active);color:var(--ds-text-primary);box-shadow:none}
+/* 选中底色与文字色由第 5 层产出（src/generated.states.css 的 row/selected）。
+ * 这里只剩宿主光晕复位：宿主 .dock-tab.is-active 自带 box-shadow，主题不用。 */
+__SCOPE__ .dock-tab.is-active{box-shadow:none}
 __SCOPE__ .background-task-error{border:1px solid color-mix(in srgb,var(--ds-error) 24%,var(--ds-border-default));border-radius: var(--at-cds-r-md);background:color-mix(in srgb,var(--ds-error) 4%,var(--ds-bg-elevated-opaque));color:var(--ds-error)}
 __SCOPE__ :is(.thread-item-meta,.thread-item-last-reply,.thread-item-worktree){color:var(--ds-text-muted);font-size:var(--at-cds-small-size)}
 __SCOPE__ .activity-marker{color:var(--ds-error)}
@@ -176,12 +184,22 @@ __SCOPE__ .todo-dock-row{min-height:28px}
  * Decided after the host-DOM comparison (surface-comparison §4). */
 /* In progress: primary ink and semibold — the only emphasised row. */
 __SCOPE__ .todo-dock-row-in_progress .todo-dock-row-content{color:var(--ds-text-primary);font-weight:var(--at-cds-w-semibold)}
-__SCOPE__ .todo-dock-row-completed{color:var(--ds-text-secondary)}
-__SCOPE__ .todo-dock-row-completed .todo-dock-row-content{text-decoration:none;color:var(--ds-text-secondary)}
-__SCOPE__ .todo-dock-row-completed .todo-dock-row-symbol{color:var(--ds-text-secondary)}
-/* 三态层次：进行中（主文字 + 半粗）> 已完成（次级文字 + ✓）> 已取消（弱化 + 删除线）。
- * 之前完成态和取消态都是 muted，只靠删除线区分，看过去一片浅灰。
- * 取消态不再叠主题自己的透明度：宿主已给整行 opacity .72，再叠 .7 会合成 0.50。 */
+/* D4 结果态（declared）：完成与否由宿主画的图标承担，**文字不降级**。
+ * 待办的首要用途是扫读「我做完了什么」，压淡文字会让这件事更难读；
+ * Claude 那边的 .5 降级来自表格的 tr[data-dimmed]（这一行当前不相关），语义不同。
+ *
+ * 必须显式写 text-primary：宿主对 .todo-dock-row-completed 自带 muted
+ * （真机实测 rgb(117,116,109)，比 pending 的 rgb(82,81,76) 还淡）。
+ * 只删掉原来的 secondary 会落回宿主的 muted —— 那是「更淡」，方向反了。
+ *
+ * 图标取 --ds-success：主题里 success 原本只给「已复制」反馈，这里给它第二个明确语义
+ * （完成），与会话状态圈的 --at-cds-result-success-bg 同源。
+ * 验收钩子 D4-a：若完成项过抢眼，调图标深浅，不动文字。 */
+__SCOPE__ .todo-dock-row-completed{color:var(--ds-text-primary)}
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-content{text-decoration:none}
+__SCOPE__ .todo-dock-row-completed .todo-dock-row-symbol{color:var(--ds-success)}
+/* 取消态：文字弱化 + 删除线；不再叠主题自己的透明度——
+ * 宿主已给整行 opacity .72，再叠 .7 会合成 0.50。 */
 __SCOPE__ .todo-dock-row-cancelled .todo-dock-row-content{text-decoration:line-through;color:var(--ds-text-muted)}
 /* Shared warm running tone; a waiting project keeps its neutral marker. */
 __SCOPE__ .project-run-badge{border-radius:0;background:none;padding: 0;height:auto;color:var(--ds-text-muted)}
@@ -204,5 +222,5 @@ __SCOPE__ :is(.turn-changes-meta,.subagent-topology-node-summary,.permission-car
 /* 强调只有陶土，且只给"正在发生"：运行中的行、live 点、当前 tab。 */
 __SCOPE__ .todo-dock-row-in_progress .todo-dock-row-symbol{color:var(--at-cds-clay-vivid)}
 __SCOPE__ .dock-live-dot{background:var(--at-cds-clay-vivid)}
-__SCOPE__ :is(.dock-tab.is-active,.dock-tab[aria-selected="true"]){color:var(--at-cds-clay-ink)}
+__SCOPE__ .task-row[data-state="running"] .task-state{background:var(--at-cds-clay-vivid)}
 /* END block-surface-system */

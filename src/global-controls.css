@@ -21,32 +21,38 @@ __SCOPE__ {
   --radius-2xl: 16px;    /* 24 */
 }
 __SCOPE__ { --at-cds-focus-ink: var(--ds-focus); --at-cds-compose-accent: var(--at-cds-clay-ink); }
+/* 路线 A：焦点只有一套可见配方 —— Claude 的 --cds-focus-shadow 三层（页底色内衬 + 1px 环 + 18% 柔光）。
+ * 原先是可见的 2px 实色 outline，与字段/composer 的三层环并存，等于两套焦点外观。 */
 __SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabindex], [contenteditable="true"]):focus-visible:where(:not(.window-control-btn):not(.radial-menu-item)):not(:disabled):not([aria-disabled="true"]) {
-  outline: 2px solid var(--at-cds-focus-ink) !important; outline-offset: 2px !important;
+  outline: 2px solid transparent !important; outline-offset: 2px !important;
+  box-shadow: var(--at-cds-focus-shadow) !important;
   scroll-margin: 6px;
+}
+/* 三层里第一层是「内衬」，要跟所在表面同色；浮层内的焦点不能再用页底色垫一圈。 */
+__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog, .gen-ui-dialog, .composer-model-menu, .composer-permission-menu, .composer-model-thinking-menu, .composer-autocomplete, .context-menu, .settings-theme-menu, .settings-language-menu, .settings-font-menu, .settings-menu-select-menu, .home-project-switcher-menu, .composer-image-preview) {
+  --at-cds-ring-liner: var(--ds-bg-elevated-opaque);
 }
 /* Text fields: one inset perimeter; native non-text controls keep their own focus. */
 __SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error)) {
   border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer);
 }
-__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):focus:not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error)) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px;
+__SCOPE__ :is(input:where(:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="color"])), textarea, [contenteditable="true"]):focus:not(:disabled):where(:not([readonly]):not([aria-invalid="true"]):not(.error)) { outline: 2px solid transparent !important; outline-offset: 2px !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px;
 }
-/* Remove only actual focus-shadow consumers; NOT all focused buttons/cards.
- * Segment/preset selected shadows, idle elevation and recorder recording state survive. */
-__SCOPE__ :is(.settings-toggle, .settings-icon-button, .agent-capability-segment-btn, .projects-sort-btn, .projects-workbench, .projects-row, .projects-detail-task, .project-create-dialog-source-option, .project-create-dialog-location, .import-group-toggle, .provider-service-chip-change, .service-chooser-empty-action, .provider-models-reload, .service-chooser-tile, .plugins-header-menu, .run-activity-retry-reason):focus-visible,
-__SCOPE__ .plugins-shortcut-recorder:focus-visible:not(.recording) { box-shadow: none !important; }
-__SCOPE__ :is(.import-row, .import-group-checkbox):has(input:focus-visible),
-__SCOPE__ .chat-width-handle:focus-visible::before { box-shadow: none !important; }
+/* 焦点环统一后，这里不再压制 focus 阴影：压制会把三层环整条抹掉。
+ * 选中态/录制态/常驻高度仍由各自规则维护，与本规则无关。 */
 
 /* Real icon+input composite boundaries. :focus-within is intentionally NOT ownership:
  * clear/tool buttons have their own frame, not a second outer one. */
 __SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):not([aria-invalid="true"]):not(.error) { border-color: var(--at-cds-input-border); background-color: var(--ds-bg-composer); box-shadow: var(--at-cds-field-idle, none) !important; }
-__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):has(> :is(input, .message-edit-input):focus:not([readonly]):not([aria-invalid="true"])):not([aria-invalid="true"]):not(.error) { outline: var(--at-cds-composer-ring) solid var(--at-cds-composer-focus-ink) !important; outline-offset: calc(-1 * var(--at-cds-composer-ring)) !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px; }
+__SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit):has(> :is(input, .message-edit-input):focus:not([readonly]):not([aria-invalid="true"])):not([aria-invalid="true"]):not(.error) { outline: 2px solid transparent !important; outline-offset: 2px !important; border-color: transparent; box-shadow: var(--at-cds-focus-shadow) !important; scroll-margin: 6px; }
 __SCOPE__ :is(.settings-search-wrap, .home-project-switcher-search, .composer-model-search, .projects-search-wrap, .agent-capability-search-wrap, .service-chooser-search, .provider-model-search-wrap, .provider-models-search-wrap, .provider-chosen-search-wrap, .provider-service-search, .settings-font-search, .settings-language-search, .settings-theme-search, .scope-popover-search, .message-edit) > :is(input, .message-edit-input):not(:disabled):not([readonly]):not([aria-invalid="true"]) { border: 0; background: transparent; outline: none !important; box-shadow: none !important; }
 __SCOPE__ .settings-search-wrap { border-radius: var(--at-cds-r-md); --at-cds-field-idle: inset 0 0 0 1px var(--at-cds-input-border); }
+/* Focus recipe (D2): the visible ring is drawn by .composer-shell::after (src/components.css)
+ * so the shell keeps its elevation. Here we only keep the forced-colors fallback and the
+ * scroll margin; outline is never the visible ring in normal rendering. */
 __SCOPE__ .composer-shell:has(.composer-input:focus) {
-  outline: none !important; outline-offset: 0 !important;
-  border-color: transparent; box-shadow: var(--at-cds-ring-shadow) !important; scroll-margin: 6px;
+  outline: 2px solid transparent !important; outline-offset: 2px !important;
+  border-color: transparent; scroll-margin: 6px;
 }
 /* The generic text-field rule below paints --ds-bg-composer, and the shell
  * already paints the same value: the input stacked a second 5%/50% wash on top,

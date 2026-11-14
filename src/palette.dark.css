@@ -24,7 +24,8 @@ __SCOPE__ {
   --ds-bg-sidebar-image: none;
   --ds-settings-rail-bg: #191815;
   --at-cds-region-line: var(--ds-neutral-3);
-  --at-cds-composer-focus-ink: #777770;
+  /* 同 light：字段环色跟普通焦点同一个参数。 */
+  --at-cds-composer-focus-ink: var(--at-cds-focus-ink);
   --at-cds-composer-ring: 1px;
   --at-cds-ring-shadow: var(--at-cds-composer-focus);
   --at-cds-input-border: #42423e;
@@ -42,18 +43,23 @@ __SCOPE__ {
   --ds-text-secondary: #c2c0b8;
   --ds-text-muted: #96948d;
   --ds-text-faint: #6e6d68;
+  /* 流光中心色：深色取 secondary（比 muted 更亮），与浅色「向亮处偏移」保持同一语义。 */
+  --at-cds-shimmer-ink: var(--ds-text-secondary);
   --ds-placeholder-ink: #6e6d68;
   --ds-accent: #e5e5e2;
   --ds-accent-hover: #ffffff;
   --ds-accent-soft: #3d3d39;
-  --ds-focus: #b5b5ae;
+  /* 焦点环：light 用 Claude --cds-gray-450（4.35:1），深色没有 Claude 证据，按同一「弱化墨」档
+   * 取 --ds-text-muted 的值 #96948d（对 #222220 约 5.2:1）。原来 #b5b5ae 是 7.7:1，1px 环过亮。 */
+  --ds-focus: #96948d;
   --ds-border-default: rgba(255, 255, 255, .08);
   --ds-border-subtle: rgba(255, 255, 255, .06);
   --ds-border-strong: rgba(255, 255, 255, .18);
   --ds-elevation-stroke: rgba(255, 255, 255, .10);
-  --ds-bg-hover: rgba(255, 255, 255, .05);
-  --ds-bg-active: rgba(255, 255, 255, .08);
-  --ds-settings-nav-active: rgba(255, 255, 255, .08);
+  /* alpha 阶梯（D1）：hover 一档 5%，selected / active 两档 10%；叠墨取正文色 #f5f4f0。 */
+  --ds-bg-hover: rgba(245, 244, 240, .05);
+  --ds-bg-active: rgba(245, 244, 240, .10);
+  --ds-settings-nav-active: rgba(245, 244, 240, .10);
   --ds-error: #f87171;
   --ds-success: #6fce9b;
   --ds-warning: #e6b465;
@@ -97,10 +103,11 @@ __SCOPE__ {
   --at-cds-action-hover: #e1e0d9;
   --at-cds-action-fg: #0b0b0b;
   --at-cds-composer-hover: 0 0 0 .5px var(--ds-border-strong), 0 4px 16px -4px rgba(0, 0, 0, .32);
-  /* 同 light：1px 环，不带光晕。 */
-  --at-cds-composer-focus: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1px var(--at-cds-focus-ink);
-  --at-cds-composer-drop: inset 0 0 0 1px var(--ds-bg-elevated-primary), 0 0 0 1.5px var(--at-cds-clay-vivid), 0 0 8px 1px color-mix(in oklab, var(--at-cds-clay-vivid) 24%, transparent), 0 8px 24px -4px rgba(0, 0, 0, .32);
-  --at-cds-focus-shadow: none;
+  /* 同 light：内衬用页底（#191815）、实环、柔光取环色 18% alpha。 */
+  --at-cds-composer-focus: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-primary)), 0 0 0 var(--at-cds-composer-ring) var(--at-cds-composer-focus-ink), 0 0 6px 1px color-mix(in oklab, var(--at-cds-focus-ink) 18%, transparent);
+  --at-cds-composer-drop: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-elevated-primary)), 0 0 0 1.5px var(--at-cds-focus-ink), 0 0 8px 1px color-mix(in oklab, var(--at-cds-focus-ink) 24%, transparent), 0 8px 24px -4px rgba(0, 0, 0, .32);
+  /* 同 light：字段与其它元素共用一条配方。 */
+  --at-cds-focus-shadow: var(--at-cds-composer-focus);
   --at-cds-card-hover: 0 0 0 1px var(--ds-border-strong), 0 6px 20px rgba(0, 0, 0, .60);
   --at-cds-segmented-track: rgba(255, 255, 255, .08);
   --at-cds-segmented-thumb: #2c2c2a;
@@ -123,6 +130,11 @@ __SCOPE__ {
   --at-cds-divider: #343430;
   --at-cds-row-even: #20201e;
   --at-cds-row-hover: #2b2b28;
+  /* 第 5 层（状态）别名。写成 var() 形式：别名不计入归因棘轮。见 docs/states.json */
+  --at-cds-fill-row-hover: var(--ds-bg-hover);
+  --at-cds-fill-ghost-hover: var(--ds-bg-hover);
+  --at-cds-fill-ghost-active: var(--ds-bg-active);
+  --at-cds-fill-row-selected: var(--ds-bg-active);
   --at-cds-code-bg: #0d0d0c;
   --at-cds-code-fg: #deded9;
   --at-cds-code-muted: #b2b2a9;
