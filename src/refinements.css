@@ -46,17 +46,18 @@ __SCOPE__[data-theme="dark"] .settings-shell { --ds-bg-primary: #1a1a19; }
 __SCOPE__ :is(.sidebar.sidebar-surface, .sidebar-rail, .settings-shell .settings-nav) { box-shadow: inset -1px 0 0 var(--at-cds-region-line); }
 /* Row height is derived from the type scale, not picked by eye:
  * one UI line box plus the medium spacing step = 20 + 12 = 32px. */
-__SCOPE__ .sidebar :is(.thread-item, .sidebar-session-group-header) { min-height: calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)); border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-base) var(--at-cds-ease); }
-__SCOPE__ .sidebar :is(.thread-item-title, .sidebar-session-group-title) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
+__SCOPE__ .sidebar :is(.thread-item, .sidebar-session-group-header, .sidebar-primary-item, .footer-settings) { min-height: calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)); border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-base) var(--at-cds-ease); }
+__SCOPE__ .sidebar :is(.thread-item-title, .sidebar-session-group-title, .sidebar-primary-item, .footer-settings) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
 __SCOPE__ .sidebar .sidebar-session-group-title { font-weight: var(--at-cds-w-semibold); }
 /* Active row: the title joins the semibold step so the selected row reads one level up,
  * matching how selected options behave elsewhere in the theme. */
-__SCOPE__ .sidebar .thread-item.active .thread-item-title { font-weight: var(--at-cds-w-semibold); }
+__SCOPE__ .sidebar :is(.thread-item.active .thread-item-title, .sidebar-primary-item.active, .footer-settings.active) { font-weight: var(--at-cds-w-semibold); }
 __SCOPE__ .sidebar .sidebar-session-group-list { gap: 2px; padding-block: var(--at-cds-s-xs) var(--at-cds-s-md); }
 __SCOPE__ .sidebar .sidebar-project-active-dot { display: none; }
 /* Sidebar navigation: project-only dates, title-only activity, five-row standalone viewport.
- * 行高 32px（20 正文行 + 12 间距），与项目组同节奏；上限 = 5 行 + 6px 余量，不加边缘遮罩也不加留白。 */
-__SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone { max-height: calc(5 * calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)) + 6px); }
+ * 行高 32px（20 正文行 + 12 间距），与项目组同节奏；上限 = 5 行 + 6px 余量，不加边缘遮罩也不加留白。
+ * v0.23 起无项目组时宿主给 .sidebar-standalone-sessions 加 .is-fill 释放高度，需让位。 */
+__SCOPE__ .sidebar .sidebar-standalone-sessions:not(.is-fill) > .sidebar-session-group-body.standalone { max-height: calc(5 * calc(var(--at-cds-ui-leading) + var(--at-cds-s-md)) + 6px); }
 __SCOPE__ .sidebar .sidebar-standalone-sessions > .sidebar-session-group-body.standalone > .thread-item { flex-shrink: 0; }
 /* Status gutter: a 16px marker inside the row, content starts after it plus the small step. */
 __SCOPE__ .sidebar .thread-item-main { padding-left: calc(16px + var(--at-cds-s-md)); }
@@ -153,6 +154,12 @@ __SCOPE__ .subagent-topology-agents::before{display:none}
 __SCOPE__ .subagent-topology-node::before{width:14px;height:0;background:none;border-top:1px dashed var(--ds-border-strong)}
 /* Keep state colors, topology geometry and responsive breakpoints. */
 @media(forced-colors:active){__SCOPE__ :is(.permission-card,.turn-outcome-card,.asktool-card,.plan-approval-bar,.plan-history-card,.tool-row-content.is-error,.subagent-topology-node:is(.outcome-failed,.outcome-timed-out,.outcome-truncated,.outcome-denied,.outcome-aborted)){border-color:CanvasText;background:Canvas;color:CanvasText;box-shadow:none}}
+/* v0.23 additions: mode run bar above composer and truncation notice. */
+__SCOPE__ .mode-run-bar{border:1px solid var(--ds-border-default);border-radius:var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);box-shadow:var(--at-cds-shadow-sm);padding:8px 12px}
+__SCOPE__ :is(.mode-run-bar,.mode-run-stage,.mode-run-edit-field,.message-output-notice){font-size:var(--at-cds-small-size);line-height:var(--at-cds-small-leading)}
+__SCOPE__ .mode-run-label{font-weight:var(--at-cds-w-semibold)}
+__SCOPE__ .mode-run-edit{border-top:1px solid var(--at-cds-divider);padding-top:8px}
+@media(forced-colors:active){__SCOPE__ .mode-run-bar{border-color:CanvasText;background:Canvas;color:CanvasText;box-shadow:none}}
 /* v0.21 additions: task dock, sidebar metadata, worktree surfaces. */
 __SCOPE__ :is(.gen-ui-card,.gen-ui-dialog,.plugins-reviews,.plugins-reviews-summary,.worktree-file-list,.worktree-setup-log){border:1px solid var(--ds-border-default);border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);color:var(--ds-text-primary)}
 __SCOPE__ .gen-ui-dialog { border-radius: var(--at-cds-r-dialog); }

@@ -45,7 +45,7 @@ __SCOPE__ :is(.composer-model-menu,.composer-permission-menu,.composer-model-thi
 }
 
 /* reading — 读数 */
-__SCOPE__ :is(.turn-usage-capsule,.turn-usage-total,.turn-usage-cost-value,.turn-usage-popover-total,.context-inspector-ring-value,.working-elapsed,.turn-changes-counts,.dock-header-current) {
+__SCOPE__ :is(.turn-usage-capsule,.turn-usage-total,.turn-usage-cost-value,.turn-usage-popover-total,.context-inspector-ring-value,.working-elapsed,.turn-changes-counts,.dock-header-current,.mode-run-rounds,.mode-run-elapsed,.startup-guide-progress) {
   box-shadow: none;
   font-variant-numeric: tabular-nums;
 }

@@ -1,4 +1,27 @@
 # Changelog
+## 1.1.1
+
+> 适配 PI-Desktop **v0.23.0**（宿主 `0.23.0.0`），完成兼容修复与新增界面的主题专项定制。
+> 2026-11-21 已在 PI-Desktop 0.23.0 完成浅色 / 深色真机安装与人工验收；`docs/acceptance-states.json` 里的自动化封存证据仍对应 1.1.0 / 0.22.0.0。
+
+### 宿主 v0.23.0 兼容修复
+
+- **贴边弹窗与设置弹窗保护**：将 `.settings-dialog`、`.app-announcement-dialog`、`.startup-guide-dialog`、`.release-notes-dialog` 等宿主 `padding: 0` 贴边弹窗排除出主题通用 `.dialog` 外层内边距（含移动端断点）与 `h2/h3` 标题覆写，避免撑歪弹窗布局。
+- **暗色设置弹窗焦点内衬**：将 `.settings-dialog` 排除出抬升层 `--at-cds-ring-liner`，保证 `.settings-shell` 内焦点环内衬与主背景同色、不再发灰。
+- **侧栏无项目组独立会话区**：为 `.sidebar-standalone-sessions` 补上 `:not(.is-fill)`，兼容 v0.23.0 无项目组时释放高度的 `.is-fill` 机制。
+
+### v0.23.0 新增界面专项定制
+
+- **侧栏主导航与底部设置入口（`.sidebar-primary-item` / `.footer-settings`）**：纳入状态层 `row` 家族统一 hover / `.active` 叠墨，复用侧栏 32px 行节奏、UI 字阶、圆角与按压微缩反馈（含 `prefers-reduced-motion` 归零）。
+- **自定义模式运行条与输出截断提示（`.mode-run-bar` / `.message-output-notice`）**：按卡片层级定制运行条材质、圆角、轻阴影、分割线与 `forced-colors` 适配；为 `.mode-run-rounds`、`.mode-run-elapsed` 注入 `reading` 等宽数字角色。
+- **模式设置页（`.modes-settings-*`）**：纳入 1120px 宽版布局、面板描边与大圆角、`.modes-settings-source` 表单材质与等宽代码字阶；`.modes-settings-row` 纳入 32px 行高、`[aria-current="true"]` 选中字重与状态层 `row` 家族。
+- **作曲器模式菜单与插件排序分段（`.composer-mode-menu*` / `.plugins-sort*`）**：模式菜单接入浮层焦点内衬、展开动效与分组标题/备注字阶；插件排序分段控件对齐 `.settings-segment` 轨道与激活态语言（含 `forced-colors` 轮廓）。
+- **公告、引导与 Provider 高级设置弹窗（`.app-announcement-*` / `.startup-guide-*` / `.provider-advanced-*`）**：统一标题展示字阶、底栏/分段发丝线、正文行距、`kbd` 快捷键键帽（含 `.is-active`）、预览卡片阴影及 `.startup-guide-progress` 等宽数字角色。
+
+### 门禁与产物
+
+静态门禁全部通过（`check-host` 2468/2468、`check-vars` 81/81、`check-coverage` 未绑定类 599/609、`check-dead-selectors` 0 死组合、`check-states --strict`、`generate-roles --check`、`generate-states --check`、`check-surface-grammar` 0 违规、`check-role-cohesion` 0 未登记偏离），单元测试 **61/61** 通过，归因棘轮维持 147/147 无回归。生成体积：浅色 `64,174` / 深色 `64,246` bytes（目标 `< 65,000`，宿主硬限 `256 KB`），权限仍仅为 `ui.theme`，生命周期为空。
+
 ## 1.1.0
 
 > 三波：令牌层 → 状态层 → 焦点与真机走查。1.0.3 与 1.0.4 从未单独发布，改动全部并入本版。

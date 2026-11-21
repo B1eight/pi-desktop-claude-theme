@@ -28,8 +28,9 @@ __SCOPE__ :is(button, a:where([href]), summary, input, textarea, select, [tabind
   box-shadow: var(--at-cds-focus-shadow) !important;
   scroll-margin: 6px;
 }
-/* 三层里第一层是「内衬」，要跟所在表面同色；浮层内的焦点不能再用页底色垫一圈。 */
-__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog, .gen-ui-dialog, .composer-model-menu, .composer-permission-menu, .composer-model-thinking-menu, .composer-autocomplete, .context-menu, .settings-theme-menu, .settings-language-menu, .settings-font-menu, .settings-menu-select-menu, .home-project-switcher-menu, .composer-image-preview) {
+/* 三层里第一层是「内衬」，要跟所在表面同色；浮层内的焦点不能再用页底色垫一圈。
+ * v0.23 起设置页放进 .dialog.settings-dialog，其主体 .settings-shell 自带 --ds-bg-primary，排除以免暗色下内衬发灰。 */
+__SCOPE__ :is(.dialog:not(.settings-dialog), .p-dialog, .provider-dialog, .gen-ui-dialog, .composer-model-menu, .composer-mode-menu, .composer-permission-menu, .composer-model-thinking-menu, .composer-autocomplete, .context-menu, .settings-theme-menu, .settings-language-menu, .settings-font-menu, .settings-menu-select-menu, .home-project-switcher-menu, .composer-image-preview) {
   --at-cds-ring-liner: var(--ds-bg-elevated-opaque);
 }
 /* Text fields: one inset perimeter; native non-text controls keep their own focus. */

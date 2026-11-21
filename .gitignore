@@ -98,3 +98,4 @@ Thumbs.db
 /scripts/reference-baseline.mjs
 /scripts/audit-motion.mjs
 /scripts/audit-states.mjs
+/scripts/impact.mjs

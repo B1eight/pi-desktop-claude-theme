@@ -10,7 +10,7 @@
 
 安装完成后，在主题设置中选择 **Claude Theme Light** 或 **Claude Theme Dark**。切换其他主题即可恢复。
 
-需要 PI-Desktop **0.20.1 或更高版本**。插件 ID：`io.github.b1eight.pi-desktop-claude-theme`。声明的最低版本不等于逐版验收：1.1.0 的真机验收基线是 **0.22.0**，0.20.1–0.21.x 未单独验收。
+需要 PI-Desktop **0.20.1 或更高版本**。插件 ID：`io.github.b1eight.pi-desktop-claude-theme`。声明的最低版本不等于逐版验收：1.1.1 已在 **0.23.0** 完成人工真机验收（[验收状态目录](docs/acceptance-states.json) 里的自动化封存证据仍对应 1.1.0 / 0.22.0），0.20.1–0.21.x 未单独验收。
 
 ## 特点
 
