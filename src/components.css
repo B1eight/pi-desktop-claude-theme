@@ -1,494 +1,298 @@
-/* Claude Theme components.
- * Preserve native chrome, pane widths, scroll pinning, content-visibility,
- * and inline drag/position measurements. */
+/* Theme vocabulary and the PI renderer token bridge. Host sizing and state remain native. */
 __SCOPE__ {
-  /* UI follows the platform first; prose has an independent installed-font stack. */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", system-ui, "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
-  --font-mono: "Cascadia Code", ui-monospace, "SFMono-Regular", Consolas, "Microsoft YaHei UI", monospace;
-  --font-prose: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
-  --font-serif: var(--font-prose);
-  /* Type scale. Every size comes with a paired line-height, so a rule never has to
-   * guess a leading value. One scale for prose, one for UI chrome, one for code. */
-  /* prose: long-form reading in the transcript */
-  --at-cds-body-size: calc(16px * var(--font-scale, 1));
-  --at-cds-body-leading: 1.68;
-  /* display: in-transcript headings, one step up from prose */
-  --at-cds-display-size: calc(18px * var(--font-scale, 1));
-  --at-cds-display-leading: 1.45;
-  /* UI: menus, rows, labels, settings */
-  --at-cds-ui-size: calc(14px * var(--font-scale, 1));
-  --at-cds-ui-leading: calc(20px * var(--font-scale, 1));
-  /* compose: the input line, slightly larger than UI */
-  --at-cds-compose-size: calc(15px * var(--font-scale, 1));
-  --at-cds-compose-leading: calc(22px * var(--font-scale, 1));
-  /* code: inline and block code */
-  --at-cds-code-size: calc(13px * var(--font-scale, 1));
-  --at-cds-code-leading: 1.42;
-  /* small: dense metadata and secondary lines */
-  --at-cds-small-size: calc(12px * var(--font-scale, 1));
-  --at-cds-small-leading: 1.45;
-  /* title: page-level headings in settings */
-  --at-cds-title-size: calc(24px * var(--font-scale, 1));
-  --at-cds-title-leading: calc(30px * var(--font-scale, 1));
-  /* tiny: captions and language tags */
-  --at-cds-tiny-size: calc(11px * var(--font-scale, 1));
-  --at-cds-tiny-leading: 1.5;
-  --at-cds-hairline: 1px;
-  --at-cds-ease-out-expo: cubic-bezier(.16, 1, .3, 1);
-  --at-cds-ease: var(--at-cds-ease-out-expo);
-  --at-cds-spring-snappy: var(--at-cds-ease-out-expo);
-  /* Small controls retain four steps; conversation containers have their own radii. */
-  --at-cds-r-sm: 6px;
-  --at-cds-r-md: 7px;
-  --at-cds-r-lg: 10px;
-  --at-cds-r-xl: 12px;
-  --at-cds-r-bubble: 14px;
-  --at-cds-r-dialog: 10px;
-  /* Three base transition speeds plus a dedicated press response. */
-  --at-cds-t-fast: 60ms;
-  --at-cds-t-base: 150ms;
-  --at-cds-t-emph: 200ms;   /* 对齐 Claude --cds-dur-base=.2s；原 220ms 不在 Claude 阶梯上 */
-  --at-cds-t-press: 70ms;
-  /* Three elevation rungs. A shadow literal anywhere else is a new dialect; the
-   * grammar check only accepts these three strings, `none`, or a token reference. */
-  --at-cds-shadow-sm: var(--at-cds-card-elevation, 0 1px 2px rgba(0, 0, 0, .05));
-  --at-cds-shadow-md: 0 3px 14px rgba(0, 0, 0, .06);
-  --at-cds-shadow-popover: var(--at-cds-popover-shadow);
-  /* Spacing rhythm: 6 / 8 / 12 / 20. New gaps should pick from these four. */
-  --at-cds-s-xs: 6px;
-  --at-cds-s-sm: 8px;
-  --at-cds-s-md: 12px;
-  --at-cds-s-lg: 20px;
-  --at-cds-fade-top: 20px;
-  --at-cds-fade-bottom: 24px;
-  --at-cds-scroll-end: 100%;
-  /* Static weights keep UI roles distinct; installed font metrics remain platform-dependent. */
-  --at-cds-w-regular: 400;
-  --at-cds-w-medium: 500;
-  --at-cds-w-semibold: 600;
-  font-family: var(--font-sans);
-  accent-color: var(--at-cds-control-neutral);
-}
-@supports (transition-timing-function: linear(0, .5, 1)) {
-  __SCOPE__ { --at-cds-spring-snappy: linear(0, .45 14%, .82 29%, 1.01 44%, 1.05 56%, 1.02 74%, 1); }
-}
-__SCOPE__ :is(button, input, textarea, select) { font-family: var(--font-sans); }
-__SCOPE__ :is(.conversation-topbar .ct-title, .conversation-topbar .ct-back-label) { font-family: var(--font-sans); }
-__SCOPE__ .conversation-topbar .ct-title { font-size: calc(14px * var(--font-scale, 1)); font-weight: var(--at-cds-w-semibold); letter-spacing: -.015em; }
-__SCOPE__ .conversation-topbar .ct-title-input { font-size: calc(14px * var(--font-scale, 1)); }
-/* Top bar breadcrumb companions follow the title +2px so the whole row scales together. */
-__SCOPE__ .conversation-topbar :is(.ct-project, .ct-sep) { font-size: calc(13px * var(--font-scale, 1)); }
-/* 读数类由角色生成（reading）；这里只留不属于 readout 的 tabular 项。 */
-__SCOPE__ :is(.composer-model-option-ctx, .permission-card-queued, .permission-card-meta, .context-inspector-trigger, .code-block-lang, .composer-image-preview output, .turn-usage-popover, .project-run-badge, .dock-tab, .todo-dock-row-symbol) { font-variant-numeric: tabular-nums; }
-/* Reserve the full 0..100% width; tabular digits alone do not stabilize 9% -> 10%. */
-__SCOPE__ .composer-right .context-inspector-ring-value { min-inline-size: 4ch; text-align: right; }
-/* Selection has an explicit contrast-tested foreground, not an asserted native color. */
-__SCOPE__::selection, __SCOPE__ ::selection {
-  background: var(--at-cds-selection-bg);
-  color: var(--at-cds-selection-fg);
-  text-shadow: none;
-}
-/* Focus ownership stays centralized in global-controls.css. */
-__SCOPE__ :is(input, textarea, select)[aria-invalid="true"] { border-color: var(--ds-error); }
-
-/* Reading rhythm. Keep host-controlled transcript width and virtualization. */
-__SCOPE__ .prose-chat {
-  font-family: var(--font-prose);
-  font-size: var(--at-cds-body-size);
-  line-height: var(--at-cds-body-leading); font-weight: var(--at-cds-w-regular);
-  color: var(--ds-text-primary);
-  letter-spacing: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-  text-wrap: pretty;
-}
-__SCOPE__ .prose-chat > :first-child { margin-top: 0; }
-__SCOPE__ .prose-chat > :last-child { margin-bottom: 0; }
-__SCOPE__ .prose-chat p { margin: .85em 0; }
-__SCOPE__ .prose-chat p + p { margin-top: .85em; }
-__SCOPE__ .prose-chat :is(strong, b) { font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ .prose-chat :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-prose); font-weight: var(--at-cds-w-semibold); line-height: var(--at-cds-display-leading);
-  letter-spacing: -.015em; text-wrap: balance; margin: 1.2em 0 .5em;
-}
-__SCOPE__ .prose-chat h1 { font-size: var(--at-cds-display-size); }
-__SCOPE__ .prose-chat h2 { font-size: var(--at-cds-display-size); }
-__SCOPE__ .prose-chat h3 { font-size: var(--at-cds-body-size); }
-__SCOPE__ .prose-chat :is(h4, h5, h6) { font-size: 1em; }
-__SCOPE__ .prose-chat :is(ul, ol) { padding-inline-start: 1.5em; margin: .75em 0; }
-__SCOPE__ .prose-chat li { margin: .3em 0; }
-__SCOPE__ .prose-chat li > p { margin: .25em 0; }
-__SCOPE__ .prose-chat :is(a, a:visited) {
-  color: var(--at-cds-link); text-decoration-line: underline;
-  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
-  text-decoration-thickness: 1px; text-underline-offset: 3px;
-  transition: color var(--at-cds-t-fast) ease, text-decoration-color var(--at-cds-t-fast) ease;
-}
-__SCOPE__ .prose-chat a:is(:hover, :focus-visible) { color: var(--at-cds-link-hover); text-decoration-color: currentColor; }
-__SCOPE__ .prose-chat blockquote {
-  border-radius: 0; border-inline-start: 4px solid var(--ds-border-strong);
-  background: transparent; margin-inline: .5em 0; padding: 0 1em; color: var(--ds-text-secondary);
-}
-__SCOPE__ .prose-chat blockquote > :first-child { margin-top: 0; }
-__SCOPE__ .prose-chat blockquote > :last-child { margin-bottom: 0; }
-__SCOPE__ .prose-chat hr { border-color: var(--ds-border-default); margin: 1.5em 0; }
-__SCOPE__ .prose-chat :is(th, td) { min-width: 4em; overflow-wrap: break-word; word-break: normal; padding: .5em .75em; border: 0; border-bottom: 1px solid var(--at-cds-divider); font-size: 1em; letter-spacing: 0; }
-__SCOPE__ .prose-chat th { background: var(--at-cds-table-head); font-weight: var(--at-cds-w-regular); }
-__SCOPE__ .prose-chat img { border-radius: var(--at-cds-r-lg); }
-__SCOPE__ .prose-chat kbd {
-  font-family: var(--font-mono); font-size: .8em; border-radius: var(--at-cds-r-sm);
-  border: 1px solid var(--ds-border-default); box-shadow: 0 1px 0 var(--ds-border-default);
-}
-__SCOPE__ :is(.prose-chat, .thinking-prose) :not(pre) > code:not(pre code) {
-  font-family: var(--font-mono); font-size: .9em; line-height: 1;
-  color: var(--at-cds-inline-fg); background: var(--at-cds-inline-code-bg);
-  border: .5px solid var(--at-cds-inline-border); border-radius: .4em; padding: .1em .25em; box-shadow: none; overflow-wrap: anywhere;
-}
-__SCOPE__ .prose-chat .table-wrap :is(th, td) code { overflow-wrap: break-word; }
-__SCOPE__ .message-row.user .message-col:not(:has(.message-edit)) { max-width: 85%; }
-__SCOPE__ .message-row.user .message-bubble:not(:has(.message-edit)) {
-  font-family: var(--font-sans); font-size: var(--at-cds-compose-size);
-  line-height: var(--at-cds-compose-leading); border-radius: var(--at-cds-r-bubble); padding: 10px 16px;
-  background: var(--at-cds-user-bg); color: var(--ds-text-primary);
-  border: 0; box-shadow: none;
-}
-__SCOPE__ .message-row.assistant .message-bubble { background: transparent; border: 0; box-shadow: none; }
-__SCOPE__ .message-user-text { overflow-wrap: anywhere; word-break: normal; }
-/* 回复页脚：模型名与用量是同一行读数，不该一边是胶囊一边是纯文字。
- * 去掉宿主的 5% 底色与胶囊内衬，两者同字号同色，只靠 6px 间距分组。 */
-__SCOPE__ .message-meta-chip { background: transparent; padding: 0; }
-
-/* 遮罩只给聊天正文：侧栏会话/项目列表与宿主一致，不加边缘渐隐（2026-11-14 验收：侧栏渐隐会削掉末行、且与项目组格式不一致）。 */
-__SCOPE__ .thread-scroll { --at-cds-scroll-end: calc(100% - var(--composer-dock-height, 168px) + 2px); }
-__SCOPE__ .thread-scroll {
-  /* Resolve here, not on :root: the dock measurement belongs to the scroll element. */
-  --at-cds-scroll-mask: linear-gradient(to bottom,
-    transparent,
-    #0000000d calc(var(--at-cds-fade-top) * .15),
-    #00000026 calc(var(--at-cds-fade-top) * .30),
-    #0000004d calc(var(--at-cds-fade-top) * .45),
-    #00000080 calc(var(--at-cds-fade-top) * .60),
-    #000000b3 calc(var(--at-cds-fade-top) * .75),
-    #000000d9 calc(var(--at-cds-fade-top) * .87),
-    #000 var(--at-cds-fade-top),
-    #000 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom)),
-    #000000d9 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .87),
-    #000000b3 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .75),
-    #00000080 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .60),
-    #0000004d calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .45),
-    #00000026 calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .30),
-    #0000000d calc(var(--at-cds-scroll-end) - var(--at-cds-fade-bottom) * .15),
-    transparent var(--at-cds-scroll-end), transparent);
-  -webkit-mask-image: var(--at-cds-scroll-mask); mask-image: var(--at-cds-scroll-mask);
+  --ct-r-control: 8px;
+  --ct-r-panel: 12px;
+  --ct-r-composer: 14px;
+  --ct-r-message: 12px;
+  --ct-font-ui: system-ui, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+  --ct-font-reading: "Source Serif 4", "Newsreader", "Literata", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --ct-font-mono: "Cascadia Code", ui-monospace, "SFMono-Regular", Consolas, "Microsoft YaHei UI", monospace;
+  --ct-ui: calc(14px * var(--font-scale, 1));
+  --ct-prose: calc(15px * var(--font-scale, 1));
+  --ct-label: calc(12px * var(--font-scale, 1));
+  --ct-fenced-code: calc(13px * var(--font-scale, 1));
+  --ct-leading-ui: calc(20px * var(--font-scale, 1));
+  --ct-leading-prose: 1.4;
+  --ct-leading-fenced-code: calc(19px * var(--font-scale, 1));
+  --ct-weight-regular: 400;
+  --ct-weight-control: 500;
+  --ct-weight-heading: 600;
+  --ct-motion-fast: 60ms;
+  --ct-motion: 200ms;
+  --ct-ease: cubic-bezier(0, 0, .2, 1);
+  --ct-focus-width: 1px;
+  --ct-focus-ring: 0 0 0 var(--ct-focus-width) var(--ct-focus-accent), 0 0 6px 1px var(--ct-focus-glow);
+  --ct-field-focus-outline: transparent;
+  --ct-field-focus-shadow: inset 0 0 0 1px var(--ct-canvas), var(--ct-focus-ring);
+  --font-sans: var(--ct-font-ui);
+  --font-mono: var(--ct-font-mono);
+  --ds-bg-primary: var(--ct-canvas);
+  --ds-bg-under: var(--ct-canvas);
+  --ds-bg-secondary: var(--ct-panel);
+  --ds-bg-tertiary: var(--ct-inset);
+  --ds-bg-inset: var(--ct-inset);
+  --ds-bg-sidebar: var(--ct-sidebar);
+  --ds-bg-sidebar-image: none;
+  --ds-settings-rail-bg: var(--ct-sidebar);
+  --ds-sidebar-glass-tint: var(--ct-sidebar);
+  --ds-sidebar-glass-sheen-top: transparent;
+  --ds-sidebar-glass-sheen-bottom: transparent;
+  --ds-bg-dock: var(--ct-panel);
+  --ds-bg-dock-raised: var(--ct-elevated);
+  --ds-bg-elevated: var(--ct-elevated);
+  --ds-bg-elevated-opaque: var(--ct-elevated);
+  --ds-bg-elevated-primary: var(--ct-elevated);
+  --ds-bg-composer: var(--ct-editor);
+  --ds-bg-hover: var(--ct-hover);
+  --ds-bg-active: var(--ct-selected);
+  --ds-bg-chip: var(--ct-hover);
+  --ds-raised: var(--ct-elevated);
+  --ds-raised-shadow: var(--ct-shadow-card);
+  --ds-text-primary: var(--ct-ink);
+  --ds-text-secondary: var(--ct-secondary);
+  --ds-text-muted: var(--ct-muted);
+  --ds-text-faint: var(--ct-faint);
+  --ds-placeholder-ink: var(--ct-muted);
+  --ds-border-default: var(--ct-line);
+  --ds-border-subtle: var(--ct-line-subtle);
+  --ds-border-strong: var(--ct-line-strong);
+  --ds-elevation-stroke: var(--ct-line);
+  --ds-accent: var(--ct-ink);
+  --ds-accent-hover: var(--ct-secondary);
+  --ds-accent-soft: var(--ct-focus);
+  --ds-accent-foreground: var(--ct-canvas);
+  --ds-focus: var(--ct-focus);
+  --ds-success: var(--ct-good);
+  --ds-warning: var(--ct-warn);
+  --ds-error: var(--ct-bad);
+  --ds-info: var(--ct-info);
+  --ds-purple: var(--ct-purple);
+  --ds-tile: var(--ct-panel);
+  --ds-tile-border: var(--ct-line);
+  --ds-tile-hover: var(--ct-hover);
+  --ds-tile-deep: var(--ct-inset);
+  --ds-settings-field-bg: var(--ct-editor);
+  --ds-settings-field-border: var(--ct-line);
+  --ds-settings-nav-active: var(--ct-selected);
+  --ds-field-inset-bg: var(--ct-inset);
+  --ds-field-inset-focus-bg: var(--ct-editor);
+  --ds-tool-row-bg: var(--ct-panel);
+  --ds-thinking-code-bg: var(--ct-code);
+  --ds-code-head-bg: var(--ct-code);
+  --ds-code-hover-bg: var(--ct-hover);
+  --ds-prose-kbd-fg: var(--ct-secondary);
+  --ds-mermaid-canvas: var(--ct-canvas);
+  --ds-switch-track-off: var(--ct-switch-track);
+  --ds-switch-track-off-hover: var(--ct-switch-track-hover);
+  --ds-switch-ring-off: var(--ct-line-strong);
+  --ds-switch-knob-off: #fff;
+  --ds-switch-knob-on: #fff;
+  --ds-send-disabled-bg: var(--ct-hover);
+  --ds-send-disabled-fg: var(--ct-muted);
+  --ds-shadow-composer: 0 0 0 1px var(--ct-line), var(--ct-shadow-card);
+  --ds-shadow-model-menu: var(--ct-shadow-menu);
+  --ds-shadow-dialog: var(--ct-shadow-dialog);
+  --ds-composer-radius: var(--ct-r-composer);
+  --ds-composer-radius-lg: var(--ct-r-composer);
+  --ds-scrim: var(--ct-veil);
+  --ds-modal-veil: var(--ct-veil);
 }
 
-/* Composer retains contenteditable, ghost placeholder, sizing and toolbar order. */
+__SCOPE__ :is(.chat-surface, .home-main-content) {
+  background-color: var(--ct-canvas);
+}
+
+__SCOPE__ .empty-hero {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+__SCOPE__ .empty-hero :is(.empty-hero-icon, .home-mascot-logo, .home-mascot-logo img) {
+  inline-size: 36px;
+  block-size: 36px;
+}
+__SCOPE__ .empty-hero h1 {
+  font-family: var(--ct-font-reading);
+  font-size: clamp(24px, calc(34px * var(--font-scale, 1)), 48px);
+  line-height: 1.16;
+  font-weight: var(--ct-weight-regular);
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+/* Only the existing editor shell gets the strong fill, not the bottom dock. */
 __SCOPE__ .composer-shell {
-  border: 1px solid transparent; border-radius: var(--ds-composer-radius); background: var(--ds-bg-composer);
+  position: relative;
+  background: var(--ct-editor);
   box-shadow: var(--ds-shadow-composer);
-  transition: box-shadow var(--at-cds-t-emph) var(--at-cds-ease), background-color var(--at-cds-t-base) ease;
 }
-__SCOPE__ .composer-shell:hover { box-shadow: var(--at-cds-composer-hover); }
-/* 焦点环画在伪元素上，**不替换外壳自己的高度阴影**。两个理由都是实测出来的：
- *  1. 焦点配方首层是 inset，静止/悬停全是 outset → box-shadow 整条不可插值，浏览器按离散处理，
- *     所以那条 220ms 的 transition 从引入 inset 衬线那版起就是死的（采样只有 1 个值）。
- *  2. 焦点一旦替换 box-shadow，静止态那两层环境影就被整体删掉，盒子在一帧内"变平"。
- * 改成伪元素后：外壳高度照旧（静止/悬停过渡继续有效），环单独淡入（opacity 可插值、200ms）。
- * 环的三层与 Claude --cds-focus-shadow 逐层相同；inset: -1px 对齐 border box（外壳有 1px 透明边框）。 */
-__SCOPE__ .composer-shell::after {
-  content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
-  box-shadow: var(--at-cds-ring-shadow);
-  opacity: 0; transition: opacity var(--at-cds-t-emph) var(--at-cds-ease);
-}
-__SCOPE__ .composer-shell:has(.composer-input:focus)::after { opacity: 1; }
+/* The standard editor shows focus via its caret, not a ring around the card.
+ * High-contrast outlines are handled with the other accessibility rules. */
 __SCOPE__ .composer-shell.is-drop-target {
-  outline: 2px solid var(--ds-focus); outline-offset: 3px;
-  box-shadow: var(--at-cds-composer-drop);
+  outline: 2px dashed var(--ct-focus-accent);
+  outline-offset: 2px;
 }
-__SCOPE__ .composer-input-wrap { padding: 14px 14px 0; }
+__SCOPE__ .composer-input-wrap { padding: 14px 16px 0; }
 __SCOPE__ :is(.composer-input, .composer-placeholder) {
-  font-family: var(--font-sans); font-size: var(--at-cds-compose-size); line-height: var(--at-cds-compose-leading);
+  font-family: var(--font-sans);
+  font-size: var(--ct-ui);
+  line-height: var(--ct-leading-ui);
 }
-__SCOPE__ .composer-input { caret-color: var(--ds-text-primary); }
-__SCOPE__ .composer-placeholder { color: var(--ds-placeholder-ink); -webkit-text-fill-color: var(--ds-placeholder-ink); opacity: 1; animation: none; }
-__SCOPE__ .composer-toolbar { padding: var(--at-cds-s-sm) 10px 10px; gap: var(--at-cds-s-sm); }
-__SCOPE__ .composer-toolbar .icon-btn { border-radius: var(--at-cds-r-md); min-width: 28px; height: 28px; }
-/* The text-button padding above is inherited here: the dock toggle is a fixed
- * 32px box, so 14px of side padding left only 4px for the glyph and squeezed it
- * into a sliver. .btn is declared later at equal specificity, so the toggle
- * selector carries its extra class to keep this inset. */
-__SCOPE__ .dock-toggle.btn { padding-inline: 0; }
-/* The chip is a container, not a square icon button: the generic
- * `.composer-toolbar .icon-btn` pins a fixed 28px height, which clips the
- * thinking-level capsule as soon as its line box grows (17.5px type already
- * reaches 27px, 21px type reaches 32px). Let the chip size to its content and
- * keep 28px as the floor instead. */
-__SCOPE__ .composer-toolbar .composer-model-thinking-chip { border-radius: 999px; height: auto; min-height: 28px; }
-__SCOPE__ :is(.composer-chip, .chat-file-chip, .chat-image-chip, .message-attachment) { border-radius: var(--at-cds-r-lg); }
-__SCOPE__ :is(.chat-file-chip, .message-attachment) { border-color: var(--ds-border-default); background: var(--ds-tile); }
-/* One idle perimeter: inner controls retain their independent keyboard focus. */
-__SCOPE__ .composer-toolbar :is(.composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .icon-btn:not(.send-btn):not(.stop-btn)),
-__SCOPE__ .composer-shell .composer-chip { border-color: transparent; background: transparent; box-shadow: none; }
-__SCOPE__ .composer-shell .composer-chip:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-neutral-2); }
-
-/* Primary actions stay neutral; Composer send uses the accent color. */
-__SCOPE__ .btn {
-  font-size: var(--at-cds-ui-size); font-weight: var(--at-cds-w-regular); line-height: var(--at-cds-ui-leading);
-  transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-base) ease, box-shadow var(--at-cds-t-emph) ease;
+__SCOPE__ .composer-placeholder {
+  color: var(--ct-muted);
+  opacity: 1;
+  animation: none;
 }
-/* Disclosure headings keep their compact host dimensions, not action-button spacing. */
-__SCOPE__ .btn:where(:not(.turn-changes-head)) { min-height: 32px; padding: 6px 14px; border-radius: var(--at-cds-r-md); }
-__SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):not(:disabled):not([aria-disabled="true"]) {
-  background: var(--at-cds-action-bg); color: var(--at-cds-action-fg); border-color: transparent;
+__SCOPE__ .composer-toolbar { padding: 4px 10px 10px; }
+/* These host chips have their own strong hover rules. Keep disabled chips untouched. */
+__SCOPE__ .composer-toolbar :is(.composer-model-thinking-chip, .mode-chip):not(:disabled, [aria-disabled="true"]) {
+  --ds-bg-hover: var(--ct-ghost-hover);
 }
-__SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--at-cds-action-hover); opacity: 1;
+__SCOPE__ .composer-toolbar :is(.composer-model-thinking-chip, .composer-mode-chip, .mode-chip, .context-inspector-trigger) {
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: var(--ct-r-control);
 }
-__SCOPE__ .send-btn:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--at-cds-action-bg); color: var(--at-cds-action-fg); border-color: transparent;
+__SCOPE__ .composer-toolbar :is(.composer-model-thinking-chip, .composer-mode-chip, .mode-chip) {
+  color: var(--ct-secondary);
 }
-__SCOPE__ .send-btn:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); opacity: 1; }
-__SCOPE__ .composer-shell .send-btn:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-clay-vivid); color: #fff; border-radius: var(--at-cds-r-md); }
-__SCOPE__ .btn-secondary { background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); color: var(--ds-text-primary); }
-__SCOPE__ .btn-ghost { background: transparent; border: 0; }
-__SCOPE__ .send-btn { width: 32px; height: 32px; flex-basis: 32px; border-radius: var(--at-cds-r-md); }
-__SCOPE__ .send-btn.message-edit-submit { width: auto; flex-basis: auto; }
-__SCOPE__ :is(.btn-primary, .send-btn, .copy-btn.primary):is(:disabled, [aria-disabled="true"]) { background: var(--ds-send-disabled-bg); color: var(--ds-send-disabled-fg); }
-__SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .sidebar-primary-item, .footer-settings, .settings-nav-item, .plugins-sort-btn, .dock-tab, .dock-toggle, .task-action, .code-copy-btn) {
-  transition: transform var(--at-cds-t-base) var(--at-cds-spring-snappy), background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease, box-shadow var(--at-cds-t-emph) var(--at-cds-ease);
+__SCOPE__ .composer-toolbar :is(.composer-model-thinking-chip, .composer-mode-chip, .mode-chip, .context-inspector-trigger):hover:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--ct-ghost-hover);
 }
-__SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .sidebar-primary-item, .footer-settings, .settings-nav-item, .plugins-sort-btn, .dock-tab, .dock-toggle, .task-action, .code-copy-btn):active:not(:disabled):not([aria-disabled="true"]) { transform: scale(.98); transition-duration: var(--at-cds-t-press); }
-__SCOPE__ :is(.btn-primary, .copy-btn.primary):not(.send-btn):active:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-action-hover); }
-__SCOPE__ .send-btn:active:not(:disabled):not([aria-disabled="true"]):not(.composer-shell .send-btn) { background: var(--at-cds-action-hover); }
-/* 禁用（D3 双档）：动作控件 .4，输入控件 .55（settings.css）。见 docs/STATE-LAYER.md §6.2.1 */
-__SCOPE__ :is(.btn, .icon-btn, .settings-toggle):disabled { opacity: .4; cursor: not-allowed; transform: none; }
-__SCOPE__ :is(.btn, .icon-btn)[aria-disabled="true"] { opacity: .4; cursor: not-allowed; transform: none; }
-__SCOPE__ .asktool-card-header-actions .btn { min-height: 24px; font-size: var(--at-cds-small-size); line-height: calc(16px * var(--font-scale, 1)); padding: 4px 8px; }
-__SCOPE__ :is(.copy-btn, .code-copy-btn) { border-radius: var(--at-cds-r-sm); }
-__SCOPE__ :is(.nav-item, .settings-nav-item, .thread-item, .sidebar-session-group-header, .sidebar-primary-item, .footer-settings, .startup-guide-preview-search, .startup-guide-preview-row) { border-radius: var(--at-cds-r-md); }
-/* Selected 已交给第 5 层（src/generated.states.css 的 row/selected）：.nav-item 不是行家族成员，留在这里。 */
-__SCOPE__ .nav-item.active { background: var(--ds-bg-active); color: var(--ds-text-primary); }
-/* 例外（states.json）：多选勾选标记，用强调柔色而非中性洗色。 */
-__SCOPE__ .thread-item.selected:not(.active) { background: var(--ds-accent-soft); color: var(--ds-text-primary); }
-
-/* Existing segmented controls; no fabricated sliding-thumb DOM or JS. */
-__SCOPE__ :is(.settings-segment, .plugins-sort) { border-radius: var(--at-cds-r-md); padding: 2px; gap: 2px; background: var(--at-cds-segmented-track); }
-__SCOPE__ .settings-segment-item { border-radius: var(--at-cds-r-sm); padding: 6px 12px; font-weight: var(--at-cds-w-regular); }
-__SCOPE__ .plugins-sort-btn { border-radius: var(--at-cds-r-sm); padding: 0 8px; font-size: var(--at-cds-small-size); line-height: var(--at-cds-small-leading); font-weight: var(--at-cds-w-regular); }
-__SCOPE__ :is(.settings-segment-item, .plugins-sort-btn).active {
-  background: var(--at-cds-segmented-thumb); color: var(--ds-text-primary); font-weight: var(--at-cds-w-semibold);
-  box-shadow: inset 0 0 0 var(--at-cds-hairline) var(--ds-border-default), var(--at-cds-shadow-chip);
+__SCOPE__ .composer-toolbar :is(.composer-model-thinking-chip, .composer-mode-chip, .mode-chip):hover:not(:disabled, [aria-disabled="true"]) {
+  color: var(--ct-ink);
 }
-__SCOPE__ .settings-toggle { width: 36px; height: 20px; }
-__SCOPE__ .settings-toggle-thumb { width: 16px; height: 16px; }
-__SCOPE__ .settings-toggle.on .settings-toggle-thumb { transform: translateX(16px); }
-__SCOPE__ .settings-toggle.on { background: var(--at-cds-functional-selection); }
-__SCOPE__ .settings-toggle.on:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--at-cds-functional-selection-hover); }
-__SCOPE__ .settings-toggle.on:is(:disabled, [aria-disabled="true"]):hover { background: var(--at-cds-functional-selection); }
-__SCOPE__ .ds-checkbox:hover:not(:disabled):not([aria-disabled="true"]) { border-color: var(--at-cds-functional-selection); }
-__SCOPE__ .ds-checkbox:is(:checked, :indeterminate) { background: var(--at-cds-functional-selection); border-color: var(--at-cds-functional-selection); }
-__SCOPE__ .ds-checkbox:checked:not(:indeterminate)::after { border-style: solid; border-width: 0 2px 2px 0; border-color: var(--at-cds-functional-selection-fg); }
-__SCOPE__ .ds-checkbox:indeterminate::after { background: var(--at-cds-functional-selection-fg); }
-__SCOPE__ :is(.prose-chat .task-list-item > input[type="checkbox"], .settings-network-checkbox input, .provider-models-check) { accent-color: var(--at-cds-functional-selection); }
-__SCOPE__ .settings-font-size-slider input[type="range"] { accent-color: var(--ds-text-secondary); }
-__SCOPE__ :is(.settings-language-check, .settings-theme-check, .settings-menu-select-check, .settings-icon-button.is-action-highlight) { color: var(--ds-text-primary); }
-__SCOPE__ :is(.mcpm-chip, .sklm-chip, .mcpm-page-btn, .sklm-page-btn).is-active { background: var(--ds-bg-active); color: var(--ds-text-primary); border-color: transparent; }
-__SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) { color: var(--at-cds-status-neutral); }
-__SCOPE__ .context-inspector:not([data-level="warning"]):not([data-level="critical"]) .context-inspector-ring-progress { stroke: var(--ds-info); }
-__SCOPE__ .composer-model-thinking-icon { color: var(--ds-text-secondary); }
-__SCOPE__ .composer-model-thinking-level { color: var(--at-cds-compose-accent); }
-/* Composer control row: model name, thinking level and the context % readout all
- * share one size and weight (14px / medium), matching Claude's composer control
- * row where every control reads at the same scale and weight. The mode chip must
- * still show its full label: the host pins it to 96px with an ellipsis, which
- * truncates "智能体" to "智...", so let it size to its content. Only the thinking
- * level carries the brand colour; it keeps capsule padding so it never touches
- * neighbouring text, and carries no chip fill. */
-__SCOPE__ .composer-mode-chip { flex: 0 1 auto; width: auto; min-width: 0; max-width: none; }
-/* Composer control row. Host specificity is beaten on purpose:
- *  - "智能体"/"全自动" chips render as .icon-btn.mode-chip with text in .mode-chip > span,
- *    and the label also carries the Tailwind .text-sm utility (0-2-0). A bare
- *    .composer-mode-chip-label (0-1-0) loses, so we climb via .composer-toolbar.
- *  - The context % trigger inherits its size from .composer-right .context-inspector-trigger
- *    (0-2-0, --text-sm); only the ring value span was bumped before, which left the trigger
- *    container big. We set both the trigger and the ring value so they read as one control. */
-__SCOPE__ .composer-mode-chip-label { overflow: visible; text-overflow: clip; }
-/* Mode/permission chips: at 12px the system sans (Segoe UI) rasterizes 500 as muddy,
- * so these read at regular weight like the host's other small-size text (84% of which
- * is weight 400). The 14px model row keeps 500. */
-__SCOPE__ .composer-toolbar .composer-mode-chip-label, __SCOPE__ .composer-toolbar .mode-chip > span { font-size: calc(12px * var(--font-scale, 1)); font-weight: var(--at-cds-w-regular); }
-__SCOPE__ :is(.composer-model-thinking-model, .composer-model-thinking-level, .context-inspector-ring-value) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-medium); }
-__SCOPE__ .composer-right .context-inspector-trigger { font-size: var(--at-cds-ui-size); font-weight: var(--at-cds-w-medium); }
-__SCOPE__ .composer-model-thinking-level { background: none; padding: 1px 0; border-radius: 0; }
-__SCOPE__ .composer-thinking-tick:not(.active) { color: var(--ds-text-muted); }
-/* v0.22 segmented labels get a quiet hover without changing the selected level. */
-__SCOPE__ .composer-thinking-rail > .composer-thinking-ticks > .composer-thinking-tick[data-hovered]:not(.active) { color: var(--ds-text-secondary); }
-__SCOPE__ .composer-thinking-range:focus-visible { outline-color: var(--ds-focus); }
-
-/* Menus stay portaled/positioned by the host; shape comes from the `overlay` role
- * (src/generated.roles.css). Only the blur reset is component-specific. */
-__SCOPE__ .composer-model-menu { border-radius: var(--at-cds-r-xl); -webkit-backdrop-filter: none; backdrop-filter: none; }
-__SCOPE__ :is(.composer-plus-item, .composer-menu-entry, .composer-menu-back, .context-menu-item, .settings-menu-select-option) { border-radius: var(--at-cds-r-md); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease; }
-/* 选中底色与文字色由第 5 层产出（row/selected，含 .composer-plus-item.active）。
- * 这里只留键盘游标：它不是「选中」，是 hover 的键盘替身。 */
-__SCOPE__ .composer-plus-item.kb-active { background: var(--ds-bg-hover); outline: 1px solid var(--ds-border-strong); outline-offset: -1px; }
-/* Selected model: Claude 的 aria-checked 只换中性底 + 主文字，不画彩色环（.aria-checked:bg-bg-400 / text-text-100）。 */
-__SCOPE__ .composer-model-option[aria-checked="true"],
-__SCOPE__ .composer-model-option[aria-checked="true"].kb-active,
-__SCOPE__ .composer-model-option[aria-checked="true"]:hover { background: var(--ds-bg-active); border-radius: var(--at-cds-r-md); box-shadow: none; }
-__SCOPE__ .composer-model-option[aria-checked="true"] .composer-model-label { color: var(--ds-text-primary); font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ .composer-model-option[aria-checked="true"] .composer-model-option-badge { color: var(--at-cds-compose-accent); }
-__SCOPE__ .composer-model-menu .composer-model-group-label {
-  padding: 8px 8px 4px; background: var(--ds-bg-elevated-opaque);
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-  color: var(--ds-text-muted); font-weight: var(--at-cds-w-semibold); border: 0;
+__SCOPE__ .composer-toolbar :is(.composer-mode-chip-label, .mode-chip > span) {
+  font-weight: var(--ct-weight-control);
 }
-__SCOPE__ .composer-model-menu .composer-model-group + .composer-model-group {
-  margin-top: 6px; padding-top: 4px; border-top: var(--at-cds-hairline) solid var(--ds-border-default);
+/* Keep the larger level label inside the trigger at increased font scales. */
+__SCOPE__ .composer-toolbar .composer-model-thinking-chip {
+  height: auto;
+  min-height: 28px;
 }
-__SCOPE__ .composer-model-label { overflow-wrap: anywhere; }
-__SCOPE__ :is(.dialog, .p-dialog, .provider-dialog) { border-radius: var(--at-cds-r-dialog); border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-dialog); }
-/* Flush-edge dialogs (host padding: 0, including v0.23 settings/announcement/startup-guide modals)
- * own their own internal header/body/footer gutters and must not receive outer dialog padding. */
-__SCOPE__ .dialog:not(.settings-dialog):not(.app-announcement-dialog):not(.startup-guide-dialog):not(.release-notes-dialog):not(.project-create-dialog):not(.remote-folder-dialog):not(.ext-sheet):not(.markdown-table-preview):not(.gen-ui-dialog) { padding: var(--at-cds-s-lg); }
-__SCOPE__ :is(.dialog:not(.settings-dialog):not(.app-announcement-dialog):not(.startup-guide-dialog):not(.release-notes-dialog), .p-dialog) :is(h2, h3) { font-size: var(--at-cds-compose-size); font-weight: var(--at-cds-w-semibold); }
-/* v0.23 modals: announcement, startup guide and provider advanced settings. */
-__SCOPE__ :is(.app-announcement-header h2, .startup-guide-heading h2) { font-size: var(--at-cds-display-size); line-height: var(--at-cds-display-leading); font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ :is(.app-announcement-footer, .startup-guide-footer, .provider-advanced-section + .provider-advanced-section) { border-top: 1px solid var(--at-cds-divider); }
-__SCOPE__ :is(.startup-guide-heading p, .startup-guide-points, .startup-guide-press-status) { font-size: var(--at-cds-ui-size); line-height: 1.5; }
-__SCOPE__ .startup-guide-keys kbd { font-family: var(--font-mono); border-radius: var(--at-cds-r-md); border: 1px solid var(--ds-border-default); background: var(--ds-tile); color: var(--ds-text-primary); box-shadow: none; }
-__SCOPE__ .startup-guide-keys.is-active kbd { background: var(--at-cds-action-bg); color: var(--at-cds-action-fg); border-color: transparent; box-shadow: none; }
-__SCOPE__ .startup-guide-preview { border-radius: var(--at-cds-r-xl); border: 1px solid var(--ds-border-subtle); }
-__SCOPE__ .startup-guide-preview-panel { border-radius: var(--at-cds-r-lg); border: 1px solid var(--at-cds-border); box-shadow: var(--at-cds-shadow-md); }
-__SCOPE__ .provider-advanced-title { font-size: var(--at-cds-compose-size); line-height: var(--at-cds-compose-leading); font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ :is(.startup-guide-progress, .provider-advanced-heading) { font-size: var(--at-cds-small-size); line-height: var(--at-cds-small-leading); }
-
-/* Mode-aware code surface; native host one-light/one-dark syntax stays intact. */
-__SCOPE__ .code-block {
-  --code-block-bg: var(--at-cds-code-bg);
-  background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: var(--at-cds-r-xl);
-  border: 0; padding: .5px; box-shadow: inset 0 0 0 .5px var(--at-cds-code-ring); overflow: hidden;
+__SCOPE__ .composer-toolbar .composer-model-thinking-chip .composer-model-thinking-level {
+  color: var(--ct-thinking-ink);
+  font-size: var(--ct-ui);
+  line-height: var(--ct-leading-ui);
+  font-weight: var(--ct-weight-control);
+  background: none;
+  padding: 1px 0;
+  border-radius: 0;
 }
-__SCOPE__ .prose-chat pre, __SCOPE__ .code-block pre {
-  font-family: var(--font-mono); font-size: var(--at-cds-code-size); line-height: var(--at-cds-code-leading);
-  background: var(--at-cds-code-bg); color: var(--at-cds-code-fg); border-radius: var(--at-cds-r-xl);
-  padding: 14px; overflow: auto; tab-size: 2;
+__SCOPE__ .context-inspector:not([data-level="warning"], [data-level="critical"]) {
+  color: var(--ct-context-ink);
 }
-__SCOPE__ .prose-chat .code-block pre { border-radius: 0; margin: 0; padding: 14px; }
-__SCOPE__ .prose-chat pre code, __SCOPE__ .code-block pre code {
-  font-family: var(--font-mono); font-size: inherit; line-height: inherit;
-  background: transparent; color: inherit; padding: 0; font-variant-ligatures: none;
+__SCOPE__ .context-inspector:not([data-level="warning"], [data-level="critical"]) .context-inspector-ring-progress {
+  stroke: var(--ct-context-ring);
 }
-__SCOPE__ .code-block-head { background: var(--ds-code-head-bg); min-height: 36px; padding: 4px 8px 4px 14px; border-bottom: 0; }
-__SCOPE__ .code-block .code-block-lang { color: var(--ds-text-faint); font: var(--at-cds-small-size)/var(--at-cds-small-leading) var(--font-mono); text-transform: lowercase; }
-__SCOPE__ .code-block .code-copy-btn { color: var(--at-cds-code-muted); opacity: .6; }
-__SCOPE__ .code-block:is(:hover, :focus-within) .code-copy-btn { opacity: 1; }
-__SCOPE__ .code-block .code-copy-btn:hover { color: var(--at-cds-code-fg); background: var(--ds-code-hover-bg); }
-__SCOPE__ .code-block .code-copy-btn.copied { color: var(--ds-success); }
-__SCOPE__ :is(.tool-diff, .review-change-diff) { font-family: var(--font-mono); font-size: var(--at-cds-small-size); line-height: 1.65; }
-__SCOPE__ :is(.tool-diff, .review-change-diff) .diff-line.add { background: color-mix(in srgb, var(--at-cds-diff-add) 20%, transparent); }
-__SCOPE__ :is(.tool-diff, .review-change-diff) .diff-line.del { background: color-mix(in srgb, var(--at-cds-diff-del) 20%, transparent); }
-
-/* Existing business states only; preserve risk and approval semantics. */
-/* 卡片与提问卡的外形由角色生成（src/generated.roles.css 的 card），这里不再重复。 */
-__SCOPE__ .tool-row.thinking > .tool-row-body { color: var(--ds-text-secondary); }
-__SCOPE__ .thinking-prose { font-size: var(--at-cds-small-size); color: var(--ds-text-secondary); line-height: var(--at-cds-small-leading); }
-__SCOPE__ .composer-image-preview { border-radius: var(--at-cds-r-xl); border-color: var(--ds-border-default); box-shadow: var(--ds-shadow-dialog); }
-__SCOPE__ .composer-image-preview::backdrop { background: rgba(0, 0, 0, .85); backdrop-filter: blur(8px); }
-
-/* Animate only host-provided states; the spring is a CSS approximation, not a runtime engine. */
-@keyframes at-cds-popover-in {
-  from { opacity: 0; transform: translateY(3px) scale(.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+__SCOPE__ .composer-right .context-inspector-ring-value {
+  min-inline-size: 4ch;
+  text-align: right;
+  font-size: var(--ct-ui);
+  line-height: var(--ct-leading-ui);
+  font-weight: var(--ct-weight-control);
 }
-@keyframes at-cds-clay-breathe {
-  0%, 100% { opacity: .45; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.15); }
+__SCOPE__ .composer-shell .send-btn {
+  border-radius: var(--ct-r-control);
+  background-color: var(--ct-brand-action);
+  color: var(--ct-on-brand);
 }
-
-/* Claude 的 --animate-spin: spin 1s linear infinite；这里同名同参，供侧栏运行弧使用。 */
-@keyframes at-cds-spin {
-  to { transform: rotate(360deg); }
+__SCOPE__ .composer-shell .send-btn:hover:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--ct-brand-action-hover);
+  opacity: 1;
 }
-@keyframes at-cds-shimmer-text-shine {
-  0%, 12% { background-position: 140% 0; }
-  70%, 100% { background-position: -140% 0; }
-}
-@keyframes at-cds-rise-in {
-  from { opacity: 0; transform: translateY(3px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: no-preference) {
-  __SCOPE__ :is(.composer-model-menu, .composer-mode-menu, .composer-permission-menu, .composer-autocomplete, .context-menu).is-open { animation: at-cds-popover-in var(--at-cds-t-base) var(--at-cds-ease) both; }
-  __SCOPE__ .dock-panel:not([hidden]) { animation: at-cds-rise-in var(--at-cds-t-base) var(--at-cds-ease) both; }
-  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span,
-  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge:not(.waiting) .project-run-badge-dot) { background: var(--at-cds-clay-vivid); animation: at-cds-clay-breathe 2.4s var(--at-cds-ease) infinite; }
-  /* 侧栏运行态：陶土旋转弧，12px / 1px 环 / 90° 实弧；周期 1s（Claude --animate-spin 原值，2026-11-14 按用户要求保留）。 */
-  __SCOPE__ .sidebar .thread-item-status.running::before { animation: at-cds-spin 1s linear infinite; }
-  /* 呼吸点改用中性文字色：陶土留给发送键与侧栏会话点，状态行的三点只做明暗呼吸。 */
-  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span { background: var(--ds-text-muted); }
-  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(2) { animation-delay: .2s; }
-  __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-mark > span:nth-child(3) { animation-delay: .4s; }
-  @supports (background-clip: text) {
-    __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running),
-    __SCOPE__ :is(.working-indicator:not(.run-activity-indicator), .run-activity-indicator:is([data-phase="waiting-model"], [data-phase="starting"], [data-phase="preparing"], [data-phase="compacting"], [data-phase="waiting-subagents"])) .working-indicator-label {
-      /* 流光只提亮，不换色：中心取 --at-cds-shimmer-ink（浅色=faint、深色=secondary），
-       * 两个模式都朝「更亮」方向偏移；2.4s 保持既有档位，改用 linear 消除「前冲后停」。 */
-      color: var(--ds-text-muted); background-image: linear-gradient(100deg, var(--ds-text-muted) 44%, var(--at-cds-shimmer-ink) 50%, var(--ds-text-muted) 56%);
-      background-size: 240% 100%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: at-cds-shimmer-text-shine 2.4s linear infinite;
-    }
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  __SCOPE__ :is(.composer-shell, .btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .sidebar-primary-item, .footer-settings, .settings-nav-item, .plugins-sort-btn, .settings-toggle, .settings-toggle-thumb, .settings-segment-item, .composer-model-menu, .composer-mode-menu, .composer-permission-menu, .composer-autocomplete, .context-menu, .working-indicator-mark > span, .dock-panel, .dock-tab, .dock-toggle, .task-action, .code-copy-btn) {
-    animation: none !important; transition-duration: .01ms !important;
-  }
-  __SCOPE__ :is(.btn, .icon-btn, .send-btn, .stop-btn, .composer-mode-chip, .mode-chip, .composer-model-thinking-chip, .context-inspector-trigger, .thread-item, .sidebar-primary-item, .footer-settings, .settings-nav-item, .plugins-sort-btn, .dock-tab, .dock-toggle, .task-action, .code-copy-btn):active { transform: none !important; }
-  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge-dot, .tool-activity-label.running, .tool-row-name.running),
-  __SCOPE__ .sidebar .thread-item-status.running::before { animation: none !important; }
-  __SCOPE__ .working-indicator-mark > span { opacity: .7; transform: none; }
-}
-@media (min-resolution: 2dppx) { __SCOPE__ { --at-cds-hairline: .5px; } }
-@media (min-resolution: 3dppx) { __SCOPE__ { --at-cds-hairline: calc(1px / 3); } }
-@media (forced-colors: active) {
-  __SCOPE__ .thread-scroll { -webkit-mask-image: none; mask-image: none; }
-  __SCOPE__ :is(.tool-activity-label.running, .tool-row-name.running, .working-indicator-label) { background: none !important; color: CanvasText !important; -webkit-text-fill-color: currentColor !important; animation: none !important; }
-  __SCOPE__ :is(.tool-row-state.is-running .tool-row-state-dot, .project-run-badge-dot) { background: Highlight; animation: none !important; }
-  __SCOPE__ .code-block { border: 1px solid CanvasText; box-shadow: none; }
-}
-@media (min-width: 640px) { __SCOPE__ .message-row.user .message-col:not(:has(.message-edit)) { max-width: 75%; } }
-@media (max-width: 640px) {
-  __SCOPE__ .thread-content { padding-inline: 16px; }
-  __SCOPE__ .dialog:not(.settings-dialog):not(.app-announcement-dialog):not(.startup-guide-dialog):not(.release-notes-dialog):not(.project-create-dialog):not(.remote-folder-dialog):not(.ext-sheet):not(.markdown-table-preview):not(.gen-ui-dialog) { padding: 16px; }
-}
-@container composer-stack (max-width: 480px) {
-  __SCOPE__ .composer-toolbar { flex-wrap: wrap; gap: var(--at-cds-s-xs); }
-  __SCOPE__ :is(.composer-left, .composer-right) { min-width: 0; gap: 4px; }
-  __SCOPE__ .composer-model-thinking-chip { max-width: 100%; }
-  __SCOPE__ .composer-model-thinking-model { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+__SCOPE__ .composer-shell .send-btn:is(:disabled, [aria-disabled="true"]) {
+  background-color: var(--ds-send-disabled-bg);
+  color: var(--ds-send-disabled-fg);
 }
 @container composer-stack (max-width: 384px) {
   __SCOPE__ .composer-input-wrap { padding-inline: 10px; }
   __SCOPE__ .composer-toolbar { padding-inline: 6px; }
 }
-@media (forced-colors: active) {
-  __SCOPE__ :is(.settings-segment-item, .plugins-sort-btn).active { outline: 1px solid Highlight; }
-  __SCOPE__ .ds-checkbox { appearance: auto; }
-  __SCOPE__ .ds-checkbox::after { display: none; }
+
+/* Assistant prose is unboxed. The user message is a first neutral fill. */
+__SCOPE__ .prose-chat {
+  font: var(--ct-weight-regular) var(--ct-prose)/var(--ct-leading-prose) var(--ct-font-reading);
+  color: var(--ct-ink);
 }
-/* System colors retain inline-code boundaries when neutral fills disappear. */
-@media (forced-colors: active) {
-  __SCOPE__ :is(.prose-chat, .thinking-prose) :not(pre) > code:not(pre code) { border: 1px solid CanvasText; }
+__SCOPE__ .prose-chat:lang(zh) { line-height: 1.55; }
+/* Match Claude's semantic emphasis without copying its font-specific axes. */
+__SCOPE__ .prose-chat :is(b, strong) { font-weight: var(--ct-weight-heading); }
+__SCOPE__ .prose-chat :is(h1, h2, h3, h4, h5, h6) {
+  font-family: inherit;
+  color: var(--ct-ink);
+  font-weight: var(--ct-weight-heading);
+  line-height: 1.26;
 }
-__SCOPE__ .composer-mode-menu{border-radius: var(--at-cds-r-xl);background:var(--ds-bg-elevated-opaque);border:1px solid var(--at-cds-border);box-shadow:var(--ds-shadow-model-menu)}
-__SCOPE__ .composer-mode-menu .active{border-radius: var(--at-cds-r-md);background:var(--ds-bg-active);color:var(--ds-text-primary)}
-__SCOPE__ :is(.composer-mode-menu-group,.composer-mode-item-note){font-size:var(--at-cds-tiny-size);line-height:var(--at-cds-tiny-leading)}
-__SCOPE__ .composer-mode-menu-group{font-weight:var(--at-cds-w-semibold)}
-__SCOPE__ :is(.composer-placeholder-suggestion,.composer-suggestion-text){font:var(--at-cds-compose-size)/var(--at-cds-compose-leading) var(--font-sans);color:var(--ds-placeholder-ink)}
-__SCOPE__ .turn-usage-popover-footer{color:var(--ds-text-secondary)}
-/* Composition bar: a 6px graphic ribbon reads as one element at a glance; the
- * segments still tile edge to edge with a 1px seam from the host. */
-__SCOPE__ :is(.turn-usage-bar,.turn-usage-popover .turn-usage-bar){height:6px}
-/* Review-all button matches the 28px control row (I11). */
-__SCOPE__ .turn-changes-view-all{min-height:28px;display:inline-flex;align-items:center}
+__SCOPE__ .prose-chat h1 { font-size: 1.45em; }
+__SCOPE__ .prose-chat h2 { font-size: 1.25em; }
+__SCOPE__ .prose-chat h3 { font-size: 1.1em; }
+__SCOPE__ .prose-chat :is(p, ul, ol, blockquote) { margin-block: .72em; }
+__SCOPE__ .prose-chat > :first-child { margin-block-start: 0; }
+__SCOPE__ .prose-chat > :last-child { margin-block-end: 0; }
+__SCOPE__ :is(.prose-chat, .thinking-prose) a {
+  color: var(--ct-link);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 3px;
+  border-radius: 2px;
+}
+__SCOPE__ :is(.prose-chat, .thinking-prose) a:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
+__SCOPE__ .prose-chat blockquote {
+  color: var(--ct-secondary);
+  background: transparent;
+  border-inline-start: 3px solid var(--ct-line-strong);
+  border-radius: 0;
+}
+__SCOPE__ .message-row.user .message-bubble:not(:has(.message-edit)) {
+  color: var(--ct-ink);
+  background: var(--ct-hover);
+  border-color: transparent;
+  border-radius: var(--ct-r-message);
+  padding: 12px 16px;
+}
+__SCOPE__ .message-row.user .message-user-text { color: var(--ct-ink); }
+__SCOPE__ .message-row.assistant .message-bubble { background: transparent; }
+__SCOPE__ :is(.prose-chat, .thinking-prose) :not(pre) > code:not(pre code) {
+  font: .9em/1 var(--ct-font-mono);
+  color: var(--ct-inline-ink);
+  background: var(--ct-hover);
+  border: 0;
+  border-radius: 4px;
+  padding: 1px 4px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+__SCOPE__ .prose-chat :not(pre) > code:not(pre code) { font-weight: inherit; }
+@media print, (forced-colors: active) {
+  __SCOPE__ :is(.prose-chat, .thinking-prose) :not(pre) > code:not(pre code) {
+    border: 1px solid CanvasText;
+  }
+}
+__SCOPE__ .code-block {
+  --code-block-bg: var(--ct-code);
+  background-color: var(--ct-code);
+  color: var(--ct-ink);
+  border-radius: var(--ct-r-panel);
+  box-shadow: inset 0 0 0 1px var(--ct-line);
+}
+__SCOPE__ .code-block-head {
+  color: var(--ct-muted);
+  background-color: transparent;
+  border-color: var(--ct-line-subtle);
+}
+__SCOPE__ .code-block :is(pre, code) {
+  font-family: var(--ct-font-mono);
+}
+__SCOPE__ :is(.prose-chat, .thinking-prose) .code-block pre,
+__SCOPE__ :is(.prose-chat, .thinking-prose) .code-block pre code {
+  font-size: var(--ct-fenced-code);
+  line-height: var(--ct-leading-fenced-code);
+}
+__SCOPE__ .prose-chat .table-wrap { border: .8px solid var(--ct-line); }
+__SCOPE__ .prose-chat :is(th, td) { border-color: var(--ct-line); }
+__SCOPE__ .prose-chat th { background-color: var(--ct-hover); font-weight: bold; }
+__SCOPE__ .prose-chat img { border-radius: var(--ct-r-control); }
+__SCOPE__ :is(.prose-chat, .thinking-prose) ::selection {
+  color: var(--ct-ink);
+  background: color-mix(in srgb, var(--ct-selection-tint) 22%, var(--ct-canvas));
+}

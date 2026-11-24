@@ -1,155 +1,55 @@
-/* Claude Theme Light palette. */
+/* Main-window light: screenshot canvas/editor; CDS 6.28899.6.0 semantic scale. */
 __SCOPE__ {
   color-scheme: light;
-  /* Neutral ladder: six steps between page and deepest surface, so a "slightly darker" request has a real step to land on. */
-  --ds-neutral-0: #ffffff;
-  --ds-neutral-1: #f9f9f7;
-  --ds-neutral-2: #f3f3f0;
-  --ds-neutral-3: #f0efec;
-  --ds-neutral-4: #eae9e4;
-  --ds-neutral-5: #e4e3dd;
-  --ds-neutral-6: #d2d1c7;
-  --ds-bg-primary: #fcfcfb;
-  --ds-bg-under: #fcfcfb;
-  --ds-bg-dock: #fcfcfb;
-  --ds-bg-secondary: #fcfcfb;
-  --ds-bg-tertiary: var(--ds-neutral-3);
-  --ds-bg-inset: #eeeeeb;
-  --ds-bg-sidebar: var(--ds-neutral-1);
-  /* 侧栏是色块，不是图片：宿主拿它当 .sidebar-rail 的 background-image，钉成 none
-   * 之后上游换默认图也不会渗进来。 */
-  --ds-bg-sidebar-image: none;
-  --ds-settings-rail-bg: #fcfcfb;
-  --at-cds-region-line: var(--ds-neutral-5);
-  /* 字段环色不再是单独一档浅灰（#c6c6c5 只有 1.6:1，等于没有环）：跟普通焦点同一个参数，
-   * 环宽留作可调项。见 docs/STATE-LAYER.md §6.2.3。 */
-  --at-cds-composer-focus-ink: var(--at-cds-focus-ink);
-  --at-cds-composer-ring: 1px;
-  --at-cds-ring-shadow: var(--at-cds-composer-focus);
-  --at-cds-input-border: #e1e1e0;
-  --ds-sidebar-glass-tint: #f9f9f7;
-  /* Field fill is translucent, matching the reference: a half-transparent white that
-   * lets the page beneath show through instead of reading as an opaque slab. */
-  --ds-bg-composer: rgba(255, 255, 255, .5);
-  --ds-composer-radius: 12px;
-  --ds-bg-elevated-opaque: #ffffff;
-  --ds-bg-elevated: rgba(255, 255, 255, .97);
-  --ds-bg-elevated-primary: rgba(255, 255, 255, .97);
-  --ds-raised: #ffffff;
-  --ds-bg-dock-raised: #ffffff;
-  --ds-text-primary: #151514;
-  --ds-text-secondary: #52514c;
-  --ds-text-muted: #75746d;
-  --ds-text-faint: #94928b;
-  /* 流光中心色：浅色必须「更亮」才像光，因此取 faint（比 muted 更浅）；深色取 secondary。 */
-  --at-cds-shimmer-ink: var(--ds-text-faint);
-  --ds-placeholder-ink: #94928b;
-  --ds-accent: #1f1f1f;
-  --ds-accent-hover: #333333;
-  --ds-accent-soft: #e8e8e4;
-  /* 焦点环 = Claude --cds-role-accent-450 = --cds-gray-450 #7b7974（基准值，直接采用）。
-   * 对页底 #fcfcfb 是 4.57:1；Claude 对它的页底 #f9f9f7 是 4.13:1，两边同一档。
-   * 曾经因为把「焦点墨 ≥4.5:1」这条文本门槛套到环上，被推到 #75746d（4.57→偏重 11%）。
-   * 环是非文本元素，按 WCAG 1.4.11 判 3:1 即可；基准优先于自定门槛，门槛已随之修正（verify.mjs）。
-   * 更早写 #525252（7.81:1），那才是"点进输入框很重"的原始主因。 */
-  --ds-focus: #7b7974;
-  --ds-border-default: rgba(21, 21, 21, .10);
-  --ds-border-subtle: rgba(21, 21, 21, .06);
-  --ds-border-strong: rgba(21, 21, 21, .20);
-  --ds-elevation-stroke: rgba(21, 21, 21, .10);
-  /* alpha 阶梯（D1）：叠墨取 Claude --cds-neutral-900 #0b0b0b；hover 一档 5%，selected / active 两档 10%。 */
-  --ds-bg-hover: rgba(11, 11, 11, .05);
-  --ds-bg-active: rgba(11, 11, 11, .10);
-  --ds-settings-nav-active: rgba(11, 11, 11, .10);
-  --ds-error: #b42318;
-  --ds-success: #167044;
-  --ds-warning: #8d520d;
-  --ds-info: #1f66a5;
-  --ds-purple: #7356ad;
-  --ds-settings-field-bg: #ffffff;
-  --ds-field-inset-bg: var(--ds-neutral-2);
-  --ds-field-inset-focus-bg: #ffffff;
-  --ds-bg-chip: rgba(21, 21, 21, .05);
-  --ds-tile: #ffffff;
-  --ds-tile-hover: #f9f9f7;
-  --ds-tile-deep: #f0efec;
-  --ds-code-head-bg: #f4f2ec;
-  --ds-code-hover-bg: #e8e8e2;
-  --ds-thinking-code-bg: #f4f2ec;
-  --ds-prose-kbd-fg: #525252;
-  --ds-switch-knob-on: #ffffff;
-  --ds-switch-knob-off: #ffffff;
-  --ds-switch-track-off: #c8c8c8;
-  --ds-switch-track-off-hover: #b8b8b8;
-  --ds-switch-ring-off: rgba(21, 21, 21, .20);
-  --ds-send-disabled-bg: #e8e8e4;
-  --ds-send-disabled-fg: #8a8a82;
-  --ds-modal-veil: #f5f5f3;
-  --ds-scrim: rgba(0, 0, 0, .45);
-  --ds-mermaid-canvas: #ffffff;
-  --ds-shadow-composer: 0 0 0 .5px var(--ds-border-subtle), 0 2px 8px -2px rgba(20, 19, 18, .05), 0 8px 24px -4px rgba(20, 19, 18, .04);
-  --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-  /* 卡片高度（语义名）：同一角色在两种模式下强度不同，但都只是同一层「1px 2px」。 */
-  --at-cds-card-elevation: 0 1px 2px rgba(0, 0, 0, .05);
-  --at-cds-shadow-chip: 0 1px 2px rgba(0, 0, 0, .06);
-  --ds-shadow-dialog: 0 12px 32px rgba(0, 0, 0, .14), 0 3px 8px rgba(0, 0, 0, .10);
-  --at-cds-popover-shadow: 0 8px 24px rgba(0, 0, 0, .12), 0 2px 6px rgba(0, 0, 0, .08);
-  --ds-shadow-model-menu: var(--at-cds-popover-shadow);
-  --at-cds-user-bg: #f0eee9;
-  --at-cds-link: #245d9d;
-  --at-cds-link-hover: #164777;
-  --at-cds-selection-bg: #d8d8d3;
-  --at-cds-selection-fg: #151515;
-  --at-cds-action-bg: #0b0b0b;
-  --at-cds-action-hover: #2c2c2a;
-  --at-cds-action-fg: #ffffff;
-  --at-cds-composer-hover: 0 0 0 .5px var(--ds-border-default), 0 4px 16px -4px rgba(20, 19, 18, .08);
-  /* 聚焦配方（D2）：逐层等于 Claude 的 --cds-focus-shadow ——
-   *   inset 0 0 0 1px 页底  →  0 0 0 1px 环  →  0 0 6px 1px 柔光
-   * 内衬用页底（不是白色）：它的语义是「环与填充之间那道页底色的缝」，
-   * 用白色等于没有缝（对填充 1.01:1）。柔光取环色 18% alpha，
-   * 在页底 #fcfcfb 上合成 #e4e4e1，对比 1.24:1；Claude 的 #e1e0d9 对它的页底是 1.26:1，同一档。 */
-  --at-cds-composer-focus: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-primary)), 0 0 0 var(--at-cds-composer-ring) var(--at-cds-composer-focus-ink), 0 0 6px 1px color-mix(in oklab, var(--at-cds-focus-ink) 18%, transparent);
-  --at-cds-composer-drop: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-elevated-primary)), 0 0 0 1.5px var(--at-cds-focus-ink), 0 0 8px 1px color-mix(in oklab, var(--at-cds-focus-ink) 24%, transparent), 0 8px 24px -4px rgba(20, 19, 18, .06);
-  /* 字段与其它元素用同一条配方（Claude 的 --cds-focus-shadow 也是同一个值贴 20 处），
-   * 只靠 --at-cds-composer-ring 的符号决定环在内还是在外。 */
-  --at-cds-focus-shadow: var(--at-cds-composer-focus);
-  --at-cds-card-hover: 0 0 0 1px var(--ds-border-strong), 0 4px 16px -2px rgba(0, 0, 0, .09);
-  --at-cds-segmented-track: rgba(0, 0, 0, .06);
-  --at-cds-segmented-thumb: #ffffff;
-  --at-cds-inline-code-bg: #efefee;
-  --at-cds-status-neutral: #525252;
-  --at-cds-control-neutral: #525252;
-  --at-cds-control-hover: #404040;
-  --at-cds-control-fg: #151515;
-  --at-cds-brand: #d97757;
-  --at-cds-brand-hover: #e08a6b;
-  --at-cds-clay-ink: #bd562f;
-  --at-cds-clay-vivid: #d97757;
-  --at-cds-code-ring: rgba(0, 0, 0, .06);
-  --at-cds-result-success-bg: #e1eee6;
-  --at-cds-result-error-bg: #f8e5e2;
-  --at-cds-slider-track: #c8c8c3;
-  --ds-accent-foreground: #ffffff;
-  --at-cds-surface: #fafafa;
-  --at-cds-border: #d8d8d5;
-  --at-cds-divider: #e4e4e3;
-  --at-cds-row-even: #f8f8f6;
-  --at-cds-row-hover: #eeeee9;
-  /* 第 5 层（状态）别名。写成 var() 形式：别名不计入归因棘轮。见 docs/states.json */
-  --at-cds-fill-row-hover: var(--ds-bg-hover);
-  --at-cds-fill-ghost-hover: var(--ds-bg-hover);
-  --at-cds-fill-ghost-active: var(--ds-bg-active);
-  --at-cds-fill-row-selected: var(--ds-bg-active);
-  --at-cds-code-bg: #f4f2ec;
-  --at-cds-code-fg: #383a42;
-  --at-cds-code-muted: #62625b;
-  --at-cds-inline-fg: #8e2626;
-  --at-cds-inline-border: #d8d8d8;
-  --at-cds-functional-selection: #2674cf;
-  --at-cds-functional-selection-hover: #1e63b3;
-  --at-cds-functional-selection-fg: #ffffff;
-  --at-cds-table-head: #efefee;
-  --at-cds-diff-add: #1e9e3c;
-  --at-cds-diff-del: #cd2054;
+  --ct-canvas: #fff;
+  --ct-sidebar: #f9f9f7;
+  --ct-panel: #fcfcfb;
+  --ct-elevated: #fff;
+  --ct-editor: #fff;
+  --ct-inset: #f3f3f0;
+  --ct-code: #f9f9f7;
+  --ct-ink: #0b0b0b;
+  --ct-secondary: #52514e;
+  --ct-muted: #6d6b67;
+  --ct-faint: #7b7974;
+  --ct-line: #0b0b0b1a;
+  --ct-line-subtle: #0b0b0b0f;
+  --ct-line-strong: #0b0b0b33;
+  --ct-hover: #0b0b0b0d;
+  --ct-selected: #0b0b0b1a;
+  --ct-ghost-hover: rgb(11 11 11 / 5%);
+  --ct-ghost-selected: rgb(11 11 11 / 10%);
+  --ct-switch-track: rgb(11 11 11 / 20%);
+  --ct-switch-track-hover: rgb(11 11 11 / 35%);
+  --ct-control-accent: #2a78d6;
+  --ct-control-accent-hover: #3987e5;
+  --ct-segment-thumb: #fff;
+  --ct-segment-thumb-shadow: 0 1px 2px rgb(11 11 11 / 6%);
+  --ct-primary-fill: #0b0b0b;
+  --ct-primary-hover: #2c2c2a;
+  --ct-on-primary: #fff;
+  --ct-link: #184e95;
+  --ct-model-check-highlight: #2a78d6;
+  --ct-selection-tint: #184e95;
+  --ct-inline-ink: #8e2626;
+  --ct-context-ink: #525252;
+  --ct-context-ring: #1f66a5;
+  --ct-thinking-ink: #bd562f;
+  --ct-brand: #d97757;
+  --ct-brand-action: #c6613f;
+  --ct-brand-action-hover: var(--ct-brand);
+  --ct-on-brand: #fff;
+  --ct-focus: #7b7974;
+  --ct-focus-accent: #2a78d6;
+  --ct-focus-glow: #cde2fb;
+  --ct-focus-danger: #d03b3b;
+  --ct-good: #006300;
+  --ct-warn: #734500;
+  --ct-bad: #8e2626;
+  --ct-info: #184e95;
+  --ct-purple: #4a3aa7;
+  --ct-shadow-card: 0 1px 2px rgb(11 11 11 / 6%), 0 2px 8px rgb(11 11 11 / 8%);
+  --ct-shadow-menu: 0 8px 24px #0000001f, 0 2px 6px #00000014;
+  --ct-shadow-dialog: 0 4px 8px rgb(11 11 11 / 8%), 0 12px 28px -2px rgb(11 11 11 / 8%);
+  --ct-veil: #0006;
 }

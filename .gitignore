@@ -13,89 +13,16 @@
 Thumbs.db
 .vscode/
 .idea/
-# 本机探查脚本与过程报告，不属于插件产物
-/audit*.mjs
-/patch-roles.mjs
-/docs/review-*.html
-/docs/claude-desktop-reference-audit.md
-# 一次性审计/验收报告是过程产物：结论只认 docs/acceptance-states.json，
-# 报告本身不随源码分发，也不再作为"已验收"的证据。
-/docs/*.html
-/docs/*.cmd
-/docs/shots/
 
-# ── 开发资料：不入公开仓库 ────────────────────────────────────────────────
-# 公开仓库只放"运行 + 构建"需要的东西。以下文件留在本机，靠 backups/ 里的
-# 时间戳压缩包保底；新增同类文件时请在这里补一条，避免 git add -A 误传。
-#
-# 基准系统（Claude 令牌、关系表、阶梯表、角色与绑定、宿主快照、棘轮基线）
-/docs/design-baseline.json
-/docs/design-map.json
-/docs/surface-contract.json
-/docs/roles.json
-/docs/bindings.json
-/docs/host-inventory.json
-/docs/attribution-baseline.json
-/docs/role-deviations.json
-/docs/SYSTEM.md
-/docs/baseline-audit.md
-#
-# 开发工具链。构建只依赖 build.mjs 与 css-*.mjs，其余不出现在插件里。
-/scripts/check-acceptance.mjs
-/scripts/check-attribution.mjs
-/scripts/check-coverage.mjs
-/scripts/check-design-baseline.mjs
-/scripts/check-host.mjs
-/scripts/check-role-cohesion.mjs
-/scripts/check-surface-grammar.mjs
-/scripts/check-visual-styles.mjs
-/scripts/claude-install.mjs
-/scripts/design-tokens.mjs
-/scripts/extract-claude-tokens.mjs
-/scripts/generate-roles.mjs
-/scripts/host-styles.mjs
-/scripts/resync.mjs
-/scripts/roles.mjs
-/scripts/check-vars.mjs
-/tests/visual-contract.test.mjs
-#
-# 本机工具与备份产物
+# 本机工具、备份与外部基准联接，不入公开仓库
 /.local/
 /backups/
-#
-# 注意：src/generated.roles.css 必须入库（scripts/build.mjs 的构建输入），
-# 不要加进这里。
+/design-baselines/
 
-# ── 2026-11-14：公开面收窄为「插件主体 + 构建链」 ────────────────────────
-# 开发记录、基准系统、真机取证与测试资料全部留在本机；docs/acceptance-states.json 例外，
-# 它是给读者的验收明细，随源码分发。新增同类文件时请补在这里。
-/docs/DEVELOPMENT.md
-/docs/host-contract.json
-/docs/screenshots/
-/docs/states.json
-/docs/STATE-LAYER.md
-/docs/STATE-AUDIT.md
-/docs/MOTION-AUDIT.md
-/docs/VALUE-RELATION-LEDGER.md
-/docs/CURRENT-BUILD-ACCEPTANCE.md
-/docs/ACCEPTANCE-RULES.md
-/docs/COMPATIBILITY-REANALYSIS.md
-/docs/PI-ADAPTATION-REGISTER.md
-/docs/REFERENCE-IDENTITY.md
-/docs/baseline-lock.json
-/tests/
-/scripts/verify.mjs
-/scripts/check-color-roles.mjs
-/scripts/check-css-equivalence.mjs
-/scripts/check-host-contract.mjs
-/scripts/capture-host-evidence.mjs
-/scripts/browser-harness.mjs
-/scripts/check-states.mjs
-/scripts/generate-states.mjs
+# 本机维护规格与底线门禁脚本（公开仓库仅保留插件主体与构建链）
+/docs/
+/scripts/host-styles.mjs
 /scripts/css-parse.mjs
-/scripts/check-current-evidence.mjs
+/scripts/check-vars.mjs
 /scripts/check-dead-selectors.mjs
-/scripts/reference-baseline.mjs
-/scripts/audit-motion.mjs
-/scripts/audit-states.mjs
-/scripts/impact.mjs
+/scripts/check-guardrails.mjs

@@ -1,149 +1,55 @@
-/* Claude Theme Dark palette. */
+/* Main-window dark: measured canvas/editor; CDS 6.28899.6.0 popover/shadow scale. */
 __SCOPE__ {
   color-scheme: dark;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* 暖度规则（与 light 同向）：暗面统一 +4 暖偏移，R = B+4、G = B+3，只抬红绿、不动蓝。
-   * 明度层次完全保留（层级仍靠 L 区分），暖偏移不随秩位忽强忽弱。
-   * light 取 Claude 的 gray-20/40/50/70/90/150 原值；dark 无原生基准，按本条规则推导。 */
-  --ds-neutral-0: #262522;
-  --ds-neutral-1: #21201d;
-  --ds-neutral-2: #1d1c19;
-  --ds-neutral-3: #1a1916;
-  --ds-neutral-4: #181714;
-  --ds-neutral-5: #151411;
-  --ds-neutral-6: #100f0c;
-  --ds-bg-primary: #191815;
-  --ds-bg-under: #191815;
-  --ds-bg-dock: #191815;
-  --ds-bg-secondary: #191815;
-  --ds-bg-tertiary: var(--ds-neutral-2);
-  --ds-bg-inset: #0c0b08;
-  --ds-bg-sidebar: var(--ds-neutral-5);
-  /* 同 light：侧栏的 background-image 钩子固定为 none。 */
-  --ds-bg-sidebar-image: none;
-  --ds-settings-rail-bg: #191815;
-  --at-cds-region-line: var(--ds-neutral-3);
-  /* 同 light：字段环色跟普通焦点同一个参数。 */
-  --at-cds-composer-focus-ink: var(--at-cds-focus-ink);
-  --at-cds-composer-ring: 1px;
-  --at-cds-ring-shadow: var(--at-cds-composer-focus);
-  --at-cds-input-border: #42423e;
-  --ds-sidebar-glass-tint: #151411;
-  /* Same translucent field fill as light mode: white at 5% over the page reads as a
-   * subtly raised surface without becoming an opaque slab. */
-  --ds-bg-composer: rgba(255, 255, 255, .05);
-  --ds-composer-radius: 12px;
-  --ds-bg-elevated-opaque: #222220;
-  --ds-bg-elevated: rgba(34, 34, 32, .97);
-  --ds-bg-elevated-primary: rgba(34, 34, 32, .97);
-  --ds-raised: #1d1c19;
-  --ds-bg-dock-raised: #22211e;
-  --ds-text-primary: #f5f4f0;
-  --ds-text-secondary: #c2c0b8;
-  --ds-text-muted: #96948d;
-  --ds-text-faint: #6e6d68;
-  /* 流光中心色：深色取 secondary（比 muted 更亮），与浅色「向亮处偏移」保持同一语义。 */
-  --at-cds-shimmer-ink: var(--ds-text-secondary);
-  --ds-placeholder-ink: #6e6d68;
-  --ds-accent: #e5e5e2;
-  --ds-accent-hover: #ffffff;
-  --ds-accent-soft: #3d3d39;
-  /* 焦点环：light 用 Claude --cds-gray-450（4.35:1），深色没有 Claude 证据，按同一「弱化墨」档
-   * 取 --ds-text-muted 的值 #96948d（对 #222220 约 5.2:1）。原来 #b5b5ae 是 7.7:1，1px 环过亮。 */
-  --ds-focus: #96948d;
-  --ds-border-default: rgba(255, 255, 255, .08);
-  --ds-border-subtle: rgba(255, 255, 255, .06);
-  --ds-border-strong: rgba(255, 255, 255, .18);
-  --ds-elevation-stroke: rgba(255, 255, 255, .10);
-  /* alpha 阶梯（D1）：hover 一档 5%，selected / active 两档 10%；叠墨取正文色 #f5f4f0。 */
-  --ds-bg-hover: rgba(245, 244, 240, .05);
-  --ds-bg-active: rgba(245, 244, 240, .10);
-  --ds-settings-nav-active: rgba(245, 244, 240, .10);
-  --ds-error: #f87171;
-  --ds-success: #6fce9b;
-  --ds-warning: #e6b465;
-  --ds-info: #85b5ed;
-  --ds-purple: #bba0e8;
-  --ds-settings-field-bg: #1a1a19;
-  --ds-field-inset-bg: #10100f;
-  --ds-field-inset-focus-bg: #20201e;
-  --ds-bg-chip: rgba(255, 255, 255, .06);
-  --ds-tile: #1d1c19;
-  --ds-tile-hover: #22211e;
-  --ds-tile-deep: #13120f;
-  --ds-code-head-bg: #0d0d0c;
-  --ds-code-hover-bg: #292927;
-  --ds-thinking-code-bg: #0d0d0c;
-  --ds-prose-kbd-fg: #d4d4ce;
-  --ds-switch-knob-on: #ffffff;
-  --ds-switch-knob-off: #ffffff;
-  --ds-switch-track-off: #555550;
-  --ds-switch-track-off-hover: #666660;
-  --ds-switch-ring-off: rgba(255, 255, 255, .20);
-  --ds-send-disabled-bg: #333330;
-  --ds-send-disabled-fg: #818179;
-  --ds-modal-veil: #0b0b0a;
-  --ds-scrim: rgba(0, 0, 0, .60);
-  --ds-mermaid-canvas: #1a1a19;
-  --ds-shadow-composer: 0 0 0 .5px var(--ds-border-default), 0 2px 8px -2px rgba(0, 0, 0, .25), 0 8px 24px -4px rgba(0, 0, 0, .22);
-  --ds-raised-shadow: 0 1px 2px rgba(0, 0, 0, .40);
-  /* 暗面同一层高度要压得更实，否则 6% 黑在暖炭上不可见。 */
-  --at-cds-card-elevation: 0 1px 2px rgba(0, 0, 0, .55);
-  --at-cds-shadow-chip: 0 1px 2px rgba(0, 0, 0, .40);
-  --ds-shadow-dialog: 0 12px 32px rgba(0, 0, 0, .45), 0 3px 8px rgba(0, 0, 0, .24);
-  --at-cds-popover-shadow: 0 8px 24px rgba(0, 0, 0, .32), 0 2px 6px rgba(0, 0, 0, .20);
-  --ds-shadow-model-menu: var(--at-cds-popover-shadow);
-  --at-cds-user-bg: #20201e;
-  --at-cds-link: #91b9ef;
-  --at-cds-link-hover: #bed8fa;
-  --at-cds-selection-bg: #50504c;
-  --at-cds-selection-fg: #ffffff;
-  --at-cds-action-bg: #f0efec;
-  --at-cds-action-hover: #e1e0d9;
-  --at-cds-action-fg: #0b0b0b;
-  --at-cds-composer-hover: 0 0 0 .5px var(--ds-border-strong), 0 4px 16px -4px rgba(0, 0, 0, .32);
-  /* 同 light：内衬用页底（#191815）、实环、柔光取环色 18% alpha。 */
-  --at-cds-composer-focus: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-primary)), 0 0 0 var(--at-cds-composer-ring) var(--at-cds-composer-focus-ink), 0 0 6px 1px color-mix(in oklab, var(--at-cds-focus-ink) 18%, transparent);
-  --at-cds-composer-drop: inset 0 0 0 1px var(--at-cds-ring-liner, var(--ds-bg-elevated-primary)), 0 0 0 1.5px var(--at-cds-focus-ink), 0 0 8px 1px color-mix(in oklab, var(--at-cds-focus-ink) 24%, transparent), 0 8px 24px -4px rgba(0, 0, 0, .32);
-  /* 同 light：字段与其它元素共用一条配方。 */
-  --at-cds-focus-shadow: var(--at-cds-composer-focus);
-  --at-cds-card-hover: 0 0 0 1px var(--ds-border-strong), 0 6px 20px rgba(0, 0, 0, .60);
-  --at-cds-segmented-track: rgba(255, 255, 255, .08);
-  --at-cds-segmented-thumb: #2c2c2a;
-  --at-cds-inline-code-bg: #292827;
-  --at-cds-status-neutral: #b5b5ae;
-  --at-cds-control-neutral: #b5b5ae;
-  --at-cds-control-hover: #d4d4cf;
-  --at-cds-control-fg: #1a1a19;
-  --at-cds-brand: #d97757;
-  --at-cds-brand-hover: #e08a6b;
-  --at-cds-clay-ink: #d97757;
-  --at-cds-clay-vivid: #cc6b49;
-  --at-cds-code-ring: rgba(255, 255, 255, .08);
-  --at-cds-result-success-bg: #20372c;
-  --at-cds-result-error-bg: #3c2525;
-  --at-cds-slider-track: #666660;
-  --ds-accent-foreground: #1a1a19;
-  --at-cds-surface: #1a1a19;
-  --at-cds-border: #41413c;
-  --at-cds-divider: #343430;
-  --at-cds-row-even: #20201e;
-  --at-cds-row-hover: #2b2b28;
-  /* 第 5 层（状态）别名。写成 var() 形式：别名不计入归因棘轮。见 docs/states.json */
-  --at-cds-fill-row-hover: var(--ds-bg-hover);
-  --at-cds-fill-ghost-hover: var(--ds-bg-hover);
-  --at-cds-fill-ghost-active: var(--ds-bg-active);
-  --at-cds-fill-row-selected: var(--ds-bg-active);
-  --at-cds-code-bg: #0d0d0c;
-  --at-cds-code-fg: #deded9;
-  --at-cds-code-muted: #b2b2a9;
-  --at-cds-inline-fg: #f1a6a6;
-  --at-cds-inline-border: #4a4644;
-  --at-cds-functional-selection: #397ed4;
-  --at-cds-functional-selection-hover: #488bdf;
-  --at-cds-functional-selection-fg: #ffffff;
-  --at-cds-table-head: #242422;
-  --at-cds-diff-add: #32d74b;
-  --at-cds-diff-del: #ff2c56;
+  --ct-canvas: #191919;
+  --ct-sidebar: #151515;
+  --ct-panel: #1e1e1d;
+  --ct-elevated: #20201f;
+  --ct-editor: #303030;
+  --ct-inset: #151515;
+  --ct-code: #151515;
+  --ct-ink: #f0efec;
+  --ct-secondary: #c3c2b7;
+  --ct-muted: #a5a49a;
+  --ct-faint: #898781;
+  --ct-line: #ffffff1a;
+  --ct-line-subtle: #ffffff0f;
+  --ct-line-strong: #ffffff33;
+  --ct-hover: #ffffff0d;
+  --ct-selected: #ffffff1a;
+  --ct-ghost-hover: rgb(255 255 255 / 7.5%);
+  --ct-ghost-selected: rgb(255 255 255 / 15%);
+  --ct-switch-track: rgb(255 255 255 / 10%);
+  --ct-switch-track-hover: rgb(255 255 255 / 20%);
+  --ct-control-accent: #2a78d6;
+  --ct-control-accent-hover: #3987e5;
+  --ct-segment-thumb: rgb(255 255 255 / 10%);
+  --ct-segment-thumb-shadow: none;
+  --ct-primary-fill: #fff;
+  --ct-primary-hover: #e1e0d9;
+  --ct-on-primary: #0b0b0b;
+  --ct-link: #6da7ec;
+  --ct-model-check-highlight: #6da7ec;
+  --ct-selection-tint: #9fc5f4;
+  --ct-inline-ink: #ec7e7e;
+  --ct-context-ink: #b5b5ae;
+  --ct-context-ring: #85b5ed;
+  --ct-thinking-ink: #e18262;
+  --ct-brand: #d97757;
+  --ct-brand-action: #c6613f;
+  --ct-brand-action-hover: var(--ct-brand);
+  --ct-on-brand: #fff;
+  --ct-focus: #a5a49a;
+  --ct-focus-accent: #3987e5;
+  --ct-focus-glow: #184f9599;
+  --ct-focus-danger: #e34948;
+  --ct-good: #0ca30c;
+  --ct-warn: #db9300;
+  --ct-bad: #ec7e7e;
+  --ct-info: #9fc5f4;
+  --ct-purple: #a096eb;
+  --ct-shadow-card: 0 1px 2px rgb(11 11 11 / 6%), 0 2px 8px #0000003d;
+  --ct-shadow-menu: inset 0 0 0 1px rgb(255 255 255 / 10%), 0 8px 24px #00000052, 0 2px 6px #0003;
+  --ct-shadow-dialog: inset 0 0 0 1px rgb(255 255 255 / 10%), 0 4px 8px rgb(11 11 11 / 8%), 0 12px 28px -2px #0000003d;
+  --ct-veil: #00000080;
 }

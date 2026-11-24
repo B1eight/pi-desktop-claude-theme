@@ -1,58 +1,191 @@
-/* BEGIN block-settings: shared host settings language in both modes.
- * Surface-only exceptions for complex lists are below. Keep host grids, editors,
- * positioning, scrolling, menu portals, data and interaction state intact. */
-__SCOPE__ .settings-shell { --ds-raised: var(--at-cds-surface); --ds-raised-shadow: none; --ds-tile: var(--ds-bg-elevated-opaque); --ds-tile-hover: var(--at-cds-row-even); }
-__SCOPE__ .settings-shell .settings-nav { background: var(--ds-settings-rail-bg); }
-__SCOPE__ .settings-shell .settings-content-inner { width: 100%; max-width: 880px; margin-inline: auto; }
-__SCOPE__ .settings-shell .settings-section-title { font-size: var(--at-cds-title-size); line-height: var(--at-cds-title-leading); font-weight: var(--at-cds-w-semibold); margin-bottom: 20px; }
-__SCOPE__ .settings-shell .settings-card-heading { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ .settings-shell .settings-row-title { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-regular); }
-__SCOPE__ .settings-shell .settings-row-detail { font-size: var(--at-cds-code-size); line-height: var(--at-cds-ui-leading); }
-__SCOPE__ .settings-shell .settings-search { border-radius: var(--at-cds-r-md); }
-__SCOPE__ .settings-shell .settings-panel:has(> .settings-row) { background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); border-radius: var(--at-cds-r-xl); overflow: visible; }
-__SCOPE__ .settings-shell .settings-panel:has(> .settings-row):not(:has(> :not(.settings-row))) { gap: 0; background: transparent; border: 0; border-radius: 0; }
-__SCOPE__ .settings-shell .settings-panel > .settings-row { background: transparent; border-radius: var(--at-cds-r-md); padding: 14px 16px; gap: 12px 20px; flex-wrap: wrap; }
-__SCOPE__ .settings-shell .settings-panel:not(:has(> :not(.settings-row))) > .settings-row { padding-inline: 12px; }
-__SCOPE__ .settings-shell .settings-panel > .settings-row + .settings-row { border-top: 1px solid var(--at-cds-divider); }
-__SCOPE__ .settings-shell .settings-panel > .settings-row > .settings-row-copy { flex: 1 1 160px; overflow-wrap: anywhere; }
-__SCOPE__ .settings-shell .settings-panel > .settings-row > .settings-row-control { flex: 0 1 auto; max-width: 100%; flex-wrap: wrap; gap: 8px; }
-__SCOPE__ .settings-shell :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select, .field-input, .field-select, .field-textarea, .modes-settings-source) { border-radius: var(--at-cds-r-md); border: 1px solid var(--at-cds-border); background: var(--at-cds-surface); box-shadow: none; font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
-__SCOPE__ .settings-shell :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select, .field-input, .field-select) { min-height: calc(32px * var(--font-scale, 1)); }
-__SCOPE__ .settings-shell :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select):hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); }
-/* Ordinary preference triggers are text+chevron; full-width configuration remains a field. */
-__SCOPE__ .settings-shell .settings-row-control :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select) { background: transparent; border-color: transparent; }
-__SCOPE__ .settings-shell .settings-row-control :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select):is(:hover, [aria-expanded="true"]):not(:disabled):not([aria-disabled="true"]) { background: var(--ds-bg-hover); }
-__SCOPE__ .settings-shell :is(.field-input, .field-select, .field-textarea, .modes-settings-source):focus { background: var(--ds-bg-elevated-opaque); }
-__SCOPE__ .settings-shell [aria-invalid="true"] { border-color: var(--ds-error); }
-__SCOPE__ .settings-shell :is(.settings-menu-select-trigger, .field-input, .field-select, .field-textarea):disabled { opacity: .55; }
-__SCOPE__ .settings-shell .settings-segment { border-radius: var(--at-cds-r-md); max-width: 100%; flex-wrap: wrap; }
-__SCOPE__ .settings-shell .settings-segment-item { border-radius: var(--at-cds-r-sm); white-space: normal; overflow-wrap: anywhere; min-width: 0; padding: 4px 10px; font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); }
-__SCOPE__ .settings-shell .settings-font-size { min-width: 0; max-width: 100%; }
-__SCOPE__ :is(.settings-theme-menu, .settings-language-menu, .settings-font-menu, .settings-menu-select-menu) { border-radius: var(--at-cds-r-xl); background: var(--ds-bg-elevated-opaque); border: 1px solid var(--at-cds-border); box-shadow: var(--ds-shadow-model-menu); }
-__SCOPE__ :is(.settings-theme-option, .settings-language-option) { border-radius: var(--at-cds-r-md); }
-@media (max-width: 900px) { __SCOPE__ .settings-shell .settings-content { padding-inline: 16px; } }
-__SCOPE__ .settings-shell .settings-content-inner:has(:is(.model-provider-panel, .agent-capability-panel, .agent-subagents-page, .shortcut-map, .projects-workbench, .settings-config-sync, .settings-remote-host-list, .settings-instruction-editor, .modes-settings-list, .modes-settings-editor)) { max-width: 1120px; }
-__SCOPE__ .settings-shell :is(.settings-remote-host-empty, .projects-empty, .about-update-panel, .settings-panel:has(.settings-instruction-editor), .settings-panel:has(.settings-config-sync-form), .settings-panel:has(.modes-settings-list), .settings-panel:has(.modes-settings-editor)) { border: 1px solid var(--at-cds-border); border-radius: var(--at-cds-r-xl); }
-/* Real capability rows: icon/copy/meta/actions remain host-owned, not settings-row substitutes. */
-__SCOPE__ .settings-shell :is(.agent-capability-list, .model-provider-list, .settings-remote-host-list, .shortcut-group) { gap: 0; }
-__SCOPE__ .settings-shell .agent-capability-group { margin-block: 20px 6px; }
-__SCOPE__ .settings-shell .agent-capability-group:first-child { margin-top: 0; }
-/* Rows own rounded interaction backgrounds and content gutters; never clip menus/focus. */
-__SCOPE__ .settings-shell :is(.agent-capability-row, .model-provider-row, .shortcut-row, .settings-remote-host-card) { background: transparent; border: 0; border-bottom: 1px solid var(--at-cds-divider); border-radius: var(--at-cds-r-md); padding: 14px 12px; }
-__SCOPE__ .settings-shell :is(.agent-capability-row, .model-provider-row, .shortcut-row, .settings-remote-host-card):is(:hover, .menu-open) { background: var(--ds-bg-hover); }
-__SCOPE__ .settings-shell .agent-capability-name { color: var(--ds-text-primary); font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ .settings-shell .agent-capability-description { color: var(--ds-text-secondary); font-size: var(--at-cds-code-size); line-height: var(--at-cds-ui-leading); }
-__SCOPE__ .settings-shell :is(.agent-capability-command, .agent-capability-meta code) { color: var(--ds-text-muted); }
-__SCOPE__ .settings-shell .agent-capability-badge:not(.is-status):not(.is-ready):not(.is-failed):not(.is-connecting) { color: var(--ds-text-secondary); background: var(--ds-bg-chip); }
-__SCOPE__ .settings-shell :is(.projects-row, .shortcut-recorder, .projects-search-wrap, .agent-capability-search-wrap, .modes-settings-row) { border-radius: var(--at-cds-r-md); }
-__SCOPE__ .settings-shell :is(.projects-search-wrap, .agent-capability-search-wrap) { border: 1px solid var(--at-cds-border); box-shadow: none; }
-__SCOPE__ .settings-shell :is(.model-provider-row-name, .settings-remote-host-name) { font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ .settings-shell :is(.model-provider-row-meta, .model-provider-row-account, .settings-remote-host-meta) { color: var(--ds-text-secondary); font-size: var(--at-cds-code-size); line-height: var(--at-cds-ui-leading); }
-__SCOPE__ .settings-shell :is(.agent-capability-toolbar, .projects-toolbar, .settings-card-heading-row) { flex-wrap: wrap; gap: 12px 20px; }
-/* v0.23 modes settings: row typography (hover/selected owned by generated.states.css) and code editor scale. */
-__SCOPE__ .settings-shell .modes-settings-row { min-height: 32px; font-size: var(--at-cds-ui-size); line-height: var(--at-cds-ui-leading); transition: background-color var(--at-cds-t-base) var(--at-cds-ease), color var(--at-cds-t-fast) ease; }
-__SCOPE__ .settings-shell .modes-settings-row[aria-current="true"] { font-weight: var(--at-cds-w-semibold); }
-__SCOPE__ .settings-shell .modes-settings-source { font-size: var(--at-cds-code-size); line-height: var(--at-cds-code-leading); }
-__SCOPE__ .settings-shell :is(.modes-settings-row-id, .modes-settings-path, .modes-settings-validation) { font-size: var(--at-cds-small-size); line-height: var(--at-cds-small-leading); }
-/* Input and composite focus are owned by shared global-controls.css. */
-/* END block-settings */
+/* Menus, settings, dialogs and PI-owned application surfaces. */
+__SCOPE__ :is(.sidebar-surface, .settings-nav) {
+  background: var(--ct-sidebar);
+  border-color: var(--ct-line-subtle);
+}
+__SCOPE__ :is(.thread-item, .sidebar-primary-item, .sidebar-session-group-header, .footer-settings, .settings-nav-item) {
+  border-radius: var(--ct-r-control);
+}
+__SCOPE__ :is(.thread-item, .sidebar-primary-item, .sidebar-session-group-header, .settings-nav-item):hover:not(.active, .selected, :disabled, [aria-disabled="true"]) {
+  background-color: var(--ct-ghost-hover);
+}
+__SCOPE__ :is(.thread-item.active, .thread-item.selected, .sidebar-primary-item.active, .footer-settings.active, .settings-nav-item.active) {
+  background-color: var(--ct-ghost-selected);
+  color: var(--ct-ink);
+}
+__SCOPE__ :is(.thread-item-meta, .thread-item-last-reply, .thread-item-worktree) { color: var(--ct-muted); }
+
+__SCOPE__ :is(.context-menu, .home-project-switcher-menu, .composer-model-menu, .composer-mode-menu, .composer-permission-menu, .composer-model-thinking-menu, .composer-autocomplete, .settings-theme-menu, .settings-menu-select-menu, .turn-usage-popover, .sidebar-floating-menu, .sidebar-submenu) {
+  background: var(--ct-elevated);
+  border-color: var(--ct-line);
+  border-radius: var(--ct-r-panel);
+  box-shadow: var(--ct-shadow-menu);
+}
+/* These two settings selectors retain their native surfaces and geometry. */
+__SCOPE__ :is(.settings-language-menu, .settings-font-menu) {
+  box-shadow: var(--ct-shadow-menu);
+}
+__SCOPE__ :is(.context-menu-item, .home-project-switcher-item, .composer-plus-item, .composer-model-option, .settings-menu-select-option) {
+  border-radius: var(--ct-r-control);
+}
+/* One state ladder for menu rows; native cursor and selection attributes still drive it. */
+__SCOPE__ :is(:where(.composer-model-menu) .composer-model-option, .settings-font-item):is(:hover, .kb-active):not(:disabled, [aria-disabled="true"]),
+__SCOPE__ :is(.settings-theme-option, .settings-language-option, .settings-menu-select-option):is(:hover, .is-active):not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--ct-ghost-hover);
+}
+__SCOPE__ :is(.composer-model-option[aria-checked="true"]:not(:where(.composer-model-menu .composer-model-option:has(.composer-model-check))), .settings-menu-select-option[aria-selected="true"], .settings-theme-option.is-current, .settings-language-option.is-current, .settings-font-item.active):not(:disabled, [aria-disabled="true"]) {
+  color: var(--ct-ink);
+  background-color: var(--ct-ghost-selected);
+}
+/* A checked model uses its native tick. Only hover or keyboard highlight fills the row. */
+__SCOPE__ .composer-model-menu .composer-model-check {
+  --ds-accent: var(--ct-focus-accent);
+}
+/* Keep the check legible on the raised dark highlight; do not change focus blue. */
+__SCOPE__ .composer-model-menu .composer-model-option:is(:hover, :focus-visible, .kb-active) .composer-model-check {
+  --ds-accent: var(--ct-model-check-highlight, var(--ct-focus-accent));
+}
+/* Let host-owned context and composer menu rows keep their keyboard/state rules. */
+__SCOPE__ :is(.context-menu-item, .home-project-switcher-item, .composer-plus-item, .composer-menu-entry, .composer-menu-back):not(.danger, :disabled, [aria-disabled="true"]) {
+  --ds-bg-hover: var(--ct-ghost-hover);
+  --ds-bg-active: var(--ct-ghost-selected);
+}
+
+__SCOPE__ :is(.settings-shell, .settings-shell-full, .work-panel, .plugins-page) {
+  background-color: var(--ct-canvas);
+}
+__SCOPE__ :is(.settings-page-heading, .settings-section-title) {
+  color: var(--ct-ink);
+}
+__SCOPE__ :is(.settings-page-heading > h1, .settings-section-title, .settings-card-heading, .composer-model-group-label, .composer-mode-menu-group) {
+  font-weight: var(--ct-weight-heading);
+}
+__SCOPE__ :is(.settings-panel, .settings-stack, .modes-settings-list, .modes-settings-editor) {
+  border-color: var(--ct-line);
+  border-radius: var(--ct-r-panel);
+}
+/* Preference sections and host-owned item lists share between-row dividers. */
+__SCOPE__ :is(.settings-shell, .settings-shell-full) :is(
+  .settings-panel:has(> .settings-row):not(:has(> :not(.settings-row))),
+  .shortcut-group, .model-provider-list, .agent-capability-list, .modes-settings-list,
+  .projects-group-rows, .projects-detail-tasks, .settings-config-sync-history, .settings-remote-host-list
+) {
+  gap: 0;
+}
+__SCOPE__ :is(.settings-shell, .settings-shell-full) :is(
+  :is(.settings-panel, .settings-disclosure-body) > .settings-row,
+  .shortcut-group > .shortcut-row,
+  .model-provider-list > .model-provider-row:where(:not(.is-dragging)),
+  .agent-capability-list > .agent-capability-row,
+  .modes-settings-list .modes-settings-row:where(:not([aria-current="true"])),
+  .projects-group-rows > .projects-row-block:where(:not(.active, .open)),
+  .settings-config-sync-history > .settings-config-sync-history-row,
+  .settings-remote-host-list > .settings-remote-host-card
+) {
+  background-color: transparent;
+  border-radius: 0;
+}
+__SCOPE__ :is(.settings-shell, .settings-shell-full) :is(
+  :is(.settings-panel, .settings-disclosure-body) > .settings-row + .settings-row,
+  .shortcut-group > .shortcut-row + .shortcut-row,
+  .model-provider-list > .model-provider-row + .model-provider-row:where(:not(.is-dragging)),
+  .agent-capability-list > .agent-capability-row + .agent-capability-row,
+  .modes-settings-list > [role="listitem"] + [role="listitem"],
+  .projects-group-rows > .projects-row-block + .projects-row-block,
+  .projects-detail-tasks > .projects-detail-task-row + .projects-detail-task-row,
+  .settings-config-sync-history > .settings-config-sync-history-row + .settings-config-sync-history-row,
+  .settings-remote-host-list > .settings-remote-host-card + .settings-remote-host-card
+) {
+  border-block-start: 1px solid var(--ct-line);
+}
+__SCOPE__ :is(.settings-shell, .settings-shell-full) :is(
+  .shortcut-group > .shortcut-row:hover,
+  .model-provider-list > .model-provider-row:is(:hover, .menu-open):where(:not(.is-dragging)),
+  .agent-capability-list > .agent-capability-row:is(:hover, .menu-open),
+  .modes-settings-list .modes-settings-row:hover:where(:not([aria-current="true"], [aria-disabled="true"], :disabled)),
+  .projects-group-rows > .projects-row-block:is(:hover, :focus-within):where(:not(.active, .open))
+) {
+  background-color: var(--ct-ghost-hover);
+}
+/* Compact triggers, not form fields, primary actions, or state indicators. */
+__SCOPE__ :is(.settings-shell, .settings-shell-full) :is(
+  .settings-row-control :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select),
+  .agent-capability-project-picker .settings-menu-select-trigger
+) {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+__SCOPE__ :is(.settings-shell, .settings-shell-full) :is(
+  .settings-row-control :is(.settings-theme-trigger, .settings-language-trigger, .settings-font-trigger, .settings-menu-select-trigger, .settings-pill-select),
+  .agent-capability-project-picker .settings-menu-select-trigger
+):is(:hover, [aria-expanded="true"]):not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--ct-ghost-hover);
+}
+__SCOPE__ :is(.settings-shell, .settings-shell-full) .shortcut-row .shortcut-recorder:not(.recording, :focus-visible) {
+  background-color: transparent;
+  box-shadow: none;
+}
+__SCOPE__ :is(.settings-shell, .settings-shell-full) .shortcut-row .shortcut-recorder:not(.recording, :focus-visible):hover:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--ct-ghost-hover);
+}
+__SCOPE__ :is(.settings-card-caption, .settings-page-subtitle, .startup-guide-status) { color: var(--ct-secondary); }
+__SCOPE__ :is(.settings-segment, .plugins-sort) {
+  background-color: var(--ct-hover);
+  border-color: transparent;
+  border-radius: var(--ct-r-control);
+}
+__SCOPE__ :is(.settings-segment-item, .plugins-sort-btn).active {
+  color: var(--ct-ink);
+  background-color: var(--ct-segment-thumb);
+  box-shadow: var(--ct-segment-thumb-shadow);
+}
+
+__SCOPE__ :is(.dialog, .plugins-modal, .p-dialog) {
+  border-radius: var(--ct-r-panel);
+  border-color: var(--ct-line);
+  box-shadow: var(--ct-shadow-dialog);
+}
+
+/* Keep risk/meaning owned by the host; tie surface treatment to its own state. */
+__SCOPE__ :is(.chat-error-notice, .toast) {
+  background: var(--ct-elevated);
+  border: 1px solid var(--ct-line);
+  border-radius: var(--ct-r-panel);
+  box-shadow: var(--ct-shadow-card);
+}
+__SCOPE__ .chat-error-notice {
+  border-inline-start: 3px solid var(--ct-bad);
+  color: var(--ct-ink);
+}
+__SCOPE__ .message-output-notice {
+  border-radius: var(--ct-r-control);
+  border-color: var(--ct-line);
+}
+__SCOPE__ :is(.dock, .todo-dock, .asktool-card, .turn-changes-card, .mode-run-bar) {
+  background-color: var(--ct-panel);
+  border-color: var(--ct-line);
+  border-radius: var(--ct-r-panel);
+}
+__SCOPE__ :is(.permission-card, .tool-row, .review-change-card, .subagent-topology-node) {
+  border-color: var(--ct-line);
+  border-radius: var(--ct-r-control);
+}
+__SCOPE__ .permission-card {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ct-warn) 30%, transparent);
+}
+__SCOPE__ .permission-card.risk-high {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ct-bad) 48%, transparent);
+}
+/* Match the brand tint without inheriting the send button's action colors. */
+__SCOPE__ :is(.task-row[data-state="running"] .task-state, .dock-live-dot, .tool-row-state.is-running .tool-row-state-dot, .project-run-badge.running .project-run-badge-dot),
+__SCOPE__ .project-run-pip.running::before {
+  background-color: var(--ct-brand);
+}
+__SCOPE__ .thread-item-status.running::before {
+  background: var(--ct-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ct-brand) 16%, transparent);
+}
+__SCOPE__ :is(.turn-usage-popover, .mode-run-rounds, .mode-run-elapsed, .diff-counts) {
+  font-variant-numeric: tabular-nums;
+}
