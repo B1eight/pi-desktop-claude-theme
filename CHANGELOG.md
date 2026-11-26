@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+- **复合搜索框单边框修复**：排除「添加 AI 服务」等包裹型搜索框（`.service-chooser-search`、`.provider-service-search`、`.model-default-search`）与 `.scheduled-instruction-input` 的内层输入聚焦阴影，外层搜索框统一为克制的 1px 中性描边（同步覆写高对比度与强制色模式）。
+- **推理等级颜色闭环**：模型选择弹层底部的分段滑块选中态（`.composer-thinking-tick.active`）与输入栏常驻推理等级统一采用陶土色，同时优化滑块轨道与胶囊在浅/深色模式下的层次与可读性。
+- **多栏分区边界增强**：为左侧栏（`.sidebar-surface` / `.settings-nav`）补齐常驻 1px 右分隔线，右侧工作面板（`.work-panel`）恢复为轻量面板底色并补齐 1px 左分隔线及顶栏/窗口控制区连续底线。
+
 ## 1.2.0
 
 - **轻量重写**：面向 PI-Desktop **0.23.0**（最低 `>= 0.20.1`），改用宿主主题变量优先与核心面精修的轻量结构，单份主题 CSS 体积缩减至约 23 KB。

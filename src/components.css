@@ -38,7 +38,7 @@ __SCOPE__ {
   --ds-sidebar-glass-sheen-top: transparent;
   --ds-sidebar-glass-sheen-bottom: transparent;
   --ds-bg-dock: var(--ct-panel);
-  --ds-bg-dock-raised: var(--ct-elevated);
+  --ds-bg-dock-raised: var(--ct-panel);
   --ds-bg-elevated: var(--ct-elevated);
   --ds-bg-elevated-opaque: var(--ct-elevated);
   --ds-bg-elevated-primary: var(--ct-elevated);
@@ -178,6 +178,17 @@ __SCOPE__ .composer-toolbar .composer-model-thinking-chip .composer-model-thinki
   background: none;
   padding: 1px 0;
   border-radius: 0;
+}
+__SCOPE__ .composer-thinking-rail {
+  background: var(--ct-inset);
+}
+__SCOPE__ .composer-thinking-thumb {
+  background: var(--ct-elevated);
+  border: 1px solid var(--ct-line-subtle);
+  box-shadow: var(--ct-segment-thumb-shadow);
+}
+__SCOPE__ .composer-thinking-tick.active {
+  color: var(--ct-thinking-ink);
 }
 __SCOPE__ .context-inspector:not([data-level="warning"], [data-level="critical"]) {
   color: var(--ct-context-ink);

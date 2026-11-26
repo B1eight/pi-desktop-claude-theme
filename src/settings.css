@@ -1,7 +1,7 @@
 /* Menus, settings, dialogs and PI-owned application surfaces. */
 __SCOPE__ :is(.sidebar-surface, .settings-nav) {
   background: var(--ct-sidebar);
-  border-color: var(--ct-line-subtle);
+  border-inline-end: 1px solid var(--ct-line);
 }
 __SCOPE__ :is(.thread-item, .sidebar-primary-item, .sidebar-session-group-header, .footer-settings, .settings-nav-item) {
   border-radius: var(--ct-r-control);
@@ -51,8 +51,17 @@ __SCOPE__ :is(.context-menu-item, .home-project-switcher-item, .composer-plus-it
   --ds-bg-active: var(--ct-ghost-selected);
 }
 
-__SCOPE__ :is(.settings-shell, .settings-shell-full, .work-panel, .plugins-page) {
+__SCOPE__ :is(.settings-shell, .settings-shell-full, .plugins-page) {
   background-color: var(--ct-canvas);
+}
+__SCOPE__ .work-panel {
+  background-color: var(--ct-panel);
+}
+__SCOPE__ .work-panel:not(.is-maximized) {
+  border-inline-start: 1px solid var(--ct-line);
+}
+__SCOPE__ :is(.work-panel-header, .app-shell:has(.work-panel) > .window-controls) {
+  box-shadow: inset 0 -1px 0 var(--ct-line);
 }
 __SCOPE__ :is(.settings-page-heading, .settings-section-title) {
   color: var(--ct-ink);
